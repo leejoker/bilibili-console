@@ -17,7 +17,7 @@ module BiliHttp
   end
 
   def self.post_form_json(url, params)
-    response = Net::HTTP.post_form(url, params)
+    response = Net::HTTP.post_form(URI(url), params)
     json_data(response)
   end
 
