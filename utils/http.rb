@@ -23,8 +23,8 @@ module BiliHttp
 
   def self.json_data(response)
     body = BiliHttp::ResponseBody.new(response.body)
-    puts body
-    body['data']
+    puts body.to_s
+    body.data
   end
 
   include Base
