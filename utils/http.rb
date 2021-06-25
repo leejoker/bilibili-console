@@ -8,7 +8,7 @@ require_relative 'response_body'
 module BiliHttp
   def self.get_json(url)
     response = Net::HTTP.get_response(URI(url))
-    get_json_data(response)
+    json_data(response)
   end
 
   def self.get(url)
@@ -18,12 +18,10 @@ module BiliHttp
 
   def self.post_form_json(url, params)
     response = Net::HTTP.post_form(url, params)
-    get_json_data(response)
+    json_data(response)
   end
 
-  private
-
-  def get_json_data(response)
+  def self.json_data(response)
     body = BiliHttp::ResponseBody.new(response.body)
     puts body
     body['data']
