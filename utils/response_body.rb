@@ -17,5 +17,9 @@ module BiliHttp
       @status = json['status']
       @data = json['data']
     end
+
+    def to_s
+      "code: #{@code}, message: #{@message}, ts: #{@ts}, data: #{@data}, status: #{@status}"
+    end
   end
 end
