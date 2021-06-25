@@ -15,7 +15,11 @@ module BiliHttp
       @message = json['message']
       @ts = json['ts']
       @status = json['status']
-      @data = JSON.parse(json['data'])
+      begin
+        @data = JSON.parse(json['data'])
+      rescue JSON::ParserError
+        @data = json['data']
+      end
     end
   end
 end
