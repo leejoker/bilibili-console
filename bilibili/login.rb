@@ -22,7 +22,7 @@ module Bilibili
       pic = qr.as_ansi(
         light: "\033[47m", dark: "\033[40m",
         fill_character: '  ',
-        quiet_zone_size: 4
+        quiet_zone_size: 1
       )
       puts pic
     end
