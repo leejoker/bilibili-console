@@ -2,5 +2,5 @@
 
 require_relative 'bilibili/login'
 
-login = BiliHttp::Login.new
+login = Bilibili::Login.new
 login.login
