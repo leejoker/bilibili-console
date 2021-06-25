@@ -37,12 +37,8 @@ module Bilibili
       show_qrcode
       print '已完成扫码？[y/n]'
       over = gets.chomp
-      if over == 'y'
-        data = login_info
-      else
-        puts '请重新登录'
-        nil
-      end
+      data = login_info unless over != 'y'
+      puts data
     end
   end
 end
