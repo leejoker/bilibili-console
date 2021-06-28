@@ -8,9 +8,7 @@ module Base
       mod.singleton_class.send :alias_method, "new_#{m}", m
       mod.singleton_class.define_method(m) do |*args|
         puts "method=[#{m}], args=#{args}"
-        result = mod.send "new_#{m}", *args
-        puts "method=[#{m}], result_size=[#{result.length}]"
-        result
+        mod.send "new_#{m}", *args
       end
     end
   end

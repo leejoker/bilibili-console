@@ -22,8 +22,11 @@ module BiliHttp
   end
 
   def self.json_data(response)
+    header = BiliHttp::ResponseHeader.new(response.headers)
     body = BiliHttp::ResponseBody.new(response.body)
-    puts body.to_s
+    puts "headers: #{header}"
+    puts "body: #{body}"
+    header.save_cookie
     body.data
   end
 
