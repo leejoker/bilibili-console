@@ -18,18 +18,18 @@ module BiliHttp
     end
 
     def save_cookie
-        cookie_file = '../cookie'
-        jar = HTTP::CookieJar.new
-        jar.load(cookie_file) if File.exist?(cookie_file)
-        @set_cookies.each { |value|
-            jar.parse(value, '/')
-        }
-        header["Cookie"] = HTTP::Cookie.cookie_value(jar.cookies(uri))
-        jar.save(filename)
+      cookie_file = '../cookie'
+      jar = HTTP::CookieJar.new
+      jar.load(cookie_file) if File.exist?(cookie_file)
+      @set_cookies.each do |value|
+        jar.parse(value, '/')
+      end
+      header['Cookie'] = HTTP::Cookie.cookie_value(jar.cookies('/'))
+      jar.save(cookie_file)
     end
 
     def to_s
-      <<DOC
+      <<~DOC
         Content-Type: @content_type
         Transfer-Encoding: @transfer_encoding
         Connection: @connection
