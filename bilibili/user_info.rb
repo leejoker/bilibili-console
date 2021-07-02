@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'json'
+
 # bilibili module
 module Bilibili
   # bilibili user info

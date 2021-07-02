@@ -50,7 +50,9 @@ module Bilibili
       show_qrcode
       print '已完成扫码？[y/n]'
       over = gets.chomp
-      login_info unless over != 'y'
+      return nil unless over == 'y'
+
+      login_info
       puts 'Login Success !!!'
       http_client.api_http.cookies = http_client.login_http.cookies
     end

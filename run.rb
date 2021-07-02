@@ -5,6 +5,8 @@ require_relative 'utils/http'
 
 http_client = BiliHttp::HttpClient.new
 login = Bilibili::Login.new(http_client)
-login.login
-user = login.login_user_info
-puts user.to_json
+success = login.login
+unless success.nil?
+  user = login.login_user_info
+  puts user.to_json
+end
