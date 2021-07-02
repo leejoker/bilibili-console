@@ -2,24 +2,24 @@ GEM
   remote: https://gems.ruby-china.com/
   specs:
     chunky_png (1.4.0)
-    domain_name (0.5.20190701)
-      unf (>= 0.0.5, < 1.0.0)
-    http-cookie (1.0.4)
-      domain_name (~> 0.5)
+    nice_hash (1.17.2)
+      string_pattern (~> 2.2, >= 2.2.2)
+    nice_http (1.8.9)
+      nice_hash (~> 1.17, >= 1.17)
+    regexp_parser (1.8.2)
     rqrcode (2.0.0)
       chunky_png (~> 1.0)
       rqrcode_core (~> 1.0)
     rqrcode_core (1.0.0)
-    unf (0.1.4)
-      unf_ext
-    unf_ext (0.0.7.7)
+    string_pattern (2.2.2)
+      regexp_parser (~> 1.3, >= 1.3.0)
 
 PLATFORMS
   x64-mingw32
   x86_64-linux
 
 DEPENDENCIES
-  http-cookie
+  nice_http
   rqrcode (~> 2.0)
 
 BUNDLED WITH

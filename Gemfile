@@ -1,4 +1,4 @@
 source 'https://gems.ruby-china.com'
 
-gem 'http-cookie'
+gem 'nice_http'
 gem 'rqrcode', '~> 2.0'

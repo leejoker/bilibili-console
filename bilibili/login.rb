@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'user_info'
 require_relative '../utils/http'
 require 'rqrcode'
 
@@ -32,13 +33,20 @@ module Bilibili
       BiliHttp.post_form_json(url, { oauthKey: @oauth_key })
     end
 
+    def login_user_info
+      url = 'http://api.bilibili.com/nav'
+      data = BiliHttp.get_json(url)
+      user = Bilibili::UserInfo.new
+      user.init_attrs(data)
+    end
+
     def login
       login_url
       show_qrcode
       print '已完成扫码？[y/n]'
       over = gets.chomp
-      data = login_info unless over != 'y'
-      puts data
+      login_info unless over != 'y'
+      puts 'Login Success !!!'
     end
   end
 end
