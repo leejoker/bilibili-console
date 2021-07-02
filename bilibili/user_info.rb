@@ -9,13 +9,13 @@ module Bilibili
     def init_attrs(json)
       return unless json.nil?
 
-      @face = json['face']
-      @level_info = json['level_info']
-      @uid = json['mid']
-      @money = json['money']
-      @moral = json['moral']
-      @uname = json['uname']
-      @vip_type = json['vipType']
+      @face = json[:face]
+      @level_info = json[:level_info]
+      @uid = json[:mid]
+      @money = json[:money]
+      @moral = json[:moral]
+      @uname = json[:moral]
+      @vip_type = json[:vipType]
     end
 
     def to_json(*options)
