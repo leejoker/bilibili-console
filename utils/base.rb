@@ -3,7 +3,7 @@
 # base module
 module Base
   def self.included(mod)
-    methods = mod.methods(false)
+    methods = mod.instance_methods(false)
     methods.each do |m|
       mod.send :alias_method, "new_#{m}", m
       mod.define_method(m) do |*args|

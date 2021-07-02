@@ -42,6 +42,7 @@ module Bilibili
       data = http_client.get_json(http_client.api_http, url)
       user = Bilibili::UserInfo.new
       user.init_attrs(data)
+      user
     end
 
     def login
