@@ -14,8 +14,8 @@ module Bilibili
     def login_url
       url = 'http://passport.bilibili.com/qrcode/getLoginUrl'
       data = BiliHttp.get_json(url)
-      @url = data['url']
-      @oauth_key = data['oauthKey']
+      @url = data[:url]
+      @oauth_key = data[:oauthKey]
     end
 
     def show_qrcode
