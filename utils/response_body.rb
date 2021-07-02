@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'http'
-require 'json'
 
 # response body
 module BiliHttp
@@ -9,8 +8,8 @@ module BiliHttp
   class ResponseBody
     attr_accessor :code, :message, :ts, :data, :status
 
-    def initialize(str)
-      return unless str.nil?
+    def initialize(json)
+      return unless json.nil?
 
       @code = json[:code]
       @message = json[:message]
