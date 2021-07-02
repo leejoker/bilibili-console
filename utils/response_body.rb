@@ -12,11 +12,11 @@ module BiliHttp
     def initialize(str)
       return unless str.nil?
 
-      @code = json['code']
-      @message = json['message']
-      @ts = json['ts']
-      @status = json['status']
-      @data = json['data']
+      @code = json.code
+      @message = json[:message]
+      @ts = json[:ts]
+      @status = json[:status]
+      @data = json[:data]
     end
 
     def to_s
