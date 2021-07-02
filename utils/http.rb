@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'net/http'
 require 'nice_http'
 require_relative 'base'
 require_relative 'response_body'
@@ -15,17 +16,19 @@ module BiliHttp
       @api_http = NiceHttp.new('http://api.bilibili.com')
     end
 
-    def get_json(http, uri)
-      response = get(http, uri)
+    def get_json(http, url)
+      response = get(http, url)
       json_data(response)
     end
 
-    def get(http, uri)
+    def get(http, url)
+      uri = URI(url)
       response = http.get(uri.request_uri)
       response.data
     end
 
-    def post_form_json(http, uri, params)
+    def post_form_json(http, url, params)
+      uri = URI(url)
       request = {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         path: uri.request_uri,

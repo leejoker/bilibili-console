@@ -3,7 +3,6 @@
 require_relative 'user_info'
 require_relative '../utils/http'
 require 'rqrcode'
-require 'net/http'
 
 # login module
 module Bilibili
@@ -17,8 +16,8 @@ module Bilibili
     end
 
     def login_url
-      uri = URI('http://passport.bilibili.com/qrcode/getLoginUrl')
-      data = http_client.get_json(http_client.login_http, uri.request_uri)
+      url = 'http://passport.bilibili.com/qrcode/getLoginUrl'
+      data = http_client.get_json(http_client.login_http, url)
       @url = data[:url]
       @oauth_key = data[:oauthKey]
     end
@@ -34,14 +33,13 @@ module Bilibili
     end
 
     def login_info
-      uri = URI('http://passport.bilibili.com/qrcode/getLoginInfo')
-      http_client.post_form_json(http_client.login_http, uri.request_uri, { oauthKey: @oauth_key })
+      url = 'http://passport.bilibili.com/qrcode/getLoginInfo'
+      http_client.post_form_json(http_client.login_http, url, { oauthKey: @oauth_key })
     end
 
     def login_user_info
-      http_client.api_http.cookies = http_client.login_http.cookies
-      uri = URI('http://api.bilibili.com/nav')
-      data = http_client.get_json(http_client.api_http, uri.request_uri)
+      url = 'http://api.bilibili.com/nav'
+      data = http_client.get_json(http_client.api_http, url)
       user = Bilibili::UserInfo.new
       user.init_attrs(data)
     end
@@ -53,6 +51,7 @@ module Bilibili
       over = gets.chomp
       login_info unless over != 'y'
       puts 'Login Success !!!'
+      http_client.api_http.cookies = http_client.login_http.cookies
     end
   end
 end
