@@ -22,7 +22,7 @@ module Bilibili
       as_json(*options).to_json(*options)
     end
 
-    def as_json(options = {})
+    def as_json(_options = {})
       {
         face: @face,
         level_info: @level_info,
@@ -31,7 +31,7 @@ module Bilibili
         moral: @moral,
         uname: @uname,
         vip_type: @vip_type
-      }.merge(super(options))
+      }
     end
   end
 end
