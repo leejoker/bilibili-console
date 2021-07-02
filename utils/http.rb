@@ -2,7 +2,6 @@
 
 require 'net/http'
 require 'nice_http'
-require_relative 'base'
 require_relative 'response_body'
 
 # bilibili client http module
@@ -42,7 +41,5 @@ module BiliHttp
       body = BiliHttp::ResponseBody.new(data.json)
       body.data
     end
-
-    include Base
   end
 end
