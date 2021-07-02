@@ -3,17 +3,22 @@
 require_relative 'user_info'
 require_relative '../utils/http'
 require 'rqrcode'
+require 'net/http'
 
 # login module
 module Bilibili
   include BiliHttp
   # login class
   class Login
-    attr_accessor :url, :oauth_key
+    attr_accessor :http_client, :url, :oauth_key
+
+    def initialize(http_client)
+      @http_client = http_client
+    end
 
     def login_url
-      url = 'http://passport.bilibili.com/qrcode/getLoginUrl'
-      data = BiliHttp.get_json(url)
+      uri = URI('http://passport.bilibili.com/qrcode/getLoginUrl')
+      data = http_client.get_json(http_client.login_http, uri.request_uri)
       @url = data[:url]
       @oauth_key = data[:oauthKey]
     end
@@ -29,13 +34,14 @@ module Bilibili
     end
 
     def login_info
-      url = 'http://passport.bilibili.com/qrcode/getLoginInfo'
-      BiliHttp.post_form_json(url, { oauthKey: @oauth_key })
+      uri = URI('http://passport.bilibili.com/qrcode/getLoginInfo')
+      http_client.post_form_json(http_client.login_http, uri.request_uri, { oauthKey: @oauth_key })
     end
 
     def login_user_info
-      url = 'http://api.bilibili.com/nav'
-      data = BiliHttp.get_json(url)
+      http_client.api_http.cookies = http_client.login_http.cookies
+      uri = URI('http://api.bilibili.com/nav')
+      data = http_client.get_json(http_client.api_http, uri.request_uri)
       user = Bilibili::UserInfo.new
       user.init_attrs(data)
     end
