@@ -9,6 +9,7 @@ module BiliHttp
     attr_accessor :code, :message, :ts, :data, :status
 
     def initialize(json)
+      puts json
       return unless json.nil?
 
       @code = json[:code]

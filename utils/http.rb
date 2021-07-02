@@ -33,7 +33,6 @@ module BiliHttp
 
   def self.json_data(data)
     body = BiliHttp::ResponseBody.new(data.json)
-    puts "body: #{body}"
     body.data
   end
 
