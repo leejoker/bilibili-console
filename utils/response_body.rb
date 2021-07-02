@@ -9,8 +9,9 @@ module BiliHttp
   class ResponseBody
     attr_accessor :code, :message, :ts, :data, :status
 
-    def initialize(str = '{}')
-      json = JSON.parse(str)
+    def initialize(str)
+      return unless str.nil?
+
       @code = json['code']
       @message = json['message']
       @ts = json['ts']
