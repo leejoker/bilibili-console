@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'bilibili/login'
-require_relative 'utils/http'
+require_relative 'bilibili-console/login'
+require_relative 'bilibili-console/http/http'
 
 http_client = BiliHttp::HttpClient.new
 login = Bilibili::Login.new(http_client)

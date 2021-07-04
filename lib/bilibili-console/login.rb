@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'user_info'
-require_relative '../utils/http'
+require_relative 'http/http'
 require 'rqrcode'
 
 # login module
