@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Gem::Specification.new do |s|
-  s.name = 'bilibili-console'
+  s.name = 'bilibili_console'
   s.version = '0.0.1'
   s.executables << 'bc'
   s.summary     = 'bilibili console'

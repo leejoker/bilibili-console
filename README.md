@@ -1,4 +1,4 @@
-# bilibili-console
+# bilibili_console
 
 #### 介绍
 
