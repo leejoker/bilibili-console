@@ -1,20 +1,35 @@
 # frozen_string_literal: true
 
-require_relative 'user_info'
 require_relative 'http/http'
 require_relative 'base'
 require 'rqrcode'
+require 'json'
 
 # login module
 module Bilibili
   include BiliHttp
+  # bilibili user info
+  class UserInfo
+    attr_accessor :face, :level_info, :uid, :money, :moral, :uname, :vip_type
+
+    def initialize(json)
+      @face = json[:face]
+      @level_info = json[:level_info]
+      @uid = json[:mid]
+      @money = json[:money]
+      @moral = json[:moral]
+      @uname = json[:moral]
+      @vip_type = json[:vipType]
+    end
+  end
+
   # login class
   class Login < BilibiliBase
     attr_accessor :url, :oauth_key
 
     def login_url
       url = 'http://passport.bilibili.com/qrcode/getLoginUrl'
-      data = @http_client.get_json(@http_client.login_http, url)
+      data = get_jsonl(url)
       @url = data[:url]
       @oauth_key = data[:oauthKey]
     end
@@ -31,15 +46,13 @@ module Bilibili
 
     def login_info
       url = 'http://passport.bilibili.com/qrcode/getLoginInfo'
-      @http_client.post_form_json(@http_client.login_http, url, { oauthKey: @oauth_key })
+      post_form_jsonl(url, { oauthKey: @oauth_key })
     end
 
     def login_user_info
       url = 'http://api.bilibili.com/nav'
-      data = @http_client.get_json(@http_client.api_http, url)
-      user = Bilibili::UserInfo.new
-      user.init_attrs(data)
-      user
+      data = get_jsona(url)
+      Bilibili::UserInfo.new(data)
     end
 
     def login
@@ -51,7 +64,7 @@ module Bilibili
 
       login_info
       puts 'Login Success !!!'
-      @http_client.api_http.cookies = @http_client.login_http.cookies
+      share_cookie
       'success'
     end
   end
