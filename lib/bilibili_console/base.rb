@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'http/http'
+require 'json'
 
 # bilibili base
 module Bilibili
@@ -30,8 +31,22 @@ module Bilibili
       @http_client.post_form_json(@http_client.api_http, url, params)
     end
 
-    def share_cookie
+    def save_cookie
       @http_client.api_http.cookies = @http_client.login_http.cookies
+      json_str = @http_client.login_http.cookies.to_json
+      File.open('cookie.txt', 'w') do |file|
+        file.write(json_str)
+      end
+    end
+
+    def load_cookie
+      return @http_client.api_http.cookies unless @http_client.api_http.cookies.nil?
+
+      cookie_file = 'cookie.txt'
+      return nil unless File.exist?(cookie_file)
+
+      json_str = File.read(cookie_file)
+      @http_client.api_http.cookies = JSON.parse(json_str)
     end
   end
 end

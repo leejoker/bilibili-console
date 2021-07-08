@@ -64,7 +64,7 @@ module Bilibili
 
       login_info
       puts 'Login Success !!!'
-      share_cookie
+      save_cookie
       'success'
     end
   end
