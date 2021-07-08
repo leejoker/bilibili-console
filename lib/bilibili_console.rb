@@ -19,7 +19,7 @@ class BilibiliConsole
   end
 
   def login_user_info
-    @bilibili_login.login_user_info
+    @user = @bilibili_login.login_user_info
   end
 
   def user_fav_list
