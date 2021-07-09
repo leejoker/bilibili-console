@@ -10,6 +10,8 @@ module Bilibili
     attr_accessor :count, :list, :season
 
     def initialize(data)
+      return if data.nil?
+
       @count = data['count']
       @season = data['season']
       @list = generate_fav_list(data['list'])
@@ -31,6 +33,8 @@ module Bilibili
     attr_accessor :id, :fid, :uid, :attr, :title, :fav_state, :media_count
 
     def initialize(json)
+      return if json.nil?
+
       @id = json[:id]
       @fid = json[:fid]
       @uid = json[:mid]
@@ -46,6 +50,8 @@ module Bilibili
     attr_accessor :info, :medias
 
     def initialize(json)
+      return if json.nil?
+
       @info = Bilibili::FavInfo.new(json['info'])
       @medias = generate_media_list(json['medias'])
     end
@@ -66,6 +72,8 @@ module Bilibili
     attr_accessor :id, :type, :title, :intro, :page, :bv_id
 
     def initialize(json)
+      return if json.nil?
+
       @id = json[:id]
       @type = json[:type]
       @title = json[:title]

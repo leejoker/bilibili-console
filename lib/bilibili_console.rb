@@ -19,14 +19,24 @@ class BilibiliConsole
   end
 
   def login_user_info
+    check_cookie
     @user = @bilibili_login.login_user_info
+    @user
   end
 
   def user_fav_list
+    check_cookie
     @fav.list_user_fav_video(@user)
   end
 
   def list_fav_video(media_id, page_num = 1, page_size = 10, keyword = nil)
+    check_cookie
     @fav.list_fav_video(media_id, page_num, page_size, keyword)
+  end
+
+  def check_cookie
+    return nil unless @http_client.api_http.cookies.nil?
+
+    login if @http_client.load_cookie.nil?
   end
 end

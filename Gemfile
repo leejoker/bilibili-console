@@ -1,4 +1,7 @@
 source 'https://gems.ruby-china.com'
 
-gem 'nice_http'
-gem 'rqrcode', '~> 2.0'
+group :test do
+  gem 'rspec'
+end
+
+gemspec

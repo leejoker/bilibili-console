@@ -12,8 +12,14 @@ Gem::Specification.new do |s|
                    'lib/bilibili_console/login.rb',
                    'lib/bilibili_console/user_info.rb',
                    'lib/bilibili_console/http/http.rb',
-                   'lib/bilibili_console/http/response_body.rb']
+                   'lib/bilibili_console/http/response_body.rb',
+                   'README.md',
+                   'LICENSE']
+  s.extra_rdoc_files = ['README.md', 'LICENSE']
   s.homepage = 'https://github.com/leejoker/bilibili-console'
   s.license = 'MIT'
   s.required_ruby_version = ['>= 2.7']
+  s.add_dependency 'nice_http'
+  s.add_dependency 'rqrcode', '~> 2.0'
+  s.add_development_dependency 'rspec', '3.10'
 end

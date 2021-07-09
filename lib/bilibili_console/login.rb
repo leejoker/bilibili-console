@@ -13,6 +13,8 @@ module Bilibili
     attr_accessor :face, :level_info, :uid, :money, :moral, :uname, :vip_type
 
     def initialize(json)
+      return if json.nil?
+
       @face = json[:face]
       @level_info = json[:level_info]
       @uid = json[:mid]
