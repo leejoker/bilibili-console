@@ -20,7 +20,7 @@ module Bilibili
       data = []
       if !data_list.nil? && !data_list.empty?
         data_list.each do |obj|
-          data << Bilibili::FavInfo.new(obj).to_json
+          data << Bilibili::FavInfo.new(obj)
         end
       end
       data
@@ -79,7 +79,7 @@ module Bilibili
       data = []
       if !medias.nil? && !medias.empty?
         medias.each do |media|
-          data << Bilibili::FavMediaInfo.new(media).to_json
+          data << Bilibili::FavMediaInfo.new(media)
         end
       end
       data
