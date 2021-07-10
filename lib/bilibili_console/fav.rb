@@ -11,9 +11,9 @@ module Bilibili
     def initialize(data)
       return if data.nil?
 
-      @count = data['count']
-      @season = data['season']
-      @list = generate_fav_list(data['list'])
+      @count = data[:count]
+      @season = data[:season]
+      @list = generate_fav_list(data[:list])
     end
 
     def generate_fav_list(data_list)
@@ -71,8 +71,8 @@ module Bilibili
     def initialize(json)
       return if json.nil?
 
-      @info = Bilibili::FavInfo.new(json['info'])
-      @medias = generate_media_list(json['medias'])
+      @info = Bilibili::FavInfo.new(json[:info])
+      @medias = generate_media_list(json[:medias])
     end
 
     def generate_media_list(medias)
