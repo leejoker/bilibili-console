@@ -4,12 +4,13 @@ require_relative 'bilibili_console/fav'
 
 # bilibili console main class
 class BilibiliConsole
-  attr_accessor :http_client, :bilibili_login, :user, :fav
+  attr_accessor :http_client, :bilibili_login, :user, :fav, :video
 
   def initialize
     @http_client = BiliHttp::HttpClient.new
     @bilibili_login = Bilibili::Login.new(@http_client)
     @fav = Bilibili::Fav.new(http_client)
+    @video = Bilibili::Video.new(http_client)
   end
 
   def login
@@ -27,5 +28,9 @@ class BilibiliConsole
 
   def list_fav_video(media_id, page_num = 1, page_size = 10, keyword = nil)
     @fav.list_fav_video(media_id, page_num, page_size, keyword)
+  end
+
+  def video_url_list(bv_id)
+    @video.video_url_list(bv_id)
   end
 end

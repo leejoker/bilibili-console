@@ -8,8 +8,18 @@ module Bilibili
   class BilibiliBase
     attr_accessor :http_client
 
+    class << self
+      attr_accessor :video_qn
+    end
+
     def initialize(http_client)
       @http_client = http_client
+      BilibiliBase.video_qn = {
+        '240' => 6, '360' => 16, '480' => 32,
+        '720' => 64, '720P60' => 74, '1080' => 80,
+        '1080+' => 112, '1080P60' => 116, '4K' => 120,
+        'HDR' => 125
+      }
     end
 
     # get json for login_http
