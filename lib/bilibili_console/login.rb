@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require_relative 'http/http'
 require_relative 'base'
 require 'rqrcode'

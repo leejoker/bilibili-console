@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require_relative 'bilibili_console/http/http'
 require_relative 'bilibili_console/login'
 require_relative 'bilibili_console/fav'

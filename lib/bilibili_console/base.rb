@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require_relative 'http/http'
 require 'json'
 
