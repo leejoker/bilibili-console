@@ -1,4 +1,5 @@
 require_relative 'http/http'
+require 'json'
 
 # video module
 module Bilibili
@@ -19,10 +20,18 @@ module Bilibili
       data = []
       if !data_list.nil? && !data_list.empty?
         data_list.each do |obj|
-          data << Bilibili::FavInfo.new(obj)
+          data << Bilibili::FavInfo.new(obj).to_json
         end
       end
       data
+    end
+
+    def to_json(*opt)
+      {
+        count: @count,
+        list: @list,
+        season: @season
+      }.to_json(*opt)
     end
   end
 
@@ -41,6 +50,18 @@ module Bilibili
       @fav_state = json[:fav_state]
       @media_count = json[:media_count]
     end
+
+    def to_json(*opt)
+      {
+        id: @id,
+        fid: @fid,
+        uid: @uid,
+        attr: @attr,
+        title: @title,
+        fav_state: @fav_state,
+        media_count: @media_count
+      }.to_json(*opt)
+    end
   end
 
   # fav media list
@@ -58,10 +79,17 @@ module Bilibili
       data = []
       if !medias.nil? && !medias.empty?
         medias.each do |media|
-          data << Bilibili::FavMediaInfo.new(media)
+          data << Bilibili::FavMediaInfo.new(media).to_json
         end
       end
       data
+    end
+
+    def to_json(*opt)
+      {
+        info: @info,
+        medias: @medias
+      }.to_json(*opt)
     end
   end
 
@@ -78,6 +106,17 @@ module Bilibili
       @intro = json[:intro]
       @page = json[:page]
       @bv_id = json[:bv_id]
+    end
+
+    def to_json(*opt)
+      {
+        id: @id,
+        type: @type,
+        title: @title,
+        intro: @intro,
+        page: @page,
+        bv_id: @bv_id
+      }.to_json(*opt)
     end
   end
 
