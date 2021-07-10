@@ -32,7 +32,6 @@ module Bilibili
     def save_cookie
       @http_client.api_http.cookies = @http_client.login_http.cookies
       json_str = @http_client.login_http.cookies.to_json
-      puts json_str
       File.open('cookie.txt', 'w') do |file|
         file.write(json_str)
       end
