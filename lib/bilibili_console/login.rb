@@ -21,6 +21,18 @@ module Bilibili
       @uname = json[:moral]
       @vip_type = json[:vipType]
     end
+
+    def to_json(*opt)
+      {
+        face: @face,
+        level_info: @level_info,
+        uid: @uid,
+        money: @money,
+        moral: @moral,
+        uname: @uname,
+        vip_type: @vip_type
+      }.to_json(*opt)
+    end
   end
 
   # login class
@@ -50,6 +62,8 @@ module Bilibili
     end
 
     def login_user_info
+      cookie = load_cookie
+      login if cookie.nil? || cookie.empty?
       url = 'http://api.bilibili.com/nav'
       data = get_jsona(url)
       Bilibili::UserInfo.new(data)
