@@ -38,8 +38,11 @@ module Bilibili
       return nil if bv_id.nil?
 
       url = "http://api.bilibili.com/x/player/pagelist?bvid=#{bv_id}"
-      get_jsona(url).map do |data|
-        Bilibili::PageInfo.new(data)
+      data = get_jsona(url)
+      return nil if data.nil?
+
+      datas.map do |d|
+        Bilibili::PageInfo.new(d)
       end
     end
 
@@ -52,7 +55,10 @@ module Bilibili
 
     def video_url_list(bv_id, video_qn = '720')
       result = []
-      video_page_list(bv_id).each do |page|
+      page_list = video_page_list(bv_id)
+      return nil if page_list.nil?
+
+      page_list.each do |page|
         get_video_url(bv_id, page.cid, video_qn).each do |durl|
           order = durl[:order] < 10 ? "0#{durl[:order]}" : durl[:order]
           result << { 'name': "#{page.part}_#{order}.flv", 'url': durl[:url].to_s }
