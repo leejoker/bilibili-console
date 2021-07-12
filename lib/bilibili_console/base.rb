@@ -6,14 +6,16 @@ module Bilibili
   include BiliHttp
   # base class
   class BilibiliBase
-    attr_accessor :http_client
+    attr_accessor :http_client, :options
 
     class << self
       attr_accessor :video_qn
     end
 
-    def initialize(http_client)
+    def initialize(http_client, options = Bilibili::OPTIONS)
       @http_client = http_client
+      @options = options
+      check_config(@options)
       BilibiliBase.video_qn = {
         '240' => 6, '360' => 16, '480' => 32,
         '720' => 64, '720P60' => 74, '1080' => 80,
@@ -42,20 +44,29 @@ module Bilibili
     def save_cookie
       @http_client.api_http.cookies = @http_client.login_http.cookies
       json_str = @http_client.login_http.cookies.to_json
-      File.open('cookie.txt', 'w') do |file|
+      File.open(@options['cookie_file'].to_s, 'w') do |file|
         file.write(json_str)
       end
     end
 
     def load_cookie
       return @http_client.api_http.cookies unless @http_client.api_http.cookies.empty?
+      return nil unless File.exist?(@options['cookie_file'].to_s)
 
-      cookie_file = 'cookie.txt'
-      return nil unless File.exist?(cookie_file)
-
-      json_str = File.read(cookie_file)
+      json_str = File.read(@options['cookie_file'].to_s)
       @http_client.api_http.cookies = JSON.parse(json_str)
       @http_client.api_http.cookies
+    end
+
+    private
+
+    def check_config(options)
+      options['config_path'] = Bilibili::OPTIONS['config_path'] if options['config_path'].nil?
+      dir = Dir.new(options['config_path'])
+      dir.mkdir unless dir.exist?
+
+      options['config_file'] = Bilibili::OPTIONS['config_file'] if options['config_file'].nil?
+      options['cookie_file'] = Bilibili::OPTIONS['cookie_file'] if options['cookie_file'].nil?
     end
   end
 end
