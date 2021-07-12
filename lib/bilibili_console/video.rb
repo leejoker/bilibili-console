@@ -38,7 +38,7 @@ module Bilibili
       return nil if bv_id.nil?
 
       url = "http://api.bilibili.com/x/player/pagelist?bvid=#{bv_id}"
-      data = get_jsona(url)
+      datas = get_jsona(url)
       return nil if data.nil?
 
       datas.map do |d|
