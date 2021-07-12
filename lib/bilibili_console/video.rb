@@ -39,7 +39,7 @@ module Bilibili
 
       url = "http://api.bilibili.com/x/player/pagelist?bvid=#{bv_id}"
       datas = get_jsona(url)
-      return nil if data.nil?
+      return nil if datas.nil?
 
       datas.map do |d|
         Bilibili::PageInfo.new(d)
