@@ -1,6 +1,7 @@
 require_relative 'bilibili_console/http/http'
 require_relative 'bilibili_console/login'
 require_relative 'bilibili_console/fav'
+require_relative 'bilibili_console/video'
 
 # bilibili console main class
 class BilibiliConsole
