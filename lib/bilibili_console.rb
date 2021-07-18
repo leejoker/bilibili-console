@@ -31,7 +31,7 @@ class BilibiliConsole
     @fav.list_fav_video(media_id, page_num, page_size, keyword)
   end
 
-  def video_url_list(bv_id)
-    @video.video_url_list(bv_id)
+  def download_video(bv_id)
+    @video.download_video_by_bv(bv_id)
   end
 end

@@ -54,8 +54,16 @@ module Bilibili
       return nil unless File.exist?(@options['cookie_file'].to_s)
 
       json_str = File.read(@options['cookie_file'].to_s)
-      @http_client.api_http.cookies = JSON.parse(json_str)
-      @http_client.api_http.cookies
+      return nil if json_str.blank?
+
+      cookies = JSON.parse(json_str)
+      @http_client.api_http.cookies = cookies
+      cookies_to_set_str = ''
+      cookies.each do |key, value|
+        cookies_to_set_str += "#{key}=#{value}; "
+      end
+      BiliHttp.headers['Cookie'] = cookies_to_set_str
+      cookies
     end
 
     private

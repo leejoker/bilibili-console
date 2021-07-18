@@ -1,4 +1,6 @@
 require_relative 'http/http'
+require 'down'
+require 'ruby-progressbar'
 
 # video module
 module Bilibili
@@ -65,6 +67,32 @@ module Bilibili
         end
       end
       result
+    end
+
+    def download_video_by_bv(bv_id, video_qn = '720')
+      urls = video_url_list(bv_id, video_qn)
+      return nil if urls.empty?
+
+      download_path = "#{Bilibili::OPTIONS['download_path']}/#{bv_id}/"
+      urls.each do |durl|
+        download_file(durl['url'], "#{download_path}#{durl['name']}")
+      end
+    end
+
+    private
+
+    def download_file(url, dest)
+      progressbar = ProgressBar.create
+      total_size = 0
+      Down::NetHttp.download(url['url'],
+                             destination: dest,
+                             headers: BiliHttp.headers,
+                             content_length_proc: proc { |size|
+                                                    total_size = size
+                                                  },
+                             progress_proc: proc { |cursize|
+                                              progressbar.progress = cursize.to_f / total_size.to_f * 100.0
+                                            })
     end
   end
 end

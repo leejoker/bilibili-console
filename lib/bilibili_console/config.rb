@@ -8,6 +8,7 @@ module Bilibili
   OPTIONS = {
     'config_path' => '~/.bc',
     'config_file' => "#{OPTIONS['config_path']}/config.json",
-    'cookie_file' => "#{OPTIONS['config_path']}/cookie.txt"
+    'cookie_file' => "#{OPTIONS['config_path']}/cookie.txt",
+    'download_path' => '~/.bc/download'
   }.freeze
 end
