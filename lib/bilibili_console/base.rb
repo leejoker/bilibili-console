@@ -58,6 +58,12 @@ module Bilibili
       @http_client.api_http.cookies
     end
 
+    def clean_cookie
+      File.open(@options['cookie_file'].to_s, 'w') do |file|
+        file.write('{}')
+      end
+    end
+
     private
 
     def check_config(options)
