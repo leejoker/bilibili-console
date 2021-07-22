@@ -16,6 +16,7 @@ module Bilibili
       AGENT
       cur_header = {}
       cur_header['User-Agent'] = user_agent
+      url = 'https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn'
     end
   end
 end
