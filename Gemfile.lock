@@ -13,8 +13,11 @@ GEM
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     chunky_png (1.4.0)
+<<<<<<< HEAD
     down (5.2.2)
       addressable (~> 2.5)
+=======
+>>>>>>> a54d63891d222c5826e00287ea297af98798c093
     nice_hash (1.17.2)
       string_pattern (~> 2.2, >= 2.2.2)
     nice_http (1.8.9)
@@ -25,7 +28,10 @@ GEM
       chunky_png (~> 1.0)
       rqrcode_core (~> 1.0)
     rqrcode_core (1.0.0)
+<<<<<<< HEAD
     ruby-progressbar (1.11.0)
+=======
+>>>>>>> a54d63891d222c5826e00287ea297af98798c093
     string_pattern (2.2.2)
       regexp_parser (~> 1.3, >= 1.3.0)
 

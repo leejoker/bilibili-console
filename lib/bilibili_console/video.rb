@@ -1,3 +1,8 @@
+# Copyright (c) 2021 leejoker
+#
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
+
 require_relative 'http/http'
 require 'down'
 require 'ruby-progressbar'

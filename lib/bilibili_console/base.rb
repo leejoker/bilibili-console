@@ -1,3 +1,8 @@
+# Copyright (c) 2021 leejoker
+#
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
+
 require_relative 'http/http'
 require 'json'
 
@@ -25,6 +30,7 @@ module Bilibili
     end
 
     # get json for login_http
+    # TODO use meta program to create these methods automaticly
     def get_jsonl(url)
       @http_client.get_json(@http_client.login_http, url)
     end
@@ -39,6 +45,10 @@ module Bilibili
 
     def post_form_jsona(url, params)
       @http_client.post_form_json(@http_client.api_http, url, params)
+    end
+
+    def post_jsonm(url, headers, req_body)
+      @http_client.post_json(@http_client.manga_http, url, headers, req_body)
     end
 
     def save_cookie
@@ -64,6 +74,12 @@ module Bilibili
       end
       BiliHttp.headers['Cookie'] = cookies_to_set_str
       cookies
+    end
+
+    def clean_cookie
+      File.open(@options['cookie_file'].to_s, 'w') do |file|
+        file.write('{}')
+      end
     end
 
     private

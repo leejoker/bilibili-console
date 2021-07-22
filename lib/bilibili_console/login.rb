@@ -1,3 +1,8 @@
+# Copyright (c) 2021 leejoker
+#
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
+
 require_relative 'http/http'
 require_relative 'base'
 require 'rqrcode'
@@ -40,8 +45,7 @@ module Bilibili
     attr_accessor :url, :oauth_key
 
     def login_url
-      url = 'http://passport.bilibili.com/qrcode/getLoginUrl'
-      data = get_jsonl(url)
+      data = get_jsonl('http://passport.bilibili.com/qrcode/getLoginUrl')
       @url = data[:url]
       @oauth_key = data[:oauthKey]
     end
@@ -56,17 +60,16 @@ module Bilibili
       puts pic
     end
 
-    def login_info
-      url = 'http://passport.bilibili.com/qrcode/getLoginInfo'
-      post_form_jsonl(url, { oauthKey: @oauth_key })
-    end
-
     def login_user_info
-      cookie = load_cookie
-      login if cookie.nil? || cookie.empty?
-      url = 'http://api.bilibili.com/nav'
-      data = get_jsona(url)
-      Bilibili::UserInfo.new(data)
+      login if check_cookie_empty
+      data = get_jsona('http://api.bilibili.com/nav')
+      if data.code != -101
+        Bilibili::UserInfo.new(data)
+      else
+        puts 'Cookie已失效'
+        clean_cookie
+        login_user_info
+      end
     end
 
     def login
@@ -76,10 +79,17 @@ module Bilibili
       over = gets.chomp
       return nil unless over == 'y'
 
-      login_info
+      post_form_jsonl('http://passport.bilibili.com/qrcode/getLoginInfo', { oauthKey: @oauth_key })
       puts 'Login Success !!!'
       save_cookie
       'success'
+    end
+
+    private
+
+    def check_cookie_empty
+      cookie = load_cookie
+      cookie.nil? || cookie.empty?
     end
   end
 end
