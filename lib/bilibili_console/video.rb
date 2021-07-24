@@ -92,12 +92,8 @@ module Bilibili
       Down::NetHttp.download(url['url'],
                              destination: dest,
                              headers: BiliHttp.headers,
-                             content_length_proc: proc { |size|
-                                                    total_size = size
-                                                  },
-                             progress_proc: proc { |cursize|
-                                              progressbar.progress = cursize.to_f / total_size.to_f * 100.0
-                                            })
+                             content_length_proc: proc { |size| total_size = size },
+                             progress_proc: proc { |cursize| progressbar.progress = cursize.to_f / total_size * 100.0 })
     end
   end
 end

@@ -5,13 +5,14 @@ require_relative 'bilibili_console/video'
 
 # bilibili console main class
 class BilibiliConsole
-  attr_accessor :http_client, :bilibili_login, :user, :fav, :video
+  attr_accessor :http_client, :bilibili_login, :user, :fav, :video, :manga
 
   def initialize
     @http_client = BiliHttp::HttpClient.new
     @bilibili_login = Bilibili::Login.new(@http_client)
     @fav = Bilibili::Fav.new(http_client)
     @video = Bilibili::Video.new(http_client)
+    @manga = Bilibili::Manga.new(http_client)
   end
 
   def login
@@ -33,5 +34,9 @@ class BilibiliConsole
 
   def download_video(bv_id)
     @video.download_video_by_bv(bv_id)
+  end
+
+  def manga_checkin
+    @manga.check_in
   end
 end

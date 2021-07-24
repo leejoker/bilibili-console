@@ -60,19 +60,14 @@ module Bilibili
     end
 
     def load_cookie
-      return @http_client.api_http.cookies unless @http_client.api_http.cookies.empty?
-      return nil unless File.exist?(@options['cookie_file'].to_s)
+      return {} unless File.exist?(@options['cookie_file'].to_s)
 
       json_str = File.read(@options['cookie_file'].to_s)
-      return nil if json_str.blank?
+      return {} if json_str.blank?
 
       cookies = JSON.parse(json_str)
       @http_client.api_http.cookies = cookies
-      cookies_to_set_str = ''
-      cookies.each do |key, value|
-        cookies_to_set_str += "#{key}=#{value}; "
-      end
-      BiliHttp.headers['Cookie'] = cookies_to_set_str
+      BiliHttp.headers['Cookie'] = create_cookie_str(cookies)
       cookies
     end
 
@@ -91,6 +86,14 @@ module Bilibili
 
       options['config_file'] = Bilibili::OPTIONS['config_file'] if options['config_file'].nil?
       options['cookie_file'] = Bilibili::OPTIONS['cookie_file'] if options['cookie_file'].nil?
+    end
+
+    def create_cookie_str(cookies)
+      cookies_to_set_str = ''
+      cookies.each do |key, value|
+        cookies_to_set_str += "#{key}=#{value}; "
+      end
+      cookies_to_set_str
     end
   end
 end

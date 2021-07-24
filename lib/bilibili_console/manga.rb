@@ -16,7 +16,8 @@ module Bilibili
       AGENT
       cur_header = {}
       cur_header['User-Agent'] = user_agent
-      url = 'https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn'
+      post_jsonm('https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn', cur_header,
+                 { 'platform' => 'android' })
     end
   end
 end
