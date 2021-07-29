@@ -5,36 +5,38 @@ require_relative 'bilibili_console/video'
 
 # bilibili console main class
 class BilibiliConsole
-  HTTP_CLIENT = BiliHttp::HttpClient.new
-  BILIBILI_LOGIN = Bilibili::Login.new(HTTP_CLIENT)
-  FAV = Bilibili::Fav.new(HTTP_CLIENT)
-  VIDEO = Bilibili::Video.new(HTTP_CLIENT)
-  MANGA = Bilibili::Manga.new(HTTP_CLIENT)
+  attr_accessor :http_client, :bilibili_login, :user, :fav, :video, :manga
 
-  attr_accessor :user
-
-  def self.login
-    BILIBILI_LOGIN.login
+  def initialize
+    @http_client = BiliHttp::HttpClient.new
+    @bilibili_login = Bilibili::Login.new(@http_client)
+    @fav = Bilibili::Fav.new(http_client)
+    @video = Bilibili::Video.new(http_client)
+    @manga = Bilibili::Manga.new(http_client)
   end
 
-  def self.login_user_info
-    BILIBILI_LOGIN.login_user_info
+  def login
+    @bilibili_login.login
   end
 
-  def self.user_fav_list
-    user = login_user_info
-    FAV.list_user_fav_video(user)
+  def login_user_info
+    @user = @bilibili_login.login_user_info
+    @user
+  end
+
+  def user_fav_list
+    @fav.list_user_fav_video(@user)
   end
 
   def list_fav_video(media_id, page_num = 1, page_size = 10, keyword = nil)
-    FAV.list_fav_video(media_id, page_num, page_size, keyword)
+    @fav.list_fav_video(media_id, page_num, page_size, keyword)
   end
 
   def download_video(bv_id)
-    VIDEO.download_video_by_bv(bv_id)
+    @video.download_video_by_bv(bv_id)
   end
 
   def manga_checkin
-    MANGA.check_in
+    @manga.check_in
   end
 end

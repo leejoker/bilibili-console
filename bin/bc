@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 
 require 'thor'
 require 'bilibili_console'
@@ -13,7 +13,8 @@ class BilibiliConsole < Thor
 
   desc 'login', 'login with qrcode'
   def login
-    puts BilibiliConsole.login
+    bc = BilibiliConsole.new
+    puts bc.login
   end
 end
 
