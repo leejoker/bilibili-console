@@ -1,3 +1,18 @@
 #!/bin/bash/env ruby
 
+require 'thor'
+require 'bilibili_console'
 
+# bilibili-console command line
+class BilibiliConsole < Thor
+  def self.exit_on_failure?
+    true
+  end
+
+  desc 'login', 'login with qrcode'
+  def login
+    puts BilibiliConsole.login
+  end
+end
+
+BilibiliConsole.start

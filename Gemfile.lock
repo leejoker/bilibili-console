@@ -6,6 +6,7 @@ PATH
       nice_http
       rqrcode (~> 2.0)
       ruby-progressbar
+      thor
 
 GEM
   remote: https://gems.ruby-china.com/
@@ -28,6 +29,7 @@ GEM
     ruby-progressbar (1.11.0)
     string_pattern (2.2.2)
       regexp_parser (~> 1.3, >= 1.3.0)
+    thor (1.1.0)
 
 PLATFORMS
   x64-mingw32
