@@ -50,10 +50,11 @@ module BiliHttp
     end
 
     def post_json(http, url, headers, req_body)
-      headers = BiliHttp.headers.clone if headers.nil? || headers.empty?
+      default_headers = BiliHttp.headers.clone
+      default_headers << headers unless headers.nil? || headers.empty?
       headers['Content-Type'] = 'application/x-www-form-urlencoded'
       request = {
-        headers: headers,
+        headers: default_headers,
         path: URI(url).request_uri,
         data: req_body
       }
