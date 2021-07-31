@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
-
 require 'thor'
 require 'bilibili_console'
 
@@ -15,6 +13,17 @@ class BiliConsole < Thor
   def login
     bc = BilibiliConsole.new
     puts bc.login
+  end
+
+  desc 'user', 'get user info'
+  def user
+    bc = BilibiliConsole.new
+    user = bc.login_user_info
+    puts <<~USER
+      uid: #{user.uid}
+      uname: #{user.uname}
+      level: #{user.level_info}
+    USER
   end
 end
 
