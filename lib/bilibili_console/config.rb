@@ -4,11 +4,11 @@
 # https://opensource.org/licenses/MIT
 
 module Bilibili
-  VERSION = '0.0.1'.freeze
+  VERSION = '0.0.1'
   OPTIONS = {
     'config_path' => '~/.bc',
-    'config_file' => "#{OPTIONS['config_path']}/config.json",
-    'cookie_file' => "#{OPTIONS['config_path']}/cookie.txt",
+    'config_file' => "~/.bc/config.json",
+    'cookie_file' => "~/.bc/cookie.txt",
     'download_path' => '~/.bc/download'
-  }.freeze
+  }
 end
