@@ -20,16 +20,12 @@ module Bilibili
     def initialize(http_client)
       @http_client = http_client
       @options = {
-        'config_path' => '~/.bc',
-        'config_file' => '~/.bc/config.json',
-        'cookie_file' => '~/.bc/cookie.txt',
-        'download_path' => '~/.bc/download'
+        'config_path' => '~/.bc', 'config_file' => '~/.bc/config.json',
+        'cookie_file' => '~/.bc/cookie.txt', 'download_path' => '~/.bc/download'
       }
       BilibiliBase.video_qn = {
-        '240' => 6, '360' => 16, '480' => 32,
-        '720' => 64, '720P60' => 74, '1080' => 80,
-        '1080+' => 112, '1080P60' => 116, '4K' => 120,
-        'HDR' => 125
+        '240' => 6, '360' => 16, '480' => 32, '720' => 64, '720P60' => 74, '1080' => 80,
+        '1080+' => 112, '1080P60' => 116, '4K' => 120, 'HDR' => 125
       }
     end
 

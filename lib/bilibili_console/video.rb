@@ -78,7 +78,7 @@ module Bilibili
       urls = video_url_list(bv_id, video_qn)
       return nil if urls.empty?
 
-      download_path = "#{Bilibili::OPTIONS['download_path']}/#{bv_id}/"
+      download_path = "#{@options['download_path']}/#{bv_id}/"
       urls.each do |durl|
         download_file(durl['url'], "#{download_path}#{durl['name']}")
       end
