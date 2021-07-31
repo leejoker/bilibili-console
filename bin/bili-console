@@ -26,7 +26,7 @@ class BiliConsole < Thor
     USER
   end
 
-  desc 'manga-checkin', 'checkin bilibili manga'
+  desc 'manga', 'checkin bilibili manga'
   def manga_checkin
     bc = BilibiliConsole.new
     bc.login_user_info
