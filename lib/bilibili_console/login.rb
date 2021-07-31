@@ -77,7 +77,7 @@ module Bilibili
       login_url
       show_qrcode
       print '已完成扫码？[y/n]'
-      over = gets.chomp
+      over = STDIN.gets.chomp
       return nil unless over == 'y'
 
       post_form_jsonl('http://passport.bilibili.com/qrcode/getLoginInfo', { oauthKey: @oauth_key })
