@@ -22,8 +22,15 @@ class BiliConsole < Thor
     puts <<~USER
       uid: #{user.uid}
       uname: #{user.uname}
-      level: #{user.level_info}
+      level: #{user.level_info[:current_level]}
     USER
+  end
+
+  desc 'manga-checkin', 'checkin bilibili manga'
+  def manga_checkin
+    bc = BilibiliConsole.new
+    bc.login_user_info
+    puts bc.manga_checkin
   end
 end
 
