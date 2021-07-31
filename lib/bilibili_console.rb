@@ -2,6 +2,7 @@ require_relative 'bilibili_console/http/http'
 require_relative 'bilibili_console/login'
 require_relative 'bilibili_console/fav'
 require_relative 'bilibili_console/video'
+require_relative 'bilibili_console/manga'
 
 # bilibili console main class
 class BilibiliConsole
@@ -10,9 +11,9 @@ class BilibiliConsole
   def initialize
     @http_client = BiliHttp::HttpClient.new
     @bilibili_login = Bilibili::Login.new(@http_client)
-    @fav = Bilibili::Fav.new(http_client)
-    @video = Bilibili::Video.new(http_client)
-    @manga = Bilibili::Manga.new(http_client)
+    @fav = Bilibili::Fav.new(@http_client)
+    @video = Bilibili::Video.new(@http_client)
+    @manga = Bilibili::Manga.new(@http_client)
   end
 
   def login

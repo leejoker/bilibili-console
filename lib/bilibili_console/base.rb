@@ -60,9 +60,10 @@ module Bilibili
     end
 
     def load_cookie
-      return {} unless File.exist?(@options['cookie_file'].to_s)
+      f_path = File.expand_path(@options['cookie_file'].to_s, __FILE__)
+      return {} unless File.exist?(f_path)
 
-      json_str = File.read(@options['cookie_file'].to_s)
+      json_str = File.read(f_path)
       return {} if json_str.blank?
 
       cookies = JSON.parse(json_str)
@@ -72,7 +73,7 @@ module Bilibili
     end
 
     def clean_cookie
-      File.open(@options['cookie_file'].to_s, 'w') do |file|
+      File.open(f_path, 'w') do |file|
         file.write('{}')
       end
     end

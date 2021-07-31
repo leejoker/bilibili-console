@@ -8,6 +8,7 @@ require_relative 'http/http'
 # video module
 module Bilibili
   include BiliHttp
+  
   # bilibili video interfaces
   class Manga < BilibiliBase
     def check_in

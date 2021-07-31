@@ -61,6 +61,7 @@ module Bilibili
     end
 
     def login_user_info
+      puts check_cookie_empty
       login if check_cookie_empty
       data = get_jsona('http://api.bilibili.com/nav')
       if data.code != -101
