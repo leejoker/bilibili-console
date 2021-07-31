@@ -3,10 +3,10 @@ PATH
   specs:
     bilibili_console (0.0.1)
       down (~> 5.0)
-      nice_http
+      nice_http (~> 1.8.9)
       rqrcode (~> 2.0)
-      ruby-progressbar
-      thor
+      ruby-progressbar (~> 1.11.0)
+      thor (~> 1.1.0)
 
 GEM
   remote: https://gems.ruby-china.com/
@@ -38,4 +38,4 @@ DEPENDENCIES
   bilibili_console!
 
 BUNDLED WITH
-   2.2.15
+   2.2.24

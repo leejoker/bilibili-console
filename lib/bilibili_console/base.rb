@@ -64,7 +64,7 @@ module Bilibili
       return {} unless File.exist?(f_path)
 
       json_str = File.read(f_path)
-      return {} if json_str.blank?
+      return {} if json_str.nil? || json_str.empty?
 
       cookies = JSON.parse(json_str)
       @http_client.api_http.cookies = cookies
