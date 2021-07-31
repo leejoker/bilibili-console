@@ -69,7 +69,6 @@ module Bilibili
 
       cookies = JSON.parse(json_str)
       @http_client.api_http.cookies = cookies
-      BiliHttp.headers['Cookie'] = create_cookie_str(cookies)
       cookies
     end
 
@@ -77,16 +76,6 @@ module Bilibili
       File.open(f_path, 'w') do |file|
         file.write('{}')
       end
-    end
-
-    private
-
-    def create_cookie_str(cookies)
-      cookies_to_set_str = ''
-      cookies.each do |key, value|
-        cookies_to_set_str += "#{key}=#{value}; "
-      end
-      cookies_to_set_str
     end
   end
 end

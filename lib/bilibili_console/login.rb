@@ -63,7 +63,7 @@ module Bilibili
     def login_user_info
       login if check_cookie_empty
       data = get_jsona('http://api.bilibili.com/nav')
-      if data.code != -101
+      if data.code != "-101"
         Bilibili::UserInfo.new(data)
       else
         puts 'Cookie已失效'
