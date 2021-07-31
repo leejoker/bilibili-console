@@ -52,9 +52,10 @@ module Bilibili
     end
 
     def save_cookie
+      f_path = File.expand_path(@options['cookie_file'].to_s, __FILE__)
       @http_client.api_http.cookies = @http_client.login_http.cookies
       json_str = @http_client.login_http.cookies.to_json
-      File.open(@options['cookie_file'].to_s, 'w') do |file|
+      File.open(f_path, 'w') do |file|
         file.write(json_str)
       end
     end
