@@ -69,6 +69,7 @@ module Bilibili
 
       cookies = JSON.parse(json_str)
       @http_client.api_http.cookies = cookies
+      @http_client.manga_http.cookies = cookies
       cookies
     end
 

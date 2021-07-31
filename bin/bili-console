@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'thor'
-require 'bilibili_console'
+require_relative '../lib/bilibili_console.rb'
 
 # bilibili-console command line
 class BiliConsole < Thor

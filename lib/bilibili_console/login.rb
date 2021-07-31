@@ -63,7 +63,7 @@ module Bilibili
     def login_user_info
       login if check_cookie_empty
       data = get_jsona('http://api.bilibili.com/nav')
-      if data.code != "-101"
+      if data.code != '-101'
         Bilibili::UserInfo.new(data)
       else
         puts 'Cookie已失效'
@@ -76,7 +76,7 @@ module Bilibili
       login_url
       show_qrcode
       print '已完成扫码？[y/n]'
-      over = STDIN.gets.chomp
+      over = $stdin.gets.chomp
       return nil unless over == 'y'
 
       post_form_jsonl('http://passport.bilibili.com/qrcode/getLoginInfo', { oauthKey: @oauth_key })
