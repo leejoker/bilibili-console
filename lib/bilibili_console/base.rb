@@ -17,10 +17,14 @@ module Bilibili
       attr_accessor :video_qn
     end
 
-    def initialize(http_client, options = Bilibili::OPTIONS)
+    def initialize(http_client)
       @http_client = http_client
-      @options = options
-      check_config(@options)
+      @options = {
+        'config_path' => '~/.bc',
+        'config_file' => '~/.bc/config.json',
+        'cookie_file' => '~/.bc/cookie.txt',
+        'download_path' => '~/.bc/download'
+      }
       BilibiliBase.video_qn = {
         '240' => 6, '360' => 16, '480' => 32,
         '720' => 64, '720P60' => 74, '1080' => 80,
@@ -78,15 +82,6 @@ module Bilibili
     end
 
     private
-
-    def check_config(options)
-      options['config_path'] = Bilibili::OPTIONS['config_path'] if options['config_path'].nil?
-      dir = Dir.new(options['config_path'])
-      dir.mkdir unless dir.exist?
-
-      options['config_file'] = Bilibili::OPTIONS['config_file'] if options['config_file'].nil?
-      options['cookie_file'] = Bilibili::OPTIONS['cookie_file'] if options['cookie_file'].nil?
-    end
 
     def create_cookie_str(cookies)
       cookies_to_set_str = ''
