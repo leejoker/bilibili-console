@@ -52,6 +52,8 @@ module Bilibili
     end
 
     def save_cookie
+      config_path = File.expand_path(@options['config_path'].to_s, __dir__)
+      Dir.mkdir(config_path) unless File.exist?(config_path)
       f_path = File.expand_path(@options['cookie_file'].to_s, __FILE__)
       @http_client.api_http.cookies = @http_client.login_http.cookies
       json_str = @http_client.login_http.cookies.to_json
