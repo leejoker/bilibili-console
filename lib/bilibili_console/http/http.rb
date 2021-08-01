@@ -19,7 +19,7 @@ module BiliHttp
     def initialize
       @login_http = NiceHttp.new('http://passport.bilibili.com')
       @api_http = NiceHttp.new('http://api.bilibili.com')
-      @manga_http = NiceHttp.new('http://manga.bilibili.com')
+      @manga_http = NiceHttp.new('https://manga.bilibili.com')
       BiliHttp.headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.64',
         'Referer': 'https://www.bilibili.com'
@@ -50,20 +50,23 @@ module BiliHttp
     end
 
     def post_json(http, url, headers, req_body)
-      default_headers = BiliHttp.headers.clone
-      default_headers.merge!(headers) unless headers.nil? || headers.empty?
-      headers['Content-Type'] = 'application/x-www-form-urlencoded'
+      headers = BiliHttp.headers.clone if headers.nil? || headers.empty?
+      headers['Content-Type'] = 'application/json' unless req_body.nil? || req_body.empty?
       request = {
-        headers: default_headers,
-        path: URI(url).request_uri,
-        data: req_body
+        headers: headers,
+        path: URI(url).request_uri
       }
+      request.merge!({ data: req_body }) unless req_body.nil? || req_body.empty?
       json_data(http.post(request).data)
     end
 
     def json_data(data)
       body = BiliHttp::ResponseBody.new(data.json)
-      body.data
+      if body.data.nil?
+        body
+      else
+        body.data
+      end
     end
   end
 end

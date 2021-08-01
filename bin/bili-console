@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'thor'
-require_relative '../lib/bilibili_console.rb'
+require 'bilibili_console'
 
 # bilibili-console command line
 class BiliConsole < Thor
@@ -29,8 +29,13 @@ class BiliConsole < Thor
   desc 'manga', 'checkin bilibili manga'
   def manga_checkin
     bc = BilibiliConsole.new
-    bc.login_user_info
-    puts bc.manga_checkin
+    bc.manga.load_cookie
+    body = bc.manga_checkin
+    if body.code == 'invalid_argument'
+      puts '您已经签到了'
+    else
+      puts '签到成功'
+    end
   end
 end
 
