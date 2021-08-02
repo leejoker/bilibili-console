@@ -15,10 +15,11 @@ class BiliConsole < Thor
     puts <<~HELP
       #{banner}
 
-      help    help messages
-      login   qrcode login
-      user    user info
-      manga   bilibili manga checkin
+      Usage: bili-console [arguments]
+        help    help messages
+        login   qrcode login
+        user    user info
+        manga   bilibili manga checkin
     HELP
   end
 
