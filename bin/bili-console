@@ -3,12 +3,23 @@
 require 'thor'
 require 'bilibili_console'
 
-puts File.read(File.expand_path('banner.txt', __dir__))
-
 # bilibili-console command line
 class BiliConsole < Thor
   def self.exit_on_failure?
     true
+  end
+
+  desc 'help', 'help content'
+  def help
+    banner = File.read(File.expand_path('banner.txt', __dir__))
+    puts <<~HELP
+      #{banner}
+
+      help    help messages
+      login   qrcode login
+      user    user info
+      manga   bilibili manga checkin
+    HELP
   end
 
   desc 'login', 'login with qrcode'

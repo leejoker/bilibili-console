@@ -18,6 +18,36 @@ $ gem build bilibili_console.gemspec
 $ gem install bilibili_console-0.0.1.gem
 ```
 
+### 使用方法
+
+gem安装完成后即可使用**bili-console**命令
+
+#### 帮助信息
+
+```shell
+$ bili-console help
+```
+
+#### 登录
+
+```shell
+# 执行二维码登录
+$ bili-console login
+```
+
+#### 用户基本信息
+
+```shell
+$ bili-console user
+```
+
+#### bilibili漫画签到
+
+```shell
+# 目前只提供漫画签到的功能
+$ bili-console manga
+```
+
 #### 功能清单
 
 * [x] bilibili漫画签到 
