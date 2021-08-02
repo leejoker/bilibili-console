@@ -58,6 +58,17 @@ $ bili-console manga
 * [ ] 视频检索
 
 
-#### 参与贡献
+#### 相关项目
 
-Fork本仓库，提交PR即可
+##### Gem依赖
+
+* [down](https://github.com/janko/down/)
+* [nice_http](https://github.com/MarioRuiz/nice_http)
+* [rqrcode](https://github.com/whomwah/rqrcode/)
+* [ruby-progressbar](https://github.com/jfelchner/ruby-progressbar/)
+* [thor](https://github.com/rails/thor)
+
+##### 接口文档
+
+* [bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect) 感谢易姐的文档支持！
+* [Bilibili-Manga](https://github.com/xkk2333/Bilibili-Manga) 参考了B站漫画的签到接口
