@@ -51,6 +51,13 @@ class BiliConsole < Thor
       puts '签到成功'
     end
   end
+
+  desc 'down', 'download video by bv code'
+  def download_video(bv)
+    bc = BilibiliConsole.new
+    bc.api_http.load_cookie
+    bc.download_video(bc)
+  end
 end
 
 BiliConsole.start
