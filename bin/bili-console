@@ -56,7 +56,7 @@ class BiliConsole < Thor
   def download_video(bv)
     bc = BilibiliConsole.new
     bc.api_http.load_cookie
-    bc.download_video(bc)
+    bc.download_video(bv)
   end
 end
 
