@@ -80,7 +80,7 @@ module Bilibili
 
       download_path = "#{File.expand_path(@options['download_path'].to_s, __dir__)}/#{bv_id}/"
       urls.each do |durl|
-        download_file(durl['url'], "#{download_path}#{durl['name']}")
+        download_file(durl[:url], "#{download_path}#{durl[:name]}")
       end
     end
 
@@ -89,7 +89,7 @@ module Bilibili
     def download_file(url, dest)
       progressbar = ProgressBar.create
       total_size = 0
-      Down::NetHttp.download(url['url'],
+      Down::NetHttp.download(url,
                              destination: dest,
                              headers: BiliHttp.headers,
                              content_length_proc: proc { |size| total_size = size },
