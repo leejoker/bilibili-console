@@ -92,6 +92,7 @@ module Bilibili
       total_size = 0
       headers = generate_headers
       FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
+      puts "开始下载文件： #{filename}"
       Down::NetHttp.download(url,
                              destination: "#{dir}#{filename}",
                              headers: headers,
