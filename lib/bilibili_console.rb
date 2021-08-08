@@ -24,6 +24,7 @@ class BilibiliConsole
   end
 
   def login_user_info
+    set_login_http
     set_api_http
     @user = @bilibili_login.login_user_info
     @user
@@ -53,13 +54,16 @@ class BilibiliConsole
 
   def set_login_http
     @http_client.login_http = NiceHttp.new('https://passport.bilibili.com')
+    @http_client.login_http.cookies = @bilibili_login.load_cookie
   end
 
   def set_api_http
     @http_client.api_http = NiceHttp.new('https://api.bilibili.com')
+    @http_client.api_http.cookies = @bilibili_login.load_cookie
   end
 
   def set_manga_http
     @http_client.manga_http = NiceHttp.new('https://manga.bilibili.com')
+    @http_client.manga_http.cookies = @bilibili_login.load_cookie
   end
 end

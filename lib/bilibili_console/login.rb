@@ -61,7 +61,7 @@ module Bilibili
     end
 
     def login_user_info
-      login if check_cookie_empty
+      set_http_cookie
       data = get_jsona('https://api.bilibili.com/nav')
       if data.code != '-101'
         Bilibili::UserInfo.new(data)
@@ -87,9 +87,14 @@ module Bilibili
 
     private
 
-    def check_cookie_empty
-      cookie = load_cookie
-      cookie.nil? || cookie.empty?
+    def set_http_cookie
+      cookies = @http_client.login_http.cookies
+      if cookies.nil? || cookies.empty?
+        login
+        @http_client.api_http.cookies = @http_client.login_http.cookies
+      else
+        @http_client.api_http.cookies = cookies
+      end
     end
   end
 end

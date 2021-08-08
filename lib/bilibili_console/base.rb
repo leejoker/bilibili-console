@@ -66,10 +66,7 @@ module Bilibili
       json_str = File.read(f_path)
       return {} if json_str.nil? || json_str.empty?
 
-      cookies = JSON.parse(json_str)
-      @http_client.api_http.cookies = cookies
-      @http_client.manga_http.cookies = cookies
-      cookies
+      JSON.parse(json_str)
     end
 
     def clean_cookie
