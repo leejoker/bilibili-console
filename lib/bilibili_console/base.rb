@@ -52,14 +52,11 @@ module Bilibili
     end
 
     def save_cookie
-      config_path = File.expand_path(@options['config_path'].to_s, __dir__)
-      Dir.mkdir(config_path) unless File.exist?(config_path)
-      f_path = File.expand_path(@options['cookie_file'].to_s, __FILE__)
+      check_config_path
+
       @http_client.api_http.cookies = @http_client.login_http.cookies
       json_str = @http_client.login_http.cookies.to_json
-      File.open(f_path, 'w') do |file|
-        file.write(json_str)
-      end
+      write_cookie(json_str)
     end
 
     def load_cookie
@@ -78,6 +75,18 @@ module Bilibili
     def clean_cookie
       File.open(f_path, 'w') do |file|
         file.write('{}')
+      end
+    end
+
+    def check_config_path
+      config_path = File.expand_path(@options['config_path'].to_s, __dir__)
+      Dir.mkdir(config_path) unless File.exist?(config_path)
+    end
+
+    def write_cookie(cookie)
+      f_path = File.expand_path(@options['cookie_file'].to_s, __FILE__)
+      File.open(f_path, 'w') do |file|
+        file.write(cookie)
       end
     end
   end

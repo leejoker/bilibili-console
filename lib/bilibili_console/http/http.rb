@@ -17,9 +17,6 @@ module BiliHttp
     attr_accessor :login_http, :api_http, :manga_http
 
     def initialize
-      @login_http = NiceHttp.new('http://passport.bilibili.com')
-      @api_http = NiceHttp.new('http://api.bilibili.com')
-      @manga_http = NiceHttp.new('https://manga.bilibili.com')
       BiliHttp.headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.64',
         'Referer': 'https://www.bilibili.com'

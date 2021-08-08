@@ -44,7 +44,7 @@ module Bilibili
     def video_page_list(bv_id)
       return nil if bv_id.nil?
 
-      url = "http://api.bilibili.com/x/player/pagelist?bvid=#{bv_id}"
+      url = "https://api.bilibili.com/x/player/pagelist?bvid=#{bv_id}"
       datas = get_jsona(url)
       return nil if datas.nil?
 
@@ -55,7 +55,7 @@ module Bilibili
 
     def get_video_url(bv_id, cid, video_qn = '720')
       qn = BilibiliBase.video_qn[video_qn]
-      url = "http://api.bilibili.com/x/player/playurl?bvid=#{bv_id}&cid=#{cid}&qn=#{qn}&fnval=0&fnver=0&fourk=1"
+      url = "https://api.bilibili.com/x/player/playurl?bvid=#{bv_id}&cid=#{cid}&qn=#{qn}&fnval=0&fnver=0&fourk=1"
       data = get_jsona(url)
       data[:durl]
     end
@@ -80,20 +80,40 @@ module Bilibili
 
       download_path = "#{File.expand_path(@options['download_path'].to_s, __dir__)}/#{bv_id}/"
       urls.each do |durl|
-        download_file(durl[:url], "#{download_path}#{durl[:name]}")
+        download_file(durl[:url], download_path, durl[:name])
       end
     end
 
     private
 
-    def download_file(url, dest)
+    def download_file(url, dir, filename)
       progressbar = ProgressBar.create
       total_size = 0
+      headers = generate_headers
+      Dir.mkdir(dir) unless Dir.exist?(dir)
       Down::NetHttp.download(url,
-                             destination: dest,
-                             headers: BiliHttp.headers,
+                             destination: "#{dir}#{filename}",
+                             headers: headers,
                              content_length_proc: proc { |size| total_size = size },
                              progress_proc: proc { |cursize| progressbar.progress = cursize.to_f / total_size * 100.0 })
+    end
+
+    def create_cookie_str(cookies)
+      cookies = cookies['/']
+      cookies_to_set_str = ''
+      cookies.each do |key, value|
+        cookies_to_set_str += "#{key}=#{value}; "
+      end
+      cookies_to_set_str
+    end
+
+    def generate_headers
+      headers = BiliHttp.headers
+      {
+        'User-Agent' => headers[:"User-Agent"],
+        'Referer' => headers[:Referer],
+        'Cookie' => create_cookie_str(load_cookie)
+      }
     end
   end
 end

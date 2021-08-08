@@ -53,10 +53,10 @@ class BiliConsole < Thor
   end
 
   desc 'down', 'download video by bv code'
-  def download_video(bv)
+  def download_video(bv_id)
     bc = BilibiliConsole.new
     bc.video.load_cookie
-    bc.download_video(bv)
+    bc.download_video(bv_id)
   end
 end
 

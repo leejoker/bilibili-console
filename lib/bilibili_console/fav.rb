@@ -128,14 +128,14 @@ module Bilibili
   # bilibili video interfaces
   class Fav < BilibiliBase
     def list_user_fav_video(user_info)
-      url = "http://api.bilibili.com/x/v3/fav/folder/created/list-all?up_mid=#{user_info.uid}&type=2"
+      url = "https://api.bilibili.com/x/v3/fav/folder/created/list-all?up_mid=#{user_info.uid}&type=2"
       data = get_jsona(url)
       Bilibili::FavList.new(data)
     end
 
     def list_fav_video(media_id, page_num = 1, page_size = 10, keyword = nil)
       keyword = "&keyword=#{keyword}" unless keyword.nil?
-      url = "http://api.bilibili.com/x/v3/fav/resource/list?media_id=#{media_id}&pn=#{page_num}&ps=#{page_size}#{keyword}&platform=web"
+      url = "https://api.bilibili.com/x/v3/fav/resource/list?media_id=#{media_id}&pn=#{page_num}&ps=#{page_size}#{keyword}&platform=web"
       data = get_jsona(url)
       Bilibili::FavResourceList.new(data)
     end
