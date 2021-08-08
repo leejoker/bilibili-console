@@ -4,6 +4,7 @@
 # https://opensource.org/licenses/MIT
 
 require_relative 'http/http'
+require 'fileutils'
 require 'json'
 
 # bilibili base
@@ -77,7 +78,7 @@ module Bilibili
 
     def check_config_path
       config_path = File.expand_path(@options['config_path'].to_s, __dir__)
-      Dir.mkdir(config_path) unless File.exist?(config_path)
+      FileUtils.mkdir_p(config_path) unless Dir.exist?(config_path)
     end
 
     def write_cookie(cookie)

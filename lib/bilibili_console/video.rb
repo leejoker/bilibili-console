@@ -5,6 +5,7 @@
 
 require_relative 'http/http'
 require 'down'
+require 'fileutils'
 require 'ruby-progressbar'
 
 # video module
@@ -90,7 +91,7 @@ module Bilibili
       progressbar = ProgressBar.create
       total_size = 0
       headers = generate_headers
-      Dir.mkdir(dir) unless Dir.exist?(dir)
+      FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
       Down::NetHttp.download(url,
                              destination: "#{dir}#{filename}",
                              headers: headers,
