@@ -8,8 +8,6 @@ require_relative 'bilibili_console/manga'
 class BilibiliConsole
   attr_accessor :http_client, :bilibili_login, :user, :fav, :video, :manga
 
-  @manga_http = 
-
   def initialize
     @http_client = BiliHttp::HttpClient.new
     @bilibili_login = Bilibili::Login.new(@http_client)

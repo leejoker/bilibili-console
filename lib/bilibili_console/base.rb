@@ -30,28 +30,6 @@ module Bilibili
       }
     end
 
-    # get json for login_http
-    # TODO use meta program to create these methods automaticly
-    def get_jsonl(url)
-      @http_client.get_json(@http_client.login_http, url)
-    end
-
-    def get_jsona(url)
-      @http_client.get_json(@http_client.api_http, url)
-    end
-
-    def post_form_jsonl(url, params)
-      @http_client.post_form_json(@http_client.login_http, url, params)
-    end
-
-    def post_form_jsona(url, params)
-      @http_client.post_form_json(@http_client.api_http, url, params)
-    end
-
-    def post_jsonm(url, headers, req_body)
-      @http_client.post_json(@http_client.manga_http, url, headers, req_body)
-    end
-
     def save_cookie
       check_config_path
 
@@ -76,6 +54,8 @@ module Bilibili
       end
     end
 
+    private
+
     def check_config_path
       config_path = File.expand_path(@options['config_path'].to_s, __dir__)
       FileUtils.mkdir_p(config_path) unless Dir.exist?(config_path)
@@ -85,6 +65,42 @@ module Bilibili
       f_path = File.expand_path(@options['cookie_file'].to_s, __FILE__)
       File.open(f_path, 'w') do |file|
         file.write(cookie)
+      end
+    end
+
+    def create_request_methods
+      methods = http_client_instance_methods
+      methods&.each do |method|
+        define_get_json_method(method)
+        define_post_form_json_method(method)
+        define_post_json_method(method)
+      end
+    end
+
+    def http_client_instance_methods
+      HttpClient.instance_methods(false)&.select do |method|
+        method.to_s.index('=').nil?
+      end
+    end
+
+    def define_get_json_method(method_name)
+      new_method_name = "get_json#{method_name[0]}"
+      BilibiliBase.singleton_class.define_method(new_method_name) do |url|
+        @http_client.get_json(@http_client.instance_variable_get(method_name), url)
+      end
+    end
+
+    def define_post_form_json_method(method_name)
+      new_method_name = "post_form_json#{method_name[0]}"
+      BilibiliBase.singleton_class.define_method(new_method_name) do |url, params|
+        @http_client.post_form_json(@http_client.instance_variable_get(method_name), url, params)
+      end
+    end
+
+    def define_post_json_method(method_name)
+      new_method_name = "post_json#{method_name[0]}"
+      BilibiliBase.singleton_class.define_method(new_method_name) do |url, headers, req_body|
+        @http_client.post_json(@http_client.instance_variable_get(method_name), url, headers, req_body)
       end
     end
   end
