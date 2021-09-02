@@ -72,6 +72,7 @@ module Bilibili
     def create_request_methods
       methods = http_client_instance_methods
       methods&.each do |method|
+        puts "create request methods: #{method}"
         define_get_json_method(method)
         define_post_form_json_method(method)
         define_post_json_method(method)
@@ -86,21 +87,24 @@ module Bilibili
 
     def define_get_json_method(method_name)
       new_method_name = "get_json#{method_name[0]}"
-      BilibiliBase.singleton_class.define_method(new_method_name) do |url|
+      puts "create get_json #{new_method_name}"
+      BilibiliBase.define_method(new_method_name) do |url|
         @http_client.get_json(@http_client.instance_variable_get(method_name), url)
       end
     end
 
     def define_post_form_json_method(method_name)
       new_method_name = "post_form_json#{method_name[0]}"
-      BilibiliBase.singleton_class.define_method(new_method_name) do |url, params|
+      puts "create post_form_json #{new_method_name}"
+      BilibiliBase.define_method(new_method_name) do |url, params|
         @http_client.post_form_json(@http_client.instance_variable_get(method_name), url, params)
       end
     end
 
     def define_post_json_method(method_name)
       new_method_name = "post_json#{method_name[0]}"
-      BilibiliBase.singleton_class.define_method(new_method_name) do |url, headers, req_body|
+      puts "create post_json #{new_method_name}"
+      BilibiliBase.define_method(new_method_name) do |url, headers, req_body|
         @http_client.post_json(@http_client.instance_variable_get(method_name), url, headers, req_body)
       end
     end
