@@ -20,6 +20,7 @@ module Bilibili
 
     def initialize(http_client)
       @http_client = http_client
+      create_request_methods
       @options = {
         'config_path' => '~/.bc', 'config_file' => '~/.bc/config.json',
         'cookie_file' => '~/.bc/cookie.txt', 'download_path' => '~/.bc/download'
