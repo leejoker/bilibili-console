@@ -79,7 +79,7 @@ module Bilibili
     end
 
     def http_client_instance_methods
-      HttpClient.instance_methods(false)&.select do |method|
+      BiliHttp::HttpClient.instance_methods(false)&.select do |method|
         method.to_s.index('=').nil?
       end
     end
