@@ -11,7 +11,6 @@ class BilibiliConsole
   def initialize
     @http_client = BiliHttp::HttpClient.new
     @bilibili_login = Bilibili::Login.new(@http_client)
-    puts @bilibili_login.class.methods
     @fav = Bilibili::Fav.new(@http_client)
     @video = Bilibili::Video.new(@http_client)
     @manga = Bilibili::Manga.new(@http_client)
