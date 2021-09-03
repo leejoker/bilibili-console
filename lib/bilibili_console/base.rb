@@ -70,17 +70,11 @@ module Bilibili
     end
 
     def create_request_methods
-      methods = http_client_instance_methods
+      methods = %w[login_http api_http manga_http]
       methods&.each do |method|
         define_get_json_method(method)
         define_post_form_json_method(method)
         define_post_json_method(method)
-      end
-    end
-
-    def http_client_instance_methods
-      BiliHttp::HttpClient.instance_methods(false)&.select do |method|
-        method.to_s.index('=').nil?
       end
     end
 
