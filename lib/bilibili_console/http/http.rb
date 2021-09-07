@@ -23,6 +23,7 @@ module BiliHttp
       }
     end
 
+    # get method
     def get_json(http, url)
       json_data(get(http, url))
     end
@@ -35,6 +36,7 @@ module BiliHttp
       http.get(request).data
     end
 
+    # post method with form data
     def post_form_json(http, url, params)
       custom_headers = BiliHttp.headers.clone
       custom_headers['Content-Type'] = 'application/x-www-form-urlencoded'
@@ -46,6 +48,7 @@ module BiliHttp
       json_data(http.post(request).data)
     end
 
+    # post method with json body
     def post_json(http, url, headers, req_body)
       headers = BiliHttp.headers.clone if headers.nil? || headers.empty?
       headers['Content-Type'] = 'application/json' unless req_body.nil? || req_body.empty?
