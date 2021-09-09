@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2021 leejoker
 #
 # This software is released under the MIT License.
@@ -12,6 +14,7 @@ module BiliHttp
   class << self
     attr_accessor :headers
   end
+
   # bilibili http client
   class HttpClient
     attr_accessor :login_http, :api_http, :manga_http

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'bilibili_console/http/http'
 require_relative 'bilibili_console/login'
 require_relative 'bilibili_console/fav'
@@ -24,11 +26,11 @@ class BilibiliConsole
   def login_user_info
     set_login_http
     set_api_http
-    @user = @bilibili_login.login_user_info
-    @user
+    @bilibili_login.login_user_info
   end
 
   def user_fav_list
+    @user = login_user_info if @user.nil?
     set_api_http
     @fav.list_user_fav_video(@user)
   end

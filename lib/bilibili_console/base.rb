@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2021 leejoker
 #
 # This software is released under the MIT License.
@@ -40,17 +42,16 @@ module Bilibili
     end
 
     def load_cookie
-      f_path = File.expand_path(@options['cookie_file'].to_s, __FILE__)
-      return {} unless File.exist?(f_path)
+      return {} unless File.exist?(cookie_path)
 
-      json_str = File.read(f_path)
+      json_str = File.read(cookie_path)
       return {} if json_str.nil? || json_str.empty?
 
       JSON.parse(json_str)
     end
 
     def clean_cookie
-      File.open(f_path, 'w') do |file|
+      File.open(cookie_path, 'w') do |file|
         file.write('{}')
       end
     end
@@ -58,20 +59,18 @@ module Bilibili
     private
 
     def check_config_path
-      config_path = File.expand_path(@options['config_path'].to_s, __dir__)
       FileUtils.mkdir_p(config_path) unless Dir.exist?(config_path)
     end
 
     def write_cookie(cookie)
-      f_path = File.expand_path(@options['cookie_file'].to_s, __FILE__)
-      File.open(f_path, 'w') do |file|
+      File.open(cookie_path, 'w') do |file|
         file.write(cookie)
       end
     end
 
     def create_request_methods
       methods = %w[login_http api_http manga_http]
-      methods&.each do |method|
+      methods.each do |method|
         define_get_json_method(method)
         define_post_form_json_method(method)
         define_post_json_method(method)
@@ -97,6 +96,14 @@ module Bilibili
       BilibiliBase.define_method(new_method_name) do |url, headers, req_body|
         @http_client.post_json(@http_client.instance_variable_get("@#{method_name}"), url, headers, req_body)
       end
+    end
+
+    def config_path
+      File.expand_path(@options['config_path'].to_s, __dir__)
+    end
+
+    def cookie_path
+      File.expand_path(@options['cookie_file'].to_s, __FILE__)
     end
   end
 end
