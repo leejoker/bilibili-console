@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.files = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
   end
-  s.extra_rdoc_files = ['README.md', 'LICENSE']
+  s.extra_rdoc_files = %w[README.md LICENSE]
   s.homepage = 'https://github.com/leejoker/bilibili-console'
   s.license = 'MIT'
   s.required_ruby_version = ['>= 2.7']
