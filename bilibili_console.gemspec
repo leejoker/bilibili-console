@@ -2,10 +2,10 @@ Gem::Specification.new do |s|
   s.name = 'bilibili_console'
   s.version = '0.0.1'
   s.executables << 'bili-console'
-  s.summary     = 'bilibili console'
+  s.summary = 'bilibili console'
   s.description = 'a console tool for bilibili'
-  s.authors     = ['leejoker']
-  s.email       = '1056650571@qq.com'
+  s.authors = ['leejoker']
+  s.email = '1056650571@qq.com'
   s.files = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
   end

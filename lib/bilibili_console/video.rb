@@ -69,9 +69,9 @@ module Bilibili
       return nil if page_list.nil?
 
       page_list.each do |page|
-        get_video_url(bv_id, page.cid, video_qn).each do |durl|
-          order = durl[:order] < 10 ? "0#{durl[:order]}" : durl[:order]
-          result << { 'name': "#{page.part}_#{order}.flv", 'url': durl[:url].to_s }
+        get_video_url(bv_id, page.cid, video_qn).each do |down_url|
+          order = down_url[:order] < 10 ? "0#{down_url[:order]}" : down_url[:order]
+          result << { 'name': "#{page.part}_#{order}.flv", 'url': down_url[:url].to_s, 'prefix': page.part }
         end
       end
       result
@@ -82,33 +82,42 @@ module Bilibili
       return nil if urls.empty?
 
       download_path = "#{File.expand_path(@options['download_path'].to_s, __dir__)}/#{bv_id}/"
-      urls.each do |durl|
-        download_file(durl[:url], download_path, durl[:name])
+      prefix = urls[0][:prefix]
+      combine_array = []
+      urls.each do |down_url|
+        file_path = download_file(down_url[:url], "#{download_path}#{down_url[:name]}")
+        combine_array << file_path if down_url[:prefix] == prefix
+        combine_media(combine_array, "#{download_path}#{prefix}.flv") if down_url[:prefix] != prefix
+        prefix = down_url[:prefix]
       end
     end
 
     private
 
-    def download_file(url, dir, filename)
+    def download_file(url, file_path)
       progressbar = ProgressBar.create
       total_size = 0
       headers = generate_headers
       FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
-      puts "开始下载文件： #{filename}"
-      Down::NetHttp.download(url,
-                             destination: "#{dir}#{filename}",
-                             headers: headers,
-                             content_length_proc: proc { |size| total_size = size },
-                             progress_proc: proc { |cursize| progressbar.progress = cursize.to_f / total_size * 100.0 })
+      puts "开始下载文件到： #{file_path}"
+      Down::NetHttp.download(url, options_builder(file_path, headers, total_size, progressbar))
+      file_path
+    end
+
+    def options_builder(file_path, headers, total_size, progressbar)
+      {
+        destination: file_path,
+        headers: headers,
+        content_length_proc: proc { |size| total_size = size },
+        progress_proc: proc { |cur_size| progressbar.progress = cur_size.to_f / total_size * 100.0 }
+      }
     end
 
     def create_cookie_str(cookies)
-      cookies = cookies['/']
-      cookies_to_set_str = ''
-      cookies.each do |key, value|
-        cookies_to_set_str += "#{key}=#{value}; "
+      cookie_array = cookies['/'].map do |key, value|
+        "#{key}=#{value}; "
       end
-      cookies_to_set_str
+      cookie_array.join
     end
 
     def generate_headers
@@ -118,6 +127,12 @@ module Bilibili
         'Referer' => headers[:Referer],
         'Cookie' => create_cookie_str(load_cookie)
       }
+    end
+
+    def combine_media(files, dest)
+      files_concat = files.join('|')
+      `ffmpeg -i concat:"#{files_concat}" -c copy #{dest}`
+      files.clear
     end
   end
 end
