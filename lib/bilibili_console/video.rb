@@ -84,11 +84,11 @@ module Bilibili
       download_path = "#{File.expand_path(@options['download_path'].to_s, __dir__)}/#{bv_id}/"
       prefix = urls[0][:prefix]
       combine_array = []
-      urls.each do |down_url|
-        file_path = download_file(down_url[:url], download_path, down_url[:name])
-        combine_array << file_path if down_url[:prefix] == prefix
-        combine_media(combine_array, "#{download_path}#{prefix}.flv") if down_url[:prefix] != prefix
-        prefix = down_url[:prefix]
+      urls.reduce do |cur, nxt|
+        file_path = download_file(cur[:url], download_path, cur[:name])
+        combine_array << file_path if cur[:prefix] == nxt[:prefix]
+        combine_media(combine_array, "#{download_path}#{prefix}.flv") if cur[:prefix] != nxt[:prefix] || nxt.nil?
+        nxt
       end
     end
 
@@ -126,6 +126,12 @@ module Bilibili
     end
 
     def combine_media(files, dest)
+      if files.size == 1
+        FileUtils.mv(files[0], dest)
+        files.clear
+        return
+      end
+
       files_concat = files.join('|')
       `ffmpeg -i concat:"#{files_concat}" -c copy #{dest}`
       files.clear
