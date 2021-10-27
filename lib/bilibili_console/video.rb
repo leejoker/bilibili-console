@@ -85,6 +85,8 @@ module Bilibili
       prefix = urls[0][:prefix]
       combine_array = []
       urls.reduce do |cur, nxt|
+        pp cur
+        pp nxt
         file_path = download_file(cur[:url], download_path, cur[:name])
         combine_array << file_path if cur[:prefix] == nxt[:prefix]
         combine_media(combine_array, "#{download_path}#{prefix}.flv") if cur[:prefix] != nxt[:prefix] || nxt.nil?
