@@ -85,7 +85,7 @@ module Bilibili
       prefix = urls[0][:prefix]
       combine_array = []
       urls.each do |down_url|
-        file_path = download_file(down_url[:url], "#{download_path}#{down_url[:name]}")
+        file_path = download_file(down_url[:url], download_path, down_url[:name])
         combine_array << file_path if down_url[:prefix] == prefix
         combine_media(combine_array, "#{download_path}#{prefix}.flv") if down_url[:prefix] != prefix
         prefix = down_url[:prefix]
@@ -94,11 +94,12 @@ module Bilibili
 
     private
 
-    def download_file(url, file_path)
+    def download_file(url, dir, file_name)
       progressbar = ProgressBar.create
       total_size = 0
       headers = generate_headers
       FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
+      file_path = "#{dir}#{file_name}"
       puts "开始下载文件到： #{file_path}"
       Down::NetHttp.download(url, options_builder(file_path, headers, total_size, progressbar))
       file_path
