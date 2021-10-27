@@ -105,17 +105,12 @@ module Bilibili
       file_path = check_path(dir, filename)
       puts "开始下载文件到： #{file_path}"
       Down::NetHttp.download(url,
-                             destination: file_path,
-                             headers: generate_headers,
+                             destination: file_path, headers: generate_headers,
                              content_length_proc: proc { |size| total_size = size },
-                             progress_proc: process_proc(progressbar, total_size))
+                             progress_proc: proc { |cur_size|
+                               progressbar.progress = cur_size.to_f / total_size * 100.0
+                             })
       file_path
-    end
-
-    def process_proc(progressbar, total_size)
-      proc { |cur_size|
-        progressbar.progress = cur_size.to_f / total_size * 100.0
-      }
     end
 
     def check_path(dir, filename)
