@@ -148,8 +148,10 @@ module Bilibili
         return
       end
 
-      files_concat = files.join('|')
-      `ffmpeg -i concat:"#{files_concat}" -c copy #{dest}`
+      files = files.filter { |file| File.new(file).exist? }
+      return if files.size.zero?
+
+      `ffmpeg -i concat:"#{files.join('|')}" -c copy #{dest}`
       files.clear
     end
   end
