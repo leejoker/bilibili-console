@@ -141,6 +141,8 @@ module Bilibili
     end
 
     def combine_media(files, dest)
+      return if files.size == 0
+
       if files.size == 1
         FileUtils.mv(files[0], dest)
         files.clear
