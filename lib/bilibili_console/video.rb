@@ -94,24 +94,19 @@ module Bilibili
 
     private
 
-    def download_file(url, dir, file_name)
+    def download_file(url, dir, file_name, total_size = 0)
       progressbar = ProgressBar.create
-      total_size = 0
-      headers = generate_headers
       FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
       file_path = "#{dir}#{file_name}"
       puts "开始下载文件到： #{file_path}"
-      Down::NetHttp.download(url, options_builder(file_path, headers, total_size, progressbar))
+      Down::NetHttp.download(url,
+                             destination: file_path,
+                             headers: generate_headers,
+                             content_length_proc: proc { |size| total_size = size },
+                             progress_proc: proc { |cur_size|
+                               progressbar.progress = cur_size.to_f / total_size * 100.0
+                             })
       file_path
-    end
-
-    def options_builder(file_path, headers, total_size, progressbar)
-      {
-        destination: file_path,
-        headers: headers,
-        content_length_proc: proc { |size| total_size = size },
-        progress_proc: proc { |cur_size| progressbar.progress = cur_size.to_f / total_size * 100.0 }
-      }
     end
 
     def create_cookie_str(cookies)
