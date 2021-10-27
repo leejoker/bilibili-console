@@ -82,33 +82,45 @@ module Bilibili
       return nil if urls.empty?
 
       download_path = "#{File.expand_path(@options['download_path'].to_s, __dir__)}/#{bv_id}/"
-      prefix = urls[0][:prefix]
       combine_array = []
-      urls.reduce do |cur, nxt|
-        pp cur
-        pp nxt
-        file_path = download_file(cur[:url], download_path, cur[:name])
-        combine_array << file_path if cur[:prefix] == nxt[:prefix]
-        combine_media(combine_array, "#{download_path}#{prefix}.flv") if cur[:prefix] != nxt[:prefix] || nxt.nil?
-        nxt
+      urls.each_with_index do |url, idx|
+        same_part = same_part?(urls, idx)
+        combine_array << download_file(url[:url], download_path, url[:name]) if same_part
+        combine_media(combine_array, "#{download_path}#{url[:prefix]}.flv") unless same_part
       end
     end
 
     private
 
-    def download_file(url, dir, file_name, total_size = 0)
+    def next?(array, index)
+      !array[index + 1].nil?
+    end
+
+    def same_part?(array, idx)
+      next?(array, idx) && array[idx][:prefix] == array[idx + 1][:prefix]
+    end
+
+    def download_file(url, dir, filename, total_size = 0)
       progressbar = ProgressBar.create
-      FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
-      file_path = "#{dir}#{file_name}"
+      file_path = check_path(dir, filename)
       puts "开始下载文件到： #{file_path}"
       Down::NetHttp.download(url,
                              destination: file_path,
                              headers: generate_headers,
                              content_length_proc: proc { |size| total_size = size },
-                             progress_proc: proc { |cur_size|
-                               progressbar.progress = cur_size.to_f / total_size * 100.0
-                             })
+                             progress_proc: process_proc(progressbar, total_size))
       file_path
+    end
+
+    def process_proc(progressbar, total_size)
+      proc { |cur_size|
+        progressbar.progress = cur_size.to_f / total_size * 100.0
+      }
+    end
+
+    def check_path(dir, filename)
+      FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
+      "#{dir}#{filename}"
     end
 
     def create_cookie_str(cookies)
