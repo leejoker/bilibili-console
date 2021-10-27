@@ -85,8 +85,7 @@ module Bilibili
       combine_array = []
       urls.each_with_index do |url, idx|
         same_part = same_part?(urls, idx)
-        puts "url: #{url[:url]}, download_path: #{download_path}, name: #{url[:name]}"
-        combine_array << download_file(url[:url], download_path, url[:name]) if same_part
+        combine_array << download_file(url[:url], download_path, url[:name])
         combine_media(combine_array, "#{download_path}#{url[:prefix]}.flv") unless same_part
       end
     end
@@ -141,7 +140,7 @@ module Bilibili
     end
 
     def combine_media(files, dest)
-      return if files.size == 0
+      return if files.size.zero?
 
       if files.size == 1
         FileUtils.mv(files[0], dest)
