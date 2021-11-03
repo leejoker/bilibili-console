@@ -103,7 +103,7 @@ module Bilibili
     def download_file(url, dir, filename, total_size = 0)
       progressbar = ProgressBar.create
       file_path = check_path(dir, filename)
-      puts "开始下载文件到： #{file_path}"
+      puts "开始下载文件到： #{file_path}, 视频地址：#{url}"
       Down::NetHttp.download(url,
                              destination: file_path, headers: generate_headers,
                              content_length_proc: proc { |size| total_size = size },
