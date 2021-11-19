@@ -54,8 +54,8 @@ $ bili-console manga
 * [x] B站二维码登录 
 * [x] 查看个人信息
 * [x] 根据bv下载视频
-* [ ] 合并下载的视频
-* [ ] 查看个人收藏夹
+* [x] 合并下载的视频
+* [x] 查看个人收藏夹
 * [ ] 视频检索
 
 
@@ -63,10 +63,8 @@ $ bili-console manga
 
 ##### Gem依赖
 
-* [down](https://github.com/janko/down/)
 * [nice_http](https://github.com/MarioRuiz/nice_http)
 * [rqrcode](https://github.com/whomwah/rqrcode/)
-* [ruby-progressbar](https://github.com/jfelchner/ruby-progressbar/)
 * [thor](https://github.com/rails/thor)
 
 ##### 接口文档
