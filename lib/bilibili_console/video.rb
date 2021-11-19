@@ -144,7 +144,7 @@ module Bilibili
     end
 
     def curl_download(url, user_agent, referer, cookie, dest)
-      `curl -X GET --referer "#{referer}" --user-agent "#{user_agent}" --cookie "#{cookie}" -O #{dest} #{url}`
+      `curl --referer "#{referer}" --user-agent "#{user_agent}" --cookie "#{cookie}" -o #{dest} #{url}`
     end
   end
 end
