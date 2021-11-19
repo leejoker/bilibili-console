@@ -145,8 +145,7 @@ module Bilibili
 
     def wget_download(url, user_agent, referer, cookie, dest)
       File.write('cookie', cookie) unless File.exist?('cookie')
-      puts "wget #{url} -E --referer='#{referer}' -U --user-agent='#{user_agent}' --load-cookie=#{cookie} -O \"#{dest}\""
-      `wget #{url} -E --referer='#{referer}' -U --user-agent='#{user_agent}' --load-cookie=cookie -O "#{dest}"`
+      `wget '#{url}' --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='cookie' -O "#{dest}"`
     end
   end
 end
