@@ -6,9 +6,7 @@
 # https://opensource.org/licenses/MIT
 
 require_relative 'http/http'
-require 'down'
 require 'fileutils'
-require 'ruby-progressbar'
 
 # video module
 module Bilibili
@@ -100,16 +98,11 @@ module Bilibili
       next?(array, idx) && array[idx][:prefix] == array[idx + 1][:prefix]
     end
 
-    def download_file(url, dir, filename, total_size = 0)
-      progressbar = ProgressBar.create
+    def download_file(url, dir, filename)
       file_path = check_path(dir, filename)
       puts "开始下载文件到： #{file_path}, 视频地址：#{url}"
-      Down::NetHttp.download(url,
-                             destination: file_path, headers: generate_headers,
-                             content_length_proc: proc { |size| total_size = size },
-                             progress_proc: proc { |cur_size|
-                               progressbar.progress = cur_size.to_f / total_size * 100.0
-                             })
+      headers = generate_headers
+      curl_download(url, headers['Referer'], headers['User-Agent'], headers['Cookie'], file_path)
       file_path
     end
 
@@ -148,6 +141,10 @@ module Bilibili
 
       `ffmpeg -i concat:"#{files.join('|')}" -c copy #{dest}`
       files.clear
+    end
+
+    def curl_download(url, user_agent, referer, cookie, dest)
+      `curl -X GET --referer #{referer} --user-agent '#{user_agent}' --cookie '#{cookie}' -O #{dest} #{url}`
     end
   end
 end
