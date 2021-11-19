@@ -102,7 +102,7 @@ module Bilibili
       file_path = check_path(dir, filename)
       puts "开始下载文件到： #{file_path}, 视频地址：#{url}"
       headers = generate_headers
-      curl_download(url, headers['Referer'], headers['User-Agent'], headers['Cookie'], file_path)
+      curl_download(url, headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
       file_path
     end
 
@@ -144,8 +144,7 @@ module Bilibili
     end
 
     def curl_download(url, user_agent, referer, cookie, dest)
-      puts "curl -X GET --referer #{referer} --user-agent '#{user_agent}' --cookie '#{cookie}' -O #{dest} #{url}"
-      `curl -X GET --referer #{referer} --user-agent '#{user_agent}' --cookie '#{cookie}' -O #{dest} #{url}`
+      `curl -X GET --referer "#{referer}" --user-agent "#{user_agent}" --cookie "#{cookie}" -O #{dest} #{url}`
     end
   end
 end
