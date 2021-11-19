@@ -122,7 +122,7 @@ module Bilibili
       headers = BiliHttp.headers
       {
         'User-Agent' => headers[:"User-Agent"],
-        'Referer' => headers[:Referer],
+        'Referer' => headers[:"Referer"],
         'Cookie' => create_cookie_str(load_cookie)
       }
     end
@@ -144,7 +144,7 @@ module Bilibili
     end
 
     def curl_download(url, user_agent, referer, cookie, dest)
-      `curl --referer "#{referer}" --user-agent "#{user_agent}" --cookie "#{cookie}" -o #{dest} #{url}`
+      `curl --referer #{referer} --user-agent '#{user_agent}' --cookie '#{cookie}' -o "#{dest}" #{url}`
     end
   end
 end
