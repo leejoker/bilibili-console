@@ -81,7 +81,7 @@ module Bilibili
 
       download_path = "#{File.expand_path(@options['download_path'].to_s, __dir__)}/#{bv_id}/"
       combine_array = []
-      urls.each_with_index do |url, _|
+      urls.each_with_index do |url, idx|
         same_part = same_part?(urls, idx)
         combine_array << download_file(url[:url], download_path, url[:name])
         combine_media(combine_array, "#{download_path}#{url[:prefix]}.flv") unless same_part
