@@ -164,9 +164,10 @@ module Bilibili
     end
 
     def wget_download(url, user_agent, referer, cookie, dest)
-      File.write('cookie', cookie) unless File.exist?('cookie')
-      command = "wget '#{url}' --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='cookie'"
-      `#{command} -O "#{dest}"` unless dest_file_exist?(dest, wget_file_size(command))
+      config_path = File.expand_path((@options['config_path']).to_s, __dir__)
+      File.write("#{config_path}/cookie", cookie) unless File.exist?("#{config_path}/cookie")
+      command = "wget '#{url}' --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='#{config_path}/cookie' "
+      `#{command} -O " #{dest}"` unless dest_file_exist?(dest, wget_file_size(command))
     end
   end
 end
