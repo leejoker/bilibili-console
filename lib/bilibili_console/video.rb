@@ -81,10 +81,8 @@ module Bilibili
 
       download_path = "#{File.expand_path(@options['download_path'].to_s, __dir__)}/#{bv_id}/"
       combine_array = []
-      urls.each_with_index do |url, idx|
-        same_part = same_part?(urls, idx)
+      urls.each do |url|
         combine_array << download_file(url[:url], download_path, url[:name])
-        combine_media(combine_array, "#{download_path}#{url[:prefix]}.flv") unless same_part
       end
     end
 
@@ -144,7 +142,6 @@ module Bilibili
     end
 
     def dest_file_exist?(dest, size)
-      puts 'check dest file exists'
       if File.exist?(dest)
         local = File.new(dest).size / 1024
         puts "file exists, local = #{local}, remote = #{size}"
@@ -168,7 +165,7 @@ module Bilibili
       config_path = File.expand_path((@options['config_path']).to_s, __dir__)
       File.write("#{config_path}/cookie", cookie) unless File.exist?("#{config_path}/cookie")
       command = "wget '#{url}' --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='#{config_path}/cookie' "
-      `#{command} -O " #{dest}"` unless dest_file_exist?(dest, wget_file_size(command))
+      `#{command} -c -O "#{dest}"`
     end
   end
 end
