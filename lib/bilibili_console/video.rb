@@ -122,7 +122,7 @@ module Bilibili
       headers = BiliHttp.headers
       {
         'User-Agent' => headers[:"User-Agent"],
-        'Referer' => headers[:"Referer"],
+        'Referer' => headers[:Referer],
         'Cookie' => create_cookie_str(load_cookie)
       }
     end
@@ -143,9 +143,30 @@ module Bilibili
       files.clear
     end
 
+    def dest_file_exist?(dest, size)
+      if File.exist?(dest)
+        local = File.new(dest).size / 1024
+        puts "file exists, local = #{local}, remote = #{size}"
+        local == size
+      else
+        false
+      end
+    end
+
+    def wget_file_size(command)
+      result = `#{command} -o -`
+      hash = {}
+      result.split("\n").filter { |n| n.include?(':') }.each do |line|
+        a = line.split(':')
+        hash[a[0].strip] = a[1].strip
+      end
+      hash['Content-Length'].to_i
+    end
+
     def wget_download(url, user_agent, referer, cookie, dest)
       File.write('cookie', cookie) unless File.exist?('cookie')
-      `wget '#{url}' --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='cookie' -O "#{dest}"`
+      command = "wget '#{url}' --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='cookie'"
+      `#{command} -O "#{dest}"` unless dest_file_exist?(dest, wget_file_size(command))
     end
   end
 end
