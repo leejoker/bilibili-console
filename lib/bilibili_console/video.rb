@@ -80,9 +80,11 @@ module Bilibili
       return nil if urls.empty?
 
       download_path = "#{File.expand_path(@options['download_path'].to_s, __dir__)}/#{bv_id}/"
-      combine_array = []
-      urls.each do |url|
-        combine_array << download_file(url[:url], download_path, url[:name])
+      url_array = []
+      urls.map { |url| download_file(url, download_path) }.each_with_index do |u, i|
+        same_part = same_part?(u, i)
+        url_array << u[:file_path]
+        combine_media(url_array, "#{download_path}#{u[:prefix]}.flv") unless same_part
       end
     end
 
@@ -96,12 +98,13 @@ module Bilibili
       next?(array, idx) && array[idx][:prefix] == array[idx + 1][:prefix]
     end
 
-    def download_file(url, dir, filename)
-      file_path = check_path(dir, filename)
-      puts "开始下载文件到： #{file_path}, 视频地址：#{url}"
+    def download_file(url, dir)
+      file_path = check_path(dir, url[:name])
+      url[:file_path] = file_path
+      puts "开始下载文件到： #{file_path}, 视频地址：#{url[:url]}"
       headers = generate_headers
-      wget_download(url, headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
-      file_path
+      wget_download(url[:url], headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
+      url
     end
 
     def check_path(dir, filename)
@@ -134,8 +137,7 @@ module Bilibili
         return
       end
 
-      files = files.filter { |file| File.new(file).exist? }
-      return if files.size.zero?
+      return if files.filter { |file| File.exist?(file) }.size.zero?
 
       `ffmpeg -i concat:"#{files.join('|')}" -c copy #{dest}`
       files.clear
