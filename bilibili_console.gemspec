@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'bilibili_console'
-  s.version = '0.0.1'
+  s.version = '0.0.2'
   s.executables << 'bili-console'
   s.summary = 'bilibili console'
   s.description = 'a console tool for bilibili'

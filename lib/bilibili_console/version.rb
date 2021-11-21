@@ -6,5 +6,5 @@
 # https://opensource.org/licenses/MIT
 
 module Bilibili
-  VERSION = '0.0.1'
+  VERSION = '0.0.2'
 end

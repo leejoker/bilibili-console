@@ -75,10 +75,11 @@ module Bilibili
       result
     end
 
-    def download_video_by_bv(bv_id, video_qn = '720')
+    def download_video_by_bv(bv_id, video_qn = '720', start = 1, page = nil)
       urls = video_url_list(bv_id, video_qn)
       return nil if urls.empty?
 
+      urls = page_slice(urls, start.to_i - 1, page)
       download_path = "#{File.expand_path(@options['download_path'].to_s, __dir__)}/#{bv_id}/"
       url_array = []
       urls.map { |url| download_file(url, download_path) }.each_with_index do |u, i|
@@ -89,6 +90,14 @@ module Bilibili
     end
 
     private
+
+    def page_slice(urls, start, page)
+      if page.nil?
+        urls.slice(start, urls.size - start)
+      else
+        [] << urls[page.to_i - 1]
+      end
+    end
 
     def next?(array, index)
       !array[index + 1].nil?
@@ -104,6 +113,7 @@ module Bilibili
       puts "开始下载文件到： #{file_path}, 视频地址：#{url[:url]}"
       headers = generate_headers
       wget_download(url[:url], headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
+      dest_file_exist?(file_path)
       url
     end
 
@@ -137,17 +147,18 @@ module Bilibili
         return
       end
 
-      return if files.filter { |file| File.exist?(file) }.size.zero?
+      return if files.select! { |file| File.exist?(file) }.size.zero?
 
       `ffmpeg -i concat:"#{files.join('|')}" -c copy #{dest}`
       files.clear
     end
 
-    def dest_file_exist?(dest, size)
+    def dest_file_exist?(dest)
       if File.exist?(dest)
-        local = File.new(dest).size / 1024
-        puts "file exists, local = #{local}, remote = #{size}"
-        local == size
+        local = File.new(dest).size
+        raise 'file size is zero' if local.zero?
+
+        true
       else
         false
       end

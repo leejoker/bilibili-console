@@ -10,6 +10,7 @@ class BiliConsole < Thor
   end
 
   desc 'help', 'help content'
+
   def help
     banner = File.read(File.expand_path('banner.txt', __dir__))
     puts <<~HELP
@@ -24,12 +25,14 @@ class BiliConsole < Thor
   end
 
   desc 'login', 'login with qrcode'
+
   def login
     bc = BilibiliConsole.new
     puts bc.login
   end
 
   desc 'user', 'get user info'
+
   def user
     bc = BilibiliConsole.new
     user = bc.login_user_info
@@ -41,6 +44,7 @@ class BiliConsole < Thor
   end
 
   desc 'manga', 'checkin bilibili manga'
+
   def manga_checkin
     bc = BilibiliConsole.new
     bc.manga.load_cookie
@@ -53,10 +57,15 @@ class BiliConsole < Thor
   end
 
   desc 'down', 'download video by bv code'
+  method_option :start, aliases: '-s', desc: 'start page'
+  method_option :page, aliases: '-p', desc: 'order one page'
+
   def download_video(bv_id)
     bc = BilibiliConsole.new
     bc.video.load_cookie
-    bc.download_video(bv_id)
+    start = options[:start].nil? ? 1 : options[:start]
+    page = options[:page]
+    bc.download_video(bv_id, start, page)
   end
 end
 
