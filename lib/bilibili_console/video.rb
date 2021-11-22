@@ -70,7 +70,7 @@ module Bilibili
         get_video_url(bv_id, page.cid, video_qn).each do |down_url|
           order = down_url[:order] < 10 ? "0#{down_url[:order]}" : down_url[:order]
           result << { 'name': "#{page.part}_#{order}.flv", 'url': down_url[:url].to_s, 'prefix': page.part,
-                      'order': "#{page[:page]}#{order}", 'bv': bv_id.to_s }
+                      'order': "#{page.page}#{order}", 'bv': bv_id.to_s }
         end
       end
       result
@@ -90,45 +90,7 @@ module Bilibili
       end
     end
 
-    def download_bv(bv_id, video_qn = '720', start = 1, page = nil)
-      page_list = video_page_list(bv_id)
-      return nil if page_list.nil?
-
-      hash = { 'bv_id': bv_id.to_s, 'video_qn': video_qn }
-      page_slice(page_list, start.to_i - 1, page).map do |p|
-        hash.merge!('page': p)
-        r = ractor_handle
-        r.send(hash)
-        r
-      end.each(&:take)
-    end
-
     private
-
-    def download_video(urls)
-      return nil if urls.empty?
-
-      download_path = "#{File.expand_path(@options['download_path'].to_s, __dir__)}/#{urls[0][:bv]}/"
-      url_array = []
-      urls.map { |url| download_file(url, download_path) }.each_with_index do |u, i|
-        same_part = same_part?(u, i)
-        url_array << u[:file_path]
-        combine_media(url_array, "#{download_path}#{u[:prefix]}.flv") unless same_part
-      end
-    end
-
-    def ractor_handle
-      Ractor.new do
-        h = receive
-        result = []
-        get_video_url(h[:bv_id], h[:page].cid, h[:video_qn]).each do |down_url|
-          order = down_url[:order] < 10 ? "0#{down_url[:order]}" : down_url[:order]
-          result << { 'name': "#{page.part}_#{order}.flv", 'url': down_url[:url].to_s, 'prefix': page.part,
-                      'order': "#{page[:page]}#{order}", 'bv': h[:bv_id].to_s }
-        end
-        download_video(result)
-      end
-    end
 
     def page_slice(urls, start, page)
       if page.nil?
