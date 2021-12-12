@@ -7,6 +7,7 @@
 
 require_relative 'http/http'
 require 'json'
+require 'cgi'
 
 # video module
 module Bilibili
@@ -138,7 +139,7 @@ module Bilibili
 
     # list user fav folder videos by page
     def list_fav_video(media_id, page_num = 1, page_size = 10, keyword = nil)
-      keyword = "&keyword=#{keyword}" unless keyword.nil?
+      keyword = "&keyword=#{CGI.escape(keyword)}&order=mtime&type=1&tid=0&jsonp=jsonp" unless keyword.nil?
       url = "https://api.bilibili.com/x/v3/fav/resource/list?media_id=#{media_id}&pn=#{page_num}&ps=#{page_size}#{keyword}&platform=web"
       data = get_jsona(url)
       Bilibili::FavResourceList.new(data)
