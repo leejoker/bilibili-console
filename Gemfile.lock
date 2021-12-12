@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    bilibili_console (0.0.1)
+    bilibili_console (0.0.2)
       nice_http (~> 1.8.9)
       rqrcode (~> 2.0)
       thor (~> 1.1.0)
@@ -68,4 +68,4 @@ DEPENDENCIES
   rubocop (~> 1.7)
 
 BUNDLED WITH
-   2.2.24
+   2.2.31
