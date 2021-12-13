@@ -7,6 +7,7 @@
 
 require_relative 'http/http'
 require_relative 'base'
+require_relative 'api'
 require 'rqrcode'
 require 'json'
 
@@ -47,7 +48,7 @@ module Bilibili
     attr_accessor :url, :oauth_key
 
     def login_url
-      data = get_jsonl('https://passport.bilibili.com/qrcode/getLoginUrl')
+      data = get_jsonl(Api::Login::QRCODE)
       @url = data[:url]
       @oauth_key = data[:oauthKey]
     end
@@ -64,7 +65,7 @@ module Bilibili
 
     def login_user_info
       set_http_cookie
-      data = get_jsona('https://api.bilibili.com/nav')
+      data = get_jsona(Api::Login::USERINFO)
       if data.code != '-101'
         Bilibili::UserInfo.new(data)
       else
@@ -81,7 +82,7 @@ module Bilibili
       over = $stdin.gets.chomp
       return nil unless over == 'y'
 
-      post_form_jsonl('https://passport.bilibili.com/qrcode/getLoginInfo', { oauthKey: @oauth_key })
+      post_form_jsonl(Api::Login::INFO, { oauthKey: @oauth_key })
       puts 'Login Success !!!'
       save_cookie
       'success'

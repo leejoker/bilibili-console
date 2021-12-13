@@ -6,6 +6,7 @@
 # https://opensource.org/licenses/MIT
 
 require_relative 'http/http'
+require_relative 'api'
 
 # video module
 module Bilibili
@@ -17,8 +18,7 @@ module Bilibili
       cur_header = {
         'User-Agent': 'Mozilla/5.0 BiliDroid/6.4.0 (bbcallen@gmail.com) os/android model/M1903F11I mobi_app/android build/6040500 channel/bili innerVer/6040500 osVer/9.0.0 network/2'
       }
-      post_jsonm('https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn?platform=android',
-                 cur_header, { 'platform' => 'android' })
+      post_jsonm(Api::Manga::CHECK_IN, cur_header, { 'platform' => 'android' })
     end
   end
 end

@@ -6,6 +6,7 @@
 # https://opensource.org/licenses/MIT
 
 require_relative 'http/http'
+require_relative 'api'
 require 'fileutils'
 
 # video module
@@ -45,7 +46,7 @@ module Bilibili
     def video_page_list(bv_id)
       return nil if bv_id.nil?
 
-      url = "https://api.bilibili.com/x/player/pagelist?bvid=#{bv_id}"
+      url = "#{Api::Video::PAGE_LIST}?bvid=#{bv_id}"
       datas = get_jsona(url)
       return nil if datas.nil?
 
@@ -56,7 +57,7 @@ module Bilibili
 
     def get_video_url(bv_id, cid, video_qn = '720')
       qn = BilibiliBase.video_qn[video_qn]
-      url = "https://api.bilibili.com/x/player/playurl?bvid=#{bv_id}&cid=#{cid}&qn=#{qn}&fnval=0&fnver=0&fourk=1"
+      url = "#{Api::Video::PLAY_URL}?bvid=#{bv_id}&cid=#{cid}&qn=#{qn}&fnval=0&fnver=0&fourk=1"
       data = get_jsona(url)
       data[:durl]
     end
@@ -70,7 +71,7 @@ module Bilibili
         get_video_url(bv_id, page.cid, video_qn).each do |down_url|
           order = down_url[:order] < 10 ? "0#{down_url[:order]}" : down_url[:order]
           result << { 'name': "#{page.part}_#{order}.flv", 'url': down_url[:url].to_s, 'prefix': page.part,
-                      'order': "#{page.page}#{order}", 'bv': bv_id.to_s }
+            'order': "#{page.page}#{order}", 'bv': bv_id.to_s }
         end
       end
       result
