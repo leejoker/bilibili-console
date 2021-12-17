@@ -1,14 +1,14 @@
 # bilibili_console
 
-#### 介绍
+#### 1 介绍
 
 B站命令行客户端Ruby版
 
-#### 软件结构
+#### 2 软件结构
 
 基于ruby开发，ruby version >= 2.7
 
-#### 安装教程
+#### 3 安装教程
 
 1. 安装ruby环境，使用[rvm](https://ruby-china.org/wiki/rvm-guide)或[rbenv](https://ruby-china.org/wiki/rbenv-guide)均可
 2. 替换gem源
@@ -19,37 +19,71 @@ $ gem build bilibili_console.gemspec
 $ gem install bilibili_console-0.0.2.gem
 ```
 
-### 使用方法
+### 4 使用方法
 
 gem安装完成后即可使用**bili-console**命令
 
-#### 帮助信息
+#### 4.1 帮助信息
 
 ```shell
 $ bili-console help
 ```
 
-#### 登录
+#### 4.2 登录
 
 ```shell
 # 执行二维码登录
 $ bili-console login
 ```
 
-#### 用户基本信息
+#### 4.3 用户基本信息
 
 ```shell
 $ bili-console user
 ```
 
-#### bilibili漫画签到
+#### 4.4 下载指定BV视频
+
+##### 4.4.1 全部下载
+
+```shell
+$ bili-console down bv_id
+```
+
+##### 4.4.2 从指定分P开始下载
+
+```shell
+$ bili-console down -s 1 bv_id
+```
+
+##### 4.4.3 下载指定分P
+
+```shell
+$ bili-console down -p 2 bv_id
+```
+
+#### 4.5 查询收藏
+
+##### 4.5.1 查询所有收藏
+
+```shell
+$ bili-console fav
+```
+
+##### 4.5.2 从收藏检索
+
+```shell
+$ bili-console fav --search 检索关键词
+```
+
+#### 4.6 bilibili漫画签到
 
 ```shell
 # 目前只提供漫画签到的功能
 $ bili-console manga
 ```
 
-#### 功能清单
+#### 5 功能清单
 
 * [x] bilibili漫画签到
 * [x] B站二维码登录
@@ -61,7 +95,7 @@ $ bili-console manga
 * [x] 从指定分p开始下载后续分p
 * [ ] 视频检索
 
-#### 相关项目
+#### 6 相关项目
 
 ##### Gem依赖
 
