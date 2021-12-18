@@ -8,5 +8,5 @@
 git pull
 bundle install
 gem build bilibili_console.gemspec
-gem install bilibili_console-0.0.1.gem
+gem install bilibili_console-0.0.3.gem
 echo "Install Over"
