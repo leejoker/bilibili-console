@@ -9,15 +9,15 @@ class BiliConsole < Thor
     true
   end
 
-  desc 'help', 'help content'
+  desc 'info', 'help content'
 
-  def help
+  def info
     banner = File.read(File.expand_path('banner.txt', __dir__))
     puts <<~HELP
       #{banner}
 
       Usage: bili-console [arguments]
-        help                       help messages
+        help    [command]          help messages
         login                      qrcode login
         user                       user info
         manga                      bilibili manga checkin
