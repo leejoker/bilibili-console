@@ -77,7 +77,7 @@ class BiliConsole < Thor
   method_option :fav, aliases: '-m', desc: 'operate with the fav'
 
   def fav_info
-    if options[:search].nil?
+    if options[:search].nil? && options[:fav].nil?
       fav_list
     else
       options_dup = options.dup
