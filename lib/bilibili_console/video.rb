@@ -95,10 +95,11 @@ module Bilibili
 
     def page_slice(urls, start_page, end_page, page)
       if page.nil?
+        start_page = start_page.to_i - 1
         if end_page.nil?
-          urls.slice(start_page.to_i - 1, urls.size - start_page)
-        elsif start_page < end_page
-          urls.slice(start_page.to_i - 1, end_page)
+          urls.slice(start_page, urls.size - start_page)
+        elsif start_page < end_page.to_i
+          urls.slice(start_page, end_page.to_i)
         else
           raise 'start should not less than or equals to end'
         end
