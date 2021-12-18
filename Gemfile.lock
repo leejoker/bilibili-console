@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    bilibili_console (0.0.2)
+    bilibili_console (0.0.3)
       nice_http (~> 1.8.9)
       rqrcode (~> 2.0)
       thor (~> 1.1.0)

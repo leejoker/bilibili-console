@@ -1,7 +1,9 @@
+require_relative 'lib/bilibili_console/version'
+
 Gem::Specification.new do |s|
   s.name = 'bilibili_console'
-  s.version = '0.0.2'
-  s.executables << 'bili-console'
+  s.version = Bilibili::VERSION
+  s.executables << 'bilic'
   s.summary = 'bilibili console'
   s.description = 'a console tool for bilibili'
   s.authors = ['leejoker']

@@ -16,7 +16,7 @@ B站命令行客户端Ruby版
 
 ```shell
 $ gem build bilibili_console.gemspec
-$ gem install bilibili_console-0.0.2.gem
+$ gem install bilibili_console-0.0.3.gem
 ```
 
 ### 4 使用方法
@@ -26,56 +26,56 @@ gem安装完成后即可使用**bili-console**命令
 #### 4.1 帮助信息
 
 ```shell
-$ bili-console help
+$ bilic help
 ```
 
 #### 4.2 登录
 
 ```shell
 # 执行二维码登录
-$ bili-console login
+$ bilic login
 ```
 
 #### 4.3 用户基本信息
 
 ```shell
-$ bili-console user
+$ bilic user
 ```
 
 #### 4.4 下载指定BV视频
 
 ```shell
 # 下载全部分P
-$ bili-console down bv_id
+$ bilic down bv_id
 
 # 从指定分P开始下载
-$ bili-console down -s 1 bv_id
+$ bilic down -s 1 bv_id
 
 # 从指定分P结束
-$ bili-console down -e 10 bv_id
+$ bilic down -e 10 bv_id
 
 # 下载指定分P
-$ bili-console down -p 2 bv_id
+$ bilic down -p 2 bv_id
 ```
 
 #### 4.5 查询收藏
 
 ```shell
 # 查询所有收藏
-$ bili-console fav
+$ bilic fav
 
 # 从收藏检索
-$ bili-console fav --search 检索关键词
+$ bilic fav --search 检索关键词
 
 # 检索指定收藏夹
-$ bili-console fav --page_size 20 --page_num 1 --fav 收藏夹id --all {0 从当前收藏夹检索, 1 从全局检索}
+$ bilic fav --page_size 20 --page_num 1 --fav 收藏夹id --all {0 从当前收藏夹检索, 1 从全局检索}
 ```
 
 #### 4.6 bilibili漫画签到
 
 ```shell
 # 目前只提供漫画签到的功能
-$ bili-console manga
+$ bilic manga
 ```
 
 #### 5 功能清单

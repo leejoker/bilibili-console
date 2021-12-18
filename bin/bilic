@@ -16,7 +16,7 @@ class BiliConsole < Thor
     puts <<~HELP
       #{banner}
 
-      Usage: bili-console [arguments]
+      Usage: bilic [arguments]
         help    [command]          help messages
         login                      qrcode login
         user                       user info
