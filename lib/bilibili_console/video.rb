@@ -81,8 +81,7 @@ module Bilibili
       urls = video_url_list(bv_id, options[:qn])
       return nil if urls.empty?
 
-      urls = page_slice(urls, options[:star], options[:end], options[:page])
-      puts urls
+      urls = page_slice(urls, options[:start], options[:end], options[:page])
       download_path = "#{File.expand_path(@options['download_path'].to_s, __dir__)}/#{bv_id}/"
       url_array = []
       urls.map { |url| download_file(url, download_path) }.each_with_index do |u, i|
