@@ -9,6 +9,23 @@ class BiliConsole < Thor
     true
   end
 
+  desc 'help', 'help content'
+
+  def help
+    banner = File.read(File.expand_path('banner.txt', __dir__))
+    puts <<~HELP
+      #{banner}
+
+      Usage: bili-console [arguments]
+        help                       help messages
+        login                      qrcode login
+        user                       user info
+        manga                      bilibili manga checkin
+        down    [-s e p q]         download video
+        fav     [-s m a ps pn]     show user video collections
+    HELP
+  end
+
   desc 'login', 'login with qrcode'
 
   def login
