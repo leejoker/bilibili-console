@@ -65,10 +65,10 @@ class BiliConsole < Thor
   def download_video(bv_id)
     bc = BilibiliConsole.new
     bc.video.load_cookie
-    options = options.dup
-    options[:start] = 1 if options[:start].nil?
-    options[:qn] = '720' if options[:qn].nil?
-    bc.download_video(bv_id, options)
+    options_dup = options.dup
+    options_dup[:start] = 1 if options[:start].nil?
+    options_dup[:qn] = '720' if options[:qn].nil?
+    bc.download_video(bv_id, options_dup)
   end
 
   desc 'fav', 'show user fav info'
@@ -80,8 +80,8 @@ class BiliConsole < Thor
     if options[:search].nil?
       fav_list
     else
-      options = options.dup
-      fav_search(options)
+      options_dup = options.dup
+      fav_search(options_dup)
     end
   end
 
