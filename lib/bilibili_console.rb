@@ -35,9 +35,9 @@ class BilibiliConsole
     @fav.list_user_fav_video(@user)
   end
 
-  def list_fav_video(media_id, page_num = 1, page_size = 10, keyword = nil)
+  def list_fav_video(options)
     set_api_http
-    @fav.list_fav_video(media_id, page_num, page_size, keyword)
+    @fav.list_fav_video(options)
   end
 
   def download_video(bv_id, options)

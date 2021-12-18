@@ -9,21 +9,6 @@ class BiliConsole < Thor
     true
   end
 
-  desc 'help', 'help content'
-
-  def help
-    banner = File.read(File.expand_path('banner.txt', __dir__))
-    puts <<~HELP
-      #{banner}
-
-      Usage: bili-console [arguments]
-        help    help messages
-        login   qrcode login
-        user    user info
-        manga   bilibili manga checkin
-    HELP
-  end
-
   desc 'login', 'login with qrcode'
 
   def login
@@ -72,9 +57,11 @@ class BiliConsole < Thor
   end
 
   desc 'fav', 'show user fav info'
-  method_option :ls, aliases: '-l', desc: 'show fav list'
   method_option :search, aliases: '-s', desc: 'search in fav'
-  method_option :fav, aliases: '-m', desc: 'operate with the fav'
+  method_option :fav, aliases: '-m', desc: 'ordered a fav to do some operations'
+  method_option :page_size, aliases: '-ps', desc: 'page size'
+  method_option :page_num, aliases: '-pn', desc: 'page number'
+  method_option :all, aliases: '-a', desc: 'usr 1 for searching in all fav and 2 for searching in the ordered fav'
 
   def fav_info
     if options[:search].nil? && options[:fav].nil?
@@ -103,8 +90,9 @@ class BiliConsole < Thor
     bc = BilibiliConsole.new
     fav = bc.user_fav_list.list[0]
     user = bc.login_user_info
-    options[:fav] = "#{fav.fid}#{user.uid.to_s.slice(-2, 2)}" if options[:fav].nil?
-    bc.list_fav_video(options[:fav], 1, 10, options[:search])&.medias&.each do |media|
+    options[:fav] = fav.fid if options[:fav].nil?
+    options[:fav] += user.uid.to_s.slice(-2, 2)
+    bc.list_fav_video(options)&.medias&.each do |media|
       puts <<~MEDIA
           title:         #{media.title}
           intro:         #{media.intro}

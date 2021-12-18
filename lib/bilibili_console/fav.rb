@@ -139,9 +139,14 @@ module Bilibili
     end
 
     # list user fav folder videos by page
-    def list_fav_video(media_id, page_num = 1, page_size = 10, keyword = nil)
-      keyword = "&keyword=#{CGI.escape(keyword)}&order=mtime&type=1&tid=0&jsonp=jsonp" unless keyword.nil?
-      url = "#{Api::Fav::FAV_VIDEO_LIST}?media_id=#{media_id}&pn=#{page_num}&ps=#{page_size}#{keyword}&platform=web"
+    def list_fav_video(options)
+      options[:page_num] = 1 if options[:page_num].nil?
+      options[:page_size] = 10 if options[:page_size].nil?
+      options[:all] = 1 if options[:all].nil?
+      unless options[:search].nil?
+        options[:search] = "&keyword=#{CGI.escape(options[:search])}&order=mtime&type=#{options[:all]}&tid=0&jsonp=jsonp"
+      end
+      url = "#{Api::Fav::FAV_VIDEO_LIST}?media_id=#{options[:fav]}&pn=#{options[:page_num]}&ps=#{options[:page_size]}#{options[:search]}&platform=web"
       data = get_jsona(url)
       Bilibili::FavResourceList.new(data)
     end

@@ -66,6 +66,9 @@ $ bili-console fav
 
 # 从收藏检索
 $ bili-console fav --search 检索关键词
+
+# 检索指定收藏夹
+$ bili-console fav --page_size 20 --page_num 1 --fav 收藏夹id --all {0 从当前收藏夹检索, 1 从全局检索}
 ```
 
 #### 4.6 bilibili漫画签到
