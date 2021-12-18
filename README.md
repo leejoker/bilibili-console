@@ -44,35 +44,27 @@ $ bili-console user
 
 #### 4.4 下载指定BV视频
 
-##### 4.4.1 全部下载
-
 ```shell
+# 下载全部分P
 $ bili-console down bv_id
-```
 
-##### 4.4.2 从指定分P开始下载
-
-```shell
+# 从指定分P开始下载
 $ bili-console down -s 1 bv_id
-```
 
-##### 4.4.3 下载指定分P
+# 从指定分P结束
+$ bili-console down -e 10 bv_id
 
-```shell
+# 下载指定分P
 $ bili-console down -p 2 bv_id
 ```
 
 #### 4.5 查询收藏
 
-##### 4.5.1 查询所有收藏
-
 ```shell
+# 查询所有收藏
 $ bili-console fav
-```
 
-##### 4.5.2 从收藏检索
-
-```shell
+# 从收藏检索
 $ bili-console fav --search 检索关键词
 ```
 
@@ -91,9 +83,11 @@ $ bili-console manga
 * [x] 根据bv下载视频
 * [x] 合并下载的视频
 * [x] 查看个人收藏夹
+* [x] 搜索个人收藏夹
 * [x] 指定分p下载
-* [x] 从指定分p开始下载后续分p
-* [ ] 视频检索
+* [x] 从指定分p开始下载
+* [x] 下载到指定分P结束
+* [ ] 全局视频检索
 
 #### 6 相关项目
 

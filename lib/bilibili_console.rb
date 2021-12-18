@@ -40,9 +40,9 @@ class BilibiliConsole
     @fav.list_fav_video(media_id, page_num, page_size, keyword)
   end
 
-  def download_video(bv_id, start = 1, page = nil)
+  def download_video(bv_id, options)
     set_api_http
-    @video.download_video_by_bv(bv_id, nil, start, page)
+    @video.download_video_by_bv(bv_id, options)
   end
 
   def manga_checkin
