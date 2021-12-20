@@ -12,6 +12,24 @@ require 'json'
 # bilibili base
 module Bilibili
   include BiliHttp
+
+  # bilibili record class meta base
+  class BiliBliliRecordBase
+    def initialize(json)
+      return if json.nil?
+      
+      hash = {}
+      public_methods(false).filter { |m| m.name.index('=').nil? }.each do |method|
+        value = method("#{method.name}=".to_sym).call(json[method.name]) unless json[method.name].nil?
+        hash.merge!({ method.name => value }) unless json[method.name].nil?
+      end
+
+      BiliBliliRecordBase.define_method('to_json') do |*opt|
+        hash.to_json(*opt)
+      end
+    end
+  end
+
   # base class
   class BilibiliBase
     attr_accessor :http_client, :options

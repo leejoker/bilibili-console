@@ -13,32 +13,8 @@ require 'fileutils'
 module Bilibili
   include BiliHttp
   # video page list
-  class PageInfo
+  class PageInfo < BiliBliliRecordBase
     attr_accessor :cid, :page, :from, :part, :duration, :vid, :weblink
-
-    def initialize(json)
-      return if json.nil?
-
-      @cid = json[:cid]
-      @page = json[:page]
-      @from = json[:from]
-      @part = json[:part]
-      @duration = json[:duration]
-      @vid = json[:vid]
-      @weblink = json[:weblink]
-    end
-
-    def to_json(*opt)
-      {
-        cid: @cid,
-        page: @page,
-        from: @from,
-        part: @part,
-        duration: @duration,
-        vid: @vid,
-        weblink: @weblink
-      }.to_json(*opt)
-    end
   end
 
   # bilibili video interfaces

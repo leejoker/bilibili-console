@@ -15,32 +15,8 @@ require 'json'
 module Bilibili
   include BiliHttp
   # bilibili user info
-  class UserInfo
-    attr_accessor :face, :level_info, :uid, :money, :moral, :uname, :vip_type
-
-    def initialize(json)
-      return if json.nil?
-
-      @face = json[:face]
-      @level_info = json[:level_info]
-      @uid = json[:mid]
-      @money = json[:money]
-      @moral = json[:moral]
-      @uname = json[:moral]
-      @vip_type = json[:vipType]
-    end
-
-    def to_json(*opt)
-      {
-        face: @face,
-        level_info: @level_info,
-        uid: @uid,
-        money: @money,
-        moral: @moral,
-        uname: @uname,
-        vip_type: @vip_type
-      }.to_json(*opt)
-    end
+  class UserInfo < BiliBliliRecordBase
+    attr_accessor :face, :level_info, :uid, :money, :moral, :uname
   end
 
   # login class

@@ -14,18 +14,10 @@ require 'cgi'
 module Bilibili
   include BiliHttp
   # fav list
-  class FavList
+  class FavList < BiliBliliRecordBase
     attr_accessor :count, :list, :season
 
-    def initialize(data)
-      return if data.nil?
-
-      @count = data[:count]
-      @season = data[:season]
-      @list = generate_fav_list(data[:list])
-    end
-
-    def generate_fav_list(data_list)
+    def list=(data_list)
       data = []
       if !data_list.nil? && !data_list.empty?
         data_list.each do |obj|
@@ -34,57 +26,22 @@ module Bilibili
       end
       data
     end
-
-    def to_json(*opt)
-      {
-        count: @count,
-        list: @list,
-        season: @season
-      }.to_json(*opt)
-    end
   end
 
   # bilibili fav info
-  class FavInfo
+  class FavInfo < BiliBliliRecordBase
     attr_accessor :id, :fid, :uid, :attr, :title, :fav_state, :media_count
-
-    def initialize(json)
-      return if json.nil?
-
-      @id = json[:id]
-      @fid = json[:fid]
-      @uid = json[:mid]
-      @attr = json[:attr]
-      @title = json[:title]
-      @fav_state = json[:fav_state]
-      @media_count = json[:media_count]
-    end
-
-    def to_json(*opt)
-      {
-        id: @id,
-        fid: @fid,
-        uid: @uid,
-        attr: @attr,
-        title: @title,
-        fav_state: @fav_state,
-        media_count: @media_count
-      }.to_json(*opt)
-    end
   end
 
   # fav media list
-  class FavResourceList
+  class FavResourceList < BiliBliliRecordBase
     attr_accessor :info, :medias
 
-    def initialize(json)
-      return if json.nil?
-
-      @info = Bilibili::FavInfo.new(json[:info])
-      @medias = generate_media_list(json[:medias])
+    def info=(json)
+      Bilibili::FavInfo.new(json[:info])
     end
 
-    def generate_media_list(medias)
+    def medias=(medias)
       data = []
       if !medias.nil? && !medias.empty?
         medias.each do |media|
@@ -93,40 +50,11 @@ module Bilibili
       end
       data
     end
-
-    def to_json(*opt)
-      {
-        info: @info,
-        medias: @medias
-      }.to_json(*opt)
-    end
   end
 
   # fav media info
-  class FavMediaInfo
+  class FavMediaInfo < BiliBliliRecordBase
     attr_accessor :id, :type, :title, :intro, :page, :bv_id
-
-    def initialize(json)
-      return if json.nil?
-
-      @id = json[:id]
-      @type = json[:type]
-      @title = json[:title]
-      @intro = json[:intro]
-      @page = json[:page]
-      @bv_id = json[:bv_id]
-    end
-
-    def to_json(*opt)
-      {
-        id: @id,
-        type: @type,
-        title: @title,
-        intro: @intro,
-        page: @page,
-        bv_id: @bv_id
-      }.to_json(*opt)
-    end
   end
 
   # bilibili video interfaces
