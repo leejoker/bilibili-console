@@ -6,47 +6,39 @@
 # https://opensource.org/licenses/MIT
 
 require_relative 'http/http'
+require_relative 'base'
 require_relative 'api'
 
 # search module
 module Bilibili
   include BiliHttp
 
-  class VideoResult
-    attr_accessor :author, :mid, :typename, :bvid, :title, :description, :pic
-  end
-
   # search result data
-  class SearchData
+  class SearchData < BiliBliliRecordBase
     attr_accessor :seid, :page, :pageSize, :numResults, :numPages, :suggest_keyword, :result
 
-    def generate_result
-
+    def result=(videos)
+      data = []
+      if !videos.nil? && !videos.empty?
+        videos.each do |video|
+          data << Bilibili::VideoResult.new(video)
+        end
+      end
+      @result = data
     end
   end
 
-  # search result list
-  class SearchList
-    attr_accessor :data
-
-    def initialize(json)
-      return if json.nil?
-
-      @data = Bilibili::SearchData.new(json[:data])
-    end
-
-    def to_json(*opt)
-      {
-        data: @data
-      }.to_json(*opt)
-    end
+  class VideoResult < BiliBliliRecordBase
+    attr_accessor :author, :mid, :typename, :bvid, :title, :description, :pic
   end
 
   # bilibili search interfaces
   class Search < BilibiliBase
     def search(options)
-      url = "#{Api::Search::TYPE}?search_type=video&keyword=#{CGI.escape(options[:keyword])}&page=#{options[:page]}"
+      url = "#{Api::Search::TYPE}?search_type=video&keyword=#{CGI.escape(options[:keyword])}"
+      url += "&page=#{options[:page]}" unless options[:page].nil?
       data = get_jsona(url)
+      Bilibili::SearchData.new(data)
     end
   end
 end

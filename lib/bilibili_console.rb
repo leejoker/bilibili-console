@@ -5,10 +5,11 @@ require_relative 'bilibili_console/login'
 require_relative 'bilibili_console/fav'
 require_relative 'bilibili_console/video'
 require_relative 'bilibili_console/manga'
+require_relative 'bilibili_console/search'
 
 # bilibili console main class
 class BilibiliConsole
-  attr_accessor :http_client, :bilibili_login, :user, :fav, :video, :manga
+  attr_accessor :http_client, :bilibili_login, :user, :fav, :video, :manga, :search
 
   def initialize
     @http_client = BiliHttp::HttpClient.new
@@ -16,6 +17,7 @@ class BilibiliConsole
     @fav = Bilibili::Fav.new(@http_client)
     @video = Bilibili::Video.new(@http_client)
     @manga = Bilibili::Manga.new(@http_client)
+    @search = Bilibili::Search.new(@http_client)
   end
 
   def login
@@ -48,6 +50,11 @@ class BilibiliConsole
   def manga_checkin
     set_manga_http
     @manga.check_in
+  end
+
+  def search_keyword(options)
+    set_api_http
+    @search.search(options)
   end
 
   private

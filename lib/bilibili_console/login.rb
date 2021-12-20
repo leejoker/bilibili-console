@@ -16,7 +16,7 @@ module Bilibili
   include BiliHttp
   # bilibili user info
   class UserInfo < BiliBliliRecordBase
-    attr_accessor :face, :level_info, :uid, :money, :moral, :uname
+    attr_accessor :face, :level_info, :mid, :money, :moral, :uname
   end
 
   # login class

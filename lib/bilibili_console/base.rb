@@ -17,11 +17,13 @@ module Bilibili
   class BiliBliliRecordBase
     def initialize(json)
       return if json.nil?
-      
+
       hash = {}
       public_methods(false).filter { |m| m.name.index('=').nil? }.each do |method|
-        value = method("#{method.name}=".to_sym).call(json[method.name]) unless json[method.name].nil?
-        hash.merge!({ method.name => value }) unless json[method.name].nil?
+        next if json[method.name.to_sym].nil?
+
+        value = method("#{method.name}=".to_sym).call(json[method.name.to_sym])
+        hash.merge!({ method.name => value })
       end
 
       BiliBliliRecordBase.define_method('to_json') do |*opt|

@@ -24,7 +24,7 @@ module Bilibili
           data << Bilibili::FavInfo.new(obj)
         end
       end
-      data
+      @list = data
     end
   end
 
@@ -38,7 +38,7 @@ module Bilibili
     attr_accessor :info, :medias
 
     def info=(json)
-      Bilibili::FavInfo.new(json[:info])
+      @info = Bilibili::FavInfo.new(json[:info])
     end
 
     def medias=(medias)
@@ -48,7 +48,7 @@ module Bilibili
           data << Bilibili::FavMediaInfo.new(media)
         end
       end
-      data
+      @medias = data
     end
   end
 
@@ -61,7 +61,7 @@ module Bilibili
   class Fav < BilibiliBase
     # list user fav folders
     def list_user_fav_video(user_info)
-      url = "#{Api::Fav::USER_FAV_LIST}?up_mid=#{user_info.uid}&type=2"
+      url = "#{Api::Fav::USER_FAV_LIST}?up_mid=#{user_info.mid}&type=2"
       data = get_jsona(url)
       Bilibili::FavList.new(data)
     end
