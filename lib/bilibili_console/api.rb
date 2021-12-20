@@ -26,5 +26,9 @@ module Bilibili
     module Manga
       CHECK_IN = 'https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn?platform=android'
     end
+
+    module Search
+      TYPE = 'https://api.bilibili.com/x/web-interface/search/type'
+    end
   end
 end
