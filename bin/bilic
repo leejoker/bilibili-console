@@ -99,7 +99,7 @@ class BiliConsole < Thor
     options_dup[:page] = 1 if options_dup[:page].nil?
     options_dup[:keyword] = keyword
     bc = BilibiliConsole.new
-    data = bc.search_keyword(options)
+    data = bc.search_keyword(options_dup)
     data&.result&.each do |video|
       puts <<~VIDEO
           bv:            #{video.bvid}
