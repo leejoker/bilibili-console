@@ -89,6 +89,29 @@ class BiliConsole < Thor
     end
   end
 
+  desc 'search', 'Searching by type'
+  method_option :page, aliases: '-p', desc: 'page number'
+
+  def search(keyword)
+    return if keyword.nil?
+
+    options_dup = options.dup
+    options_dup[:page] = 1 if options_dup[:page].nil?
+    options_dup[:keyword] = keyword
+    bc = BilibiliConsole.new
+    data = bc.search_keyword(options)
+    data&.result&.each do |video|
+      puts <<~VIDEO
+          bv:            #{video.bvid}
+          title:         #{video.title}
+          author:        #{video.author}
+          desc:          #{video.description}
+          pic:           #{video.pic}
+        -----------------------------------------------------------------------
+      VIDEO
+    end
+  end
+
   private
 
   def fav_list

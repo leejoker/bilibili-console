@@ -29,7 +29,7 @@ module Bilibili
   end
 
   class VideoResult < BiliBliliRecordBase
-    attr_accessor :author, :mid, :typename, :bvid, :title, :description, :pic
+    attr_accessor :author, :bvid, :title, :description, :pic
   end
 
   # bilibili search interfaces
