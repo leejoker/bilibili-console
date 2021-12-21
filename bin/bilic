@@ -102,6 +102,7 @@ class BiliConsole < Thor
     data = bc.search_keyword(options_dup)
     data&.result&.each do |video|
       puts <<~VIDEO
+          av:            #{video.aid}
           bv:            #{video.bvid}
           title:         #{video.title}
           author:        #{video.author}
