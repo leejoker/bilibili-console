@@ -25,7 +25,7 @@ $ gem install bilibili_console-0.0.3.gem
 
 ### 4 使用方法
 
-gem安装完成后即可使用**bili-console**命令
+gem安装完成后即可使用**bilic**命令
 
 #### 4.1 帮助信息
 
