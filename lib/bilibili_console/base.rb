@@ -5,9 +5,10 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
+require_relative 'config'
 require_relative 'http/http'
-require 'fileutils'
 require 'json'
+require 'logger'
 
 # bilibili base
 module Bilibili
@@ -34,19 +35,16 @@ module Bilibili
 
   # base class
   class BilibiliBase
-    attr_accessor :http_client, :options
+    attr_accessor :http_client, :log
 
     class << self
-      attr_accessor :video_qn
+      attr_accessor :video_qn, :options, :logger
     end
 
     def initialize(http_client)
       @http_client = http_client
       create_request_methods
-      @options = {
-        'config_path' => '~/.bc', 'config_file' => '~/.bc/config.json',
-        'cookie_file' => '~/.bc/cookie.txt', 'download_path' => '~/.bc/download'
-      }
+      BilibiliBase.options = Config.new if BilibiliBase.options.nil?
       BilibiliBase.video_qn = {
         '240' => 6, '360' => 16, '480' => 32, '720' => 64, '720P60' => 74, '1080' => 80,
         '1080+' => 112, '1080P60' => 116, '4K' => 120, 'HDR' => 125
@@ -58,6 +56,7 @@ module Bilibili
 
       @http_client.api_http.cookies = @http_client.login_http.cookies
       json_str = @http_client.login_http.cookies.to_json
+      @log.info("cookie_json: #{json_str}")
       write_cookie(json_str)
     end
 
@@ -100,6 +99,7 @@ module Bilibili
     def define_get_json_method(method_name)
       new_method_name = "get_json#{method_name[0]}"
       BilibiliBase.define_method(new_method_name) do |url|
+        @log.debug("#{new_method_name}: [url]= #{url}")
         @http_client.get_json(@http_client.instance_variable_get("@#{method_name}"), url)
       end
     end
@@ -107,6 +107,7 @@ module Bilibili
     def define_post_form_json_method(method_name)
       new_method_name = "post_form_json#{method_name[0]}"
       BilibiliBase.define_method(new_method_name) do |url, params|
+        @log.debug("#{new_method_name}: [url]= #{url}, params= #{params}")
         @http_client.post_form_json(@http_client.instance_variable_get("@#{method_name}"), url, params)
       end
     end
@@ -114,6 +115,7 @@ module Bilibili
     def define_post_json_method(method_name)
       new_method_name = "post_json#{method_name[0]}"
       BilibiliBase.define_method(new_method_name) do |url, headers, req_body|
+        @log.debug("#{new_method_name}: [url]= #{url}, headers= #{headers}, req_body= #{req_body}")
         @http_client.post_json(@http_client.instance_variable_get("@#{method_name}"), url, headers, req_body)
       end
     end

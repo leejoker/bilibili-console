@@ -95,7 +95,8 @@ module Bilibili
     def download_file(url, dir)
       file_path = check_path(dir, url[:name])
       url[:file_path] = file_path
-      puts "开始下载文件到： #{file_path}, 视频地址：#{url[:url]}"
+      puts "开始下载文件到： #{file_path}"
+      @log.info "开始下载视频， 视频地址：#{url[:url]}"
       headers = generate_headers
       wget_download(url[:url], headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
       dest_file_exist?(file_path)

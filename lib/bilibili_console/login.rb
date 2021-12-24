@@ -54,7 +54,7 @@ module Bilibili
     def login
       login_url
       show_qrcode
-      print '已完成扫码？[y/n]'
+      puts '已完成扫码？[y/n]'
       over = $stdin.gets.chomp
       return nil unless over == 'y'
 
