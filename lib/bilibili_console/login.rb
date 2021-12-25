@@ -66,6 +66,7 @@ module Bilibili
       data = post_form_jsonl(Api::Login::INFO, { oauthKey: @oauth_key })
       @log.debug("login response data: #{data}")
       if [-4, -5].include?(data)
+        sleep 2
         login_check
       else
         true
