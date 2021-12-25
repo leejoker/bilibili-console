@@ -17,13 +17,13 @@ module Bilibili
     attr_accessor :options
 
     DEFAULT_OPTIONS = {
-      base_path: '~/.bc',
-      config_file: '~/.bc/bilic.conf',
-      cookie_json: '~/.bc/cookie.json',
-      cookie: '~/.bc/cookie.txt',
+      base_path: "#{Dir.home}/.bc",
+      config_file: "#{Dir.home}/.bc/bilic.conf",
+      cookie_json: "#{Dir.home}/.bc/cookie.json",
+      cookie: "#{Dir.home}/.bc/cookie.txt",
       video_qn: '720',
-      log_file: '~/.bc/bilic.log',
-      download_dir: '~/.bc/downloads'
+      log_file: "#{Dir.home}/.bc/bilic.log",
+      download_dir: "#{Dir.home}/.bc/downloads"
     }.freeze
 
     VIDEO_QN = {
