@@ -5,8 +5,9 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
-require_relative 'http/http'
 require_relative 'api'
+require_relative 'config'
+require_relative 'http/http'
 require 'fileutils'
 
 # video module
@@ -32,7 +33,7 @@ module Bilibili
     end
 
     def get_video_url(bv_id, cid, video_qn = '720')
-      qn = BilibiliBase.video_qn[video_qn]
+      qn = Config::VIDEO_QN[video_qn]
       url = "#{Api::Video::PLAY_URL}?bvid=#{bv_id}&cid=#{cid}&qn=#{qn}&fnval=0&fnver=0&fourk=1"
       data = get_jsona(url)
       data[:durl]
@@ -58,7 +59,7 @@ module Bilibili
       return nil if urls.empty?
 
       urls = page_slice(urls, options[:start], options[:end], options[:page])
-      download_path = "#{File.expand_path(@options['download_path'].to_s, __dir__)}/#{bv_id}/"
+      download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{bv_id}/"
       url_array = []
       urls.map { |url| download_file(url, download_path) }.each_with_index do |u, i|
         same_part = same_part?(u, i)
@@ -161,9 +162,8 @@ module Bilibili
     end
 
     def wget_download(url, user_agent, referer, cookie, dest)
-      config_path = File.expand_path((@options['config_path']).to_s, __dir__)
-      File.write("#{config_path}/cookie", cookie) unless File.exist?("#{config_path}/cookie")
-      command = "wget '#{url}' --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='#{config_path}/cookie' "
+      File.write("#{@opt[:cookie]}", cookie) unless File.exist?("#{@opt[:cookie]}")
+      command = "wget '#{url}' --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='#{@opt[:cookie]}' "
       `#{command} -c -O "#{dest}"`
     end
   end

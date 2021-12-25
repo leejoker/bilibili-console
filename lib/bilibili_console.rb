@@ -13,11 +13,12 @@ class BilibiliConsole
 
   def initialize
     @http_client = BiliHttp::HttpClient.new
-    @bilibili_login = Bilibili::Login.new(@http_client)
-    @fav = Bilibili::Fav.new(@http_client)
-    @video = Bilibili::Video.new(@http_client)
-    @manga = Bilibili::Manga.new(@http_client)
-    @search = Bilibili::Search.new(@http_client)
+    BilibiliBase.http_client = @http_client
+    @bilibili_login = Bilibili::Login.new
+    @fav = Bilibili::Fav.new
+    @video = Bilibili::Video.new
+    @manga = Bilibili::Manga.new
+    @search = Bilibili::Search.new
   end
 
   def login

@@ -5,6 +5,8 @@ require 'bilibili_console'
 
 # bilibili-console command line
 class BiliConsole < Thor
+  BC = BilibiliConsole.new
+
   def self.exit_on_failure?
     true
   end
@@ -29,15 +31,13 @@ class BiliConsole < Thor
   desc 'login', 'login with qrcode'
 
   def login
-    bc = BilibiliConsole.new
-    puts bc.login
+    puts BC.login
   end
 
   desc 'user', 'get user info'
 
   def user
-    bc = BilibiliConsole.new
-    user = bc.login_user_info
+    user = BC.login_user_info
     puts <<~USER
       uid: #{user.mid}
       uname: #{user.uname}
@@ -48,9 +48,8 @@ class BiliConsole < Thor
   desc 'manga', 'checkin bilibili manga'
 
   def manga_checkin
-    bc = BilibiliConsole.new
-    bc.manga.load_cookie
-    body = bc.manga_checkin
+    BC.manga.load_cookie
+    body = BC.manga_checkin
     if body.code == 'invalid_argument'
       puts '您已经签到了'
     else
@@ -65,12 +64,11 @@ class BiliConsole < Thor
   method_option :qn, aliases: '-q', desc: 'video resolution ratio'
 
   def download_video(bv_id)
-    bc = BilibiliConsole.new
-    bc.video.load_cookie
+    BC.video.load_cookie
     options_dup = options.dup
     options_dup[:start] = 1 if options[:start].nil?
     options_dup[:qn] = '720' if options[:qn].nil?
-    bc.download_video(bv_id, options_dup)
+    BC.download_video(bv_id, options_dup)
   end
 
   desc 'fav', 'show user fav info'
@@ -98,8 +96,7 @@ class BiliConsole < Thor
     options_dup = options.dup
     options_dup[:page] = 1 if options_dup[:page].nil?
     options_dup[:keyword] = keyword
-    bc = BilibiliConsole.new
-    data = bc.search_keyword(options_dup)
+    data = BC.search_keyword(options_dup)
     data&.result&.each do |video|
       puts <<~VIDEO
           av:            #{video.aid}
@@ -116,8 +113,7 @@ class BiliConsole < Thor
   private
 
   def fav_list
-    bc = BilibiliConsole.new
-    bc.user_fav_list.list.each do |fav|
+    BC.user_fav_list.list.each do |fav|
       puts <<~FAV
           fav_id:         #{fav.fid}
           fav_name:       #{fav.title}
@@ -128,12 +124,11 @@ class BiliConsole < Thor
   end
 
   def fav_search(options)
-    bc = BilibiliConsole.new
-    fav = bc.user_fav_list.list[0]
-    user = bc.login_user_info
+    fav = BC.user_fav_list.list[0]
+    user = BC.login_user_info
     options[:fav] = fav.fid.to_s if options[:fav].nil?
     options[:fav] += user.mid.to_s.slice(-2, 2)
-    bc.list_fav_video(options)&.medias&.each do |media|
+    BC.list_fav_video(options)&.medias&.each do |media|
       puts <<~MEDIA
           title:         #{media.title}
           intro:         #{media.intro}

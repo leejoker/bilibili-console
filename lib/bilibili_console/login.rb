@@ -67,12 +67,12 @@ module Bilibili
     private
 
     def set_http_cookie
-      cookies = @http_client.login_http.cookies
+      cookies = @client.login_http.cookies
       if cookies.nil? || cookies.empty?
         login
-        @http_client.api_http.cookies = @http_client.login_http.cookies
+        @client.api_http.cookies = @client.login_http.cookies
       else
-        @http_client.api_http.cookies = cookies
+        @client.api_http.cookies = cookies
       end
     end
   end
