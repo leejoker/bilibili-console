@@ -18,12 +18,12 @@ module Bilibili
 
     DEFAULT_OPTIONS = {
       base_path: '~/.bc',
-      config_file: "#{DEFAULT_OPTIONS[:base_path]}/bilic.conf",
-      cookie_json: "#{DEFAULT_OPTIONS[:base_path]}/cookie.json",
-      cookie: "#{DEFAULT_OPTIONS[:base_path]}/cookie.txt",
+      config_file: '~/.bc/bilic.conf',
+      cookie_json: '~/.bc/cookie.json',
+      cookie: '~/.bc/cookie.txt',
       video_qn: '720',
-      log_file: "#{DEFAULT_OPTIONS[:base_path]}/bilic.log",
-      download_dir: "#{DEFAULT_OPTIONS[:base_path]}/downloads"
+      log_file: '~/.bc/bilic.log',
+      download_dir: '~/.bc/downloads'
     }.freeze
 
     VIDEO_QN = {
@@ -32,9 +32,9 @@ module Bilibili
     }.freeze
 
     def initialize(*config_file)
-      @options = DEFAULT_OPTIONS.dup
-      conf = config_file.nil? ? @options[:config_file] : config_file[0]
-      config_info = File.read(conf) if File.exists?(conf)
+      @options = Config::DEFAULT_OPTIONS.dup
+      conf = config_file.empty? ? @options[:config_file] : config_file[0]
+      config_info = File.read(conf) if File.exist?(conf)
       @options.merge!(JSON.parse(config_info)) unless config_info.nil?
       check_paths
     end

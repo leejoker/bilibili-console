@@ -13,7 +13,7 @@ class BilibiliConsole
 
   def initialize
     @http_client = BiliHttp::HttpClient.new
-    BilibiliBase.http_client = @http_client
+    Bilibili::BilibiliBase.http_client = @http_client
     @bilibili_login = Bilibili::Login.new
     @fav = Bilibili::Fav.new
     @video = Bilibili::Video.new
