@@ -37,6 +37,9 @@ module Bilibili
       config_info = File.read(conf) if File.exist?(conf)
       @options.merge!(JSON.parse(config_info)) unless config_info.nil?
       check_paths
+
+      logger = Logger.new(File.new(@options[:log_file], 'w+'))
+      logger.debug("config info: #{@options}")
     end
 
     private

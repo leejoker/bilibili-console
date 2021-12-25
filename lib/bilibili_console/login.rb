@@ -54,17 +54,23 @@ module Bilibili
     def login
       login_url
       show_qrcode
-      puts '已完成扫码？[y/n]'
-      over = $stdin.gets.chomp
-      return nil unless over == 'y'
-
-      post_form_jsonl(Api::Login::INFO, { oauthKey: @oauth_key })
+      login_check
       puts 'Login Success !!!'
       save_cookie
       'success'
     end
 
     private
+
+    def login_check
+      data = post_form_jsonl(Api::Login::INFO, { oauthKey: @oauth_key })
+      @log.debug("login response data: #{data}")
+      if [-4, -5].include?(data)
+        login_check
+      else
+        true
+      end
+    end
 
     def set_http_cookie
       cookies = @client.login_http.cookies
