@@ -32,18 +32,19 @@ module Bilibili
       end
     end
 
-    def get_video_url(bv_id, cid, video_qn = '720')
+    def get_video_url(bv_id, cid, video_qn)
       qn = Config::VIDEO_QN[video_qn]
       url = "#{Api::Video::PLAY_URL}?bvid=#{bv_id}&cid=#{cid}&qn=#{qn}&fnval=0&fnver=0&fourk=1"
       data = get_jsona(url)
       data[:durl]
     end
 
-    def video_url_list(bv_id, video_qn = '720')
+    def video_url_list(bv_id, video_qn)
       result = []
       page_list = video_page_list(bv_id)
       return nil if page_list.nil?
 
+      video_qn = @opt[:video_qn].to_s if video_qn.nil?
       page_list.each do |page|
         get_video_url(bv_id, page.cid, video_qn).each do |down_url|
           order = down_url[:order] < 10 ? "0#{down_url[:order]}" : down_url[:order]

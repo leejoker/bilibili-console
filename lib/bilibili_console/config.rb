@@ -22,6 +22,7 @@ module Bilibili
       cookie_json: "#{Dir.home}/.bc/cookie.json",
       cookie: "#{Dir.home}/.bc/cookie.txt",
       video_qn: '720',
+      save_video_pic: false,
       log_file: "#{Dir.home}/.bc/bilic.log",
       download_dir: "#{Dir.home}/.bc/downloads"
     }.freeze
