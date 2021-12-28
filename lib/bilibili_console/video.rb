@@ -100,7 +100,7 @@ module Bilibili
       puts "开始下载文件到： #{file_path}"
       @log.info "开始下载视频， 视频地址：#{url[:url]}"
       headers = generate_headers
-      wget_download(url[:url], headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
+      download(url[:url], headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
       dest_file_exist?(file_path)
       url
     end
@@ -162,8 +162,29 @@ module Bilibili
       hash['Content-Length'].to_i
     end
 
-    def wget_download(url, user_agent, referer, cookie, dest)
+    def download(url, user_agent, referer, cookie, dest)
       File.write("#{@opt[:cookie]}", cookie) unless File.exist?("#{@opt[:cookie]}")
+      if @os == :windows
+        @log.debug("OS: Windows, use nice_http")
+        nice_http_download(url, user_agent, referer, cookie, dest)
+      else
+        @log.debug("OS: unix like, use wget")
+        wget_download(url, user_agent, referer, dest)
+      end
+    end
+
+    def nice_http_download(url, user_agent, referer, cookie, dest)
+      http = NiceHttp.new
+      http.headers = {
+        "User-Agent" => user_agent,
+        "Referer" => referer,
+        "Cookie" => cookie
+      }
+
+      http.get(url, save_data: dest)
+    end
+
+    def wget_download(url, user_agent, referer, dest)
       command = "wget '#{url}' --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='#{@opt[:cookie]}' "
       `#{command} -c -O "#{dest}"`
     end

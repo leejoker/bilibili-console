@@ -111,5 +111,23 @@ module Bilibili
         @client.post_json(@client.instance_variable_get("@#{method_name}"), url, headers, req_body)
       end
     end
+
+    def os
+      @os ||= (
+        host_os = RbConfig::CONFIG['host_os']
+        case host_os
+        when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+          :windows
+        when /darwin|mac os/
+          :macosx
+        when /linux/
+          :linux
+        when /solaris|bsd/
+          :unix
+        else
+          raise StandardError, "unknown os: #{host_os.inspect}"
+        end
+      )
+    end
   end
 end
