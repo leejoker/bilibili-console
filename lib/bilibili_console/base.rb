@@ -42,6 +42,7 @@ module Bilibili
     end
 
     def initialize
+      os
       @client = BilibiliBase.http_client
       create_request_methods
       BilibiliBase.options = Config.new if BilibiliBase.options.nil?

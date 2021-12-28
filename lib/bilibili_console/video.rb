@@ -130,7 +130,11 @@ module Bilibili
       return if files.size.zero?
 
       if files.size == 1
-        FileUtils.mv(files[0], dest)
+        begin
+          FileUtils.mv(files[0], dest)
+        rescue StandardError
+          @log.error("error: #{$!} at:#{$@}")
+        end
         files.clear
         return
       end
@@ -163,25 +167,33 @@ module Bilibili
     end
 
     def download(url, user_agent, referer, cookie, dest)
+      @log.debug(<<~DOWNLOAD
+        url:        #{url}
+        user_agent: #{user_agent}
+        referer:    #{referer}
+        cookie:     #{cookie}
+        dest:       #{dest}
+      DOWNLOAD
+      )
       File.write("#{@opt[:cookie]}", cookie) unless File.exist?("#{@opt[:cookie]}")
       if @os == :windows
         @log.debug("OS: Windows, use nice_http")
-        nice_http_download(url, user_agent, referer, cookie, dest)
+        nice_http_download(url, user_agent, referer, dest)
       else
         @log.debug("OS: unix like, use wget")
         wget_download(url, user_agent, referer, dest)
       end
     end
 
-    def nice_http_download(url, user_agent, referer, cookie, dest)
-      http = NiceHttp.new
+    def nice_http_download(url, user_agent, referer, dest)
+      uri = URI(url)
+      http = NiceHttp.new(host: "https://#{uri.host}", ssl: true)
       http.headers = {
         "User-Agent" => user_agent,
-        "Referer" => referer,
-        "Cookie" => cookie
+        "Referer" => referer
       }
-
-      http.get(url, save_data: dest)
+      http.cookies = JSON.parse(File.read(@opt[:cookie_json]))
+      http.get(uri.request_uri, save_data: dest)
     end
 
     def wget_download(url, user_agent, referer, dest)

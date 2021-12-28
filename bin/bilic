@@ -89,6 +89,7 @@ class BiliConsole < Thor
 
   desc 'search', 'Searching by type'
   method_option :page, aliases: '-p', desc: 'page number'
+  method_option :bv, aliases: '-b', desc: 'search by bv id, this option must behind your keyword'
 
   def search(keyword)
     return if keyword.nil?
@@ -97,7 +98,13 @@ class BiliConsole < Thor
     options_dup[:page] = 1 if options_dup[:page].nil?
     options_dup[:keyword] = keyword
     data = BC.search_keyword(options_dup)
-    data&.result&.each do |video|
+    data&.result&.filter do |v|
+      if options_dup.key? :bv
+        v.bvid.to_s == keyword.to_s
+      else
+        true
+      end
+    end.each do |video|
       puts <<~VIDEO
           av:            #{video.aid}
           bv:            #{video.bvid}
