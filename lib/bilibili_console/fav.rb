@@ -70,7 +70,7 @@ module Bilibili
     def list_fav_video(options)
       options[:page_num] = 1 if options[:page_num].nil?
       options[:page_size] = 10 if options[:page_size].nil?
-      options[:all] = 1 if options[:all].nil?
+      options[:all] = (options.key?(:all) ? 1 : 0)
       unless options[:search].nil?
         options[:search] = "&keyword=#{CGI.escape(options[:search])}&order=mtime&type=#{options[:all]}&tid=0&jsonp=jsonp"
       end
