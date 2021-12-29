@@ -74,7 +74,7 @@ class BiliConsole < Thor
   desc 'fav', 'show user fav info'
   method_option :search, aliases: '-s', desc: 'search in fav'
   method_option :fav, aliases: '-m', desc: 'ordered a fav to do some operations'
-  method_option :page_size, aliases: '-s', desc: 'page size'
+  method_option :page_size, aliases: '-p', desc: 'page size'
   method_option :page_num, aliases: '-n', desc: 'page number'
   method_option :all, aliases: '-a', desc: 'searching in all fav'
 
