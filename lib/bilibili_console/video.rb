@@ -9,6 +9,7 @@ require_relative 'api'
 require_relative 'config'
 require_relative 'http/http'
 require 'fileutils'
+require 'progressbar'
 
 # video module
 module Bilibili
@@ -166,7 +167,7 @@ module Bilibili
     end
 
     def download(url, user_agent, referer, cookie, dest)
-      puts "开始下载文件到： #{file_path}"
+      puts "开始下载文件到： #{dest}"
       @log.debug(<<~DOWNLOAD
         url:        #{url}
         user_agent: #{user_agent}
@@ -193,7 +194,17 @@ module Bilibili
         "Referer" => referer
       }
       http.cookies = JSON.parse(File.read(@opt[:cookie_json]))
-      http.get(uri.request_uri, save_data: dest)
+      resp = http.get(uri.request_uri)
+      total = resp[:header]["Content-Length"]
+      bar = ProgressBar.create(length: 40)
+      bar.total = total
+      Proc.new {
+        File.open(dest, 'wb') do |f|
+          d = resp.data
+          bar.progress += d.length
+          f.write(resp.data)
+        end
+      }
     end
 
     def wget_download(url, user_agent, referer, dest)

@@ -3,6 +3,7 @@ PATH
   specs:
     bilibili_console (0.0.3)
       nice_http (~> 1.8.9)
+      progressbar (~> 1.11.0)
       rqrcode (~> 2.0)
       thor (~> 1.1.0)
 
@@ -19,6 +20,7 @@ GEM
     parallel (1.20.1)
     parser (3.0.1.1)
       ast (~> 2.4.1)
+    progressbar (1.11.0)
     rainbow (3.0.0)
     rake (13.0.3)
     regexp_parser (1.8.2)
