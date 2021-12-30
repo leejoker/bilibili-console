@@ -97,7 +97,6 @@ module Bilibili
     def download_file(url, dir)
       file_path = check_path(dir, url[:name])
       url[:file_path] = file_path
-      puts "开始下载文件到： #{file_path}"
       @log.info "开始下载视频， 视频地址：#{url[:url]}"
       headers = generate_headers
       download(url[:url], headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
@@ -167,6 +166,7 @@ module Bilibili
     end
 
     def download(url, user_agent, referer, cookie, dest)
+      puts "开始下载文件到： #{file_path}"
       @log.debug(<<~DOWNLOAD
         url:        #{url}
         user_agent: #{user_agent}
