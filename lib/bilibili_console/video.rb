@@ -166,7 +166,7 @@ module Bilibili
     end
 
     def download(url, user_agent, referer, cookie, dest)
-      puts "开始下载文件到： #{file_path}"
+      puts "开始下载文件到： #{dest}"
       @log.debug(<<~DOWNLOAD
         url:        #{url}
         user_agent: #{user_agent}
