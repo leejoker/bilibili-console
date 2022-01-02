@@ -24,7 +24,8 @@ module Bilibili
       video_qn: '720',
       save_video_pic: false,
       log_file: "#{Dir.home}/.bc/bilic.log",
-      download_dir: "#{Dir.home}/.bc/downloads"
+      download_dir: "#{Dir.home}/.bc/downloads",
+      video_pic_dir: "#{Dir.home}/.bc/pic"
     }.freeze
 
     VIDEO_QN = {
@@ -50,6 +51,7 @@ module Bilibili
       check_file(@options[:cookie])
       check_file(@options[:log_file])
       FileUtils.mkdir_p(@options[:download_dir]) unless Dir.exist?(@options[:download_dir])
+      FileUtils.mkdir_p(@options[:video_pic_dir]) unless Dir.exist?(@options[:video_pic_dir])
     end
 
     def check_file(path)
