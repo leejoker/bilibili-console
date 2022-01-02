@@ -176,35 +176,20 @@ module Bilibili
         dest:       #{dest}
       DOWNLOAD
       )
-      File.write("#{@opt[:cookie]}", cookie) unless File.exist?("#{@opt[:cookie]}")
+      File.write((@opt[:cookie]).to_s, cookie) unless File.exist?((@opt[:cookie]).to_s)
       if @os == :windows
-        @log.debug("OS: Windows, use nice_http")
-        nice_http_download(url, user_agent, referer, dest)
+        @log.debug('OS: Windows, use wget.exe')
+        win_wget_download(url, user_agent, referer, dest)
       else
-        @log.debug("OS: unix like, use wget")
+        @log.debug('OS: unix like, use wget')
         wget_download(url, user_agent, referer, dest)
       end
     end
 
-    def nice_http_download(url, user_agent, referer, dest)
-      uri = URI(url)
-      http = NiceHttp.new(host: "https://#{uri.host}", ssl: true)
-      http.headers = {
-        "User-Agent" => user_agent,
-        "Referer" => referer
-      }
-      http.cookies = JSON.parse(File.read(@opt[:cookie_json]))
-      resp = http.get(uri.request_uri)
-      total = resp[:header]["Content-Length"]
-      bar = ProgressBar.create(length: 40)
-      bar.total = total
-      Proc.new {
-        File.open(dest, 'wb') do |f|
-          d = resp.data
-          bar.progress += d.length
-          f.write(resp.data)
-        end
-      }
+    def win_wget_download(url, user_agent, referer, dest)
+      wget_path = File.expand_path('../../bin/wget.exe', __dir__)
+      command = "#{wget_path} \"#{url}\" --referer \"#{referer}\" --user-agent \"#{user_agent}\" --load-cookie=\"#{@opt[:cookie]}\" "
+      `#{command} -c -O "#{dest}"`
     end
 
     def wget_download(url, user_agent, referer, dest)

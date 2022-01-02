@@ -10,7 +10,7 @@ B站命令行客户端
 
 #### 2 软件结构
 
-基于ruby开发，ruby version >= 2.7
+基于ruby开发，ruby version >= 2.5
 
 #### 3 安装教程
 
