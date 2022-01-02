@@ -20,11 +20,11 @@ module Bilibili
       return if json.nil?
 
       hash = {}
-      public_methods(false).filter { |m| m.name.index('=').nil? }.each do |method|
-        next if json[method.name.to_sym].nil?
+      public_methods(false).filter { |m| m.to_s.index('=').nil? }.each do |method|
+        next if json[method.to_s.to_sym].nil?
 
-        value = method("#{method.name}=".to_sym).call(json[method.name.to_sym])
-        hash.merge!({ method.name => value })
+        value = method("#{method.to_s}=".to_sym).call(json[method.to_s.to_sym])
+        hash.merge!({ method.to_s => value })
       end
 
       BiliBliliRecordBase.define_method('to_json') do |*opt|
