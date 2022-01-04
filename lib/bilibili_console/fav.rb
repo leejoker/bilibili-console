@@ -70,9 +70,9 @@ module Bilibili
     def list_fav_video(options)
       options[:page_num] = 1 if options[:page_num].nil?
       options[:page_size] = 10 if options[:page_size].nil?
-      options[:all] = (options.key?(:all) ? 1 : 0)
+      type = options[:all] ? 1 : 0
       unless options[:search].nil?
-        options[:search] = "&keyword=#{CGI.escape(options[:search])}&order=mtime&type=#{options[:all]}&tid=0&jsonp=jsonp"
+        options[:search] = "&keyword=#{CGI.escape(options[:search])}&order=mtime&type=#{type}&tid=0&jsonp=jsonp"
       end
       url = "#{Api::Fav::FAV_VIDEO_LIST}?media_id=#{options[:fav]}&pn=#{options[:page_num]}&ps=#{options[:page_size]}#{options[:search]}&platform=web"
       data = get_jsona(url)

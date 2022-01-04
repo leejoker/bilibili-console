@@ -58,10 +58,10 @@ class BiliConsole < Thor
   end
 
   desc 'down', 'download video by bv code'
-  method_option :start, aliases: '-s', desc: 'start page'
-  method_option :end, aliases: '-e', desc: 'end page'
-  method_option :page, aliases: '-p', desc: 'order one page'
-  method_option :qn, aliases: '-q', desc: 'video resolution ratio'
+  option :start, aliases: :s, desc: 'start page'
+  option :end, aliases: :e, desc: 'end page'
+  option :page, aliases: :p, desc: 'order one page'
+  option :qn, aliases: :q, desc: 'video resolution ratio'
 
   def download_video(bv_id)
     BC.video.load_cookie
@@ -72,11 +72,11 @@ class BiliConsole < Thor
   end
 
   desc 'fav', 'show user fav info'
-  method_option :search, aliases: '-s', desc: 'search in fav'
-  method_option :fav, aliases: '-m', desc: 'ordered a fav to do some operations'
-  method_option :page_size, aliases: '-p', desc: 'page size'
-  method_option :page_num, aliases: '-n', desc: 'page number'
-  method_option :all, aliases: '-a', desc: 'searching in all fav'
+  option :search, aliases: :s, desc: 'search in fav'
+  option :fav, aliases: :m, desc: 'ordered a fav to do some operations'
+  option :page_size, aliases: :p, desc: 'page size'
+  option :page_num, aliases: :n, desc: 'page number'
+  option :all, aliases: :a, desc: 'searching in all fav', type: :boolean
 
   def fav_info
     if options[:search].nil? && options[:fav].nil?
@@ -88,9 +88,9 @@ class BiliConsole < Thor
   end
 
   desc 'search', 'Searching by type'
-  method_option :page, aliases: '-p', desc: 'page number'
-  method_option :bv, aliases: '-b', desc: 'search by bv id, this option must behind your keyword'
-  method_option :pic, aliased: '-c', desc: 'save video cover with ordered bv'
+  option :page, aliases: :p, desc: 'page number'
+  option :bv, desc: 'search by bv id', type: :boolean
+  option :pic, desc: 'save video cover with ordered bv', type: :boolean
 
   def search(keyword)
     return if keyword.nil?
@@ -141,4 +141,4 @@ class BiliConsole < Thor
   end
 end
 
-BiliConsole.start
+BiliConsole.start(ARGV)

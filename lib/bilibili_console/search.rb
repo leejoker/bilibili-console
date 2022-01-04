@@ -47,16 +47,12 @@ module Bilibili
 
     def bv_filter(data, options)
       data&.result&.select! do |v|
-        if options.key? :bv
-          v.bvid.to_s == options[:keyword].to_s
-        else
-          true
-        end
+        options[:bv] ? v.bvid.to_s == options[:keyword].to_s : true
       end
     end
 
     def cover_save(data, options)
-      return unless options.key?(:pic) && options.key?(:bv)
+      return unless options[:pic] && options[:bv]
 
       uri = URI("https:#{data.result[0].pic}")
       http = NiceHttp.new(host: "https://#{uri.host}", ssl: true)
