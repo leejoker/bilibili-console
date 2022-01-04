@@ -85,7 +85,12 @@ $ bilic manga
 #### 4.7 视频搜索
 
 ```shell
+# 查看指定分页
 $ bilic search --page 2 av170001
+# 指定BV查看
+$ bilic search --bv BV1zL411L75A
+# 保存指定BV封面
+$ bilic search BV1zL411L75A --bv --pic
 ```
 
 #### 5 功能清单
