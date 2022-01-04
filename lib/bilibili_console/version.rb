@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright (c) 2021 10344742
+# Copyright (c) 2021 leejoker
 #
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
