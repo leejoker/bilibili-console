@@ -189,12 +189,12 @@ module Bilibili
     def win_wget_download(url, user_agent, referer, dest)
       wget_path = File.expand_path('../../bin/wget.exe', __dir__)
       command = "#{wget_path} \"#{url}\" --referer \"#{referer}\" --user-agent \"#{user_agent}\" --load-cookie=\"#{@opt[:cookie]}\" "
-      `#{command} -c -O "#{dest}"`
+      `#{command} -c -O "#{dest}" --no-check-certificate`
     end
 
     def wget_download(url, user_agent, referer, dest)
       command = "wget '#{url}' --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='#{@opt[:cookie]}' "
-      `#{command} -c -O "#{dest}"`
+      `#{command} -c -O "#{dest}" --no-check-certificate`
     end
   end
 end
