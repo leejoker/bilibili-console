@@ -112,8 +112,6 @@ module Bilibili
       headers = generate_headers
       download(url[:url], headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
       dest_file_exist?(file_path)
-      # sleep then start another download
-      sleep rand(5)
       url
     end
 
@@ -201,12 +199,12 @@ module Bilibili
     def win_wget_download(url, user_agent, referer, dest)
       wget_path = File.expand_path('../../bin/wget.exe', __dir__)
       command = "#{wget_path} \"#{url}\" --referer \"#{referer}\" --user-agent \"#{user_agent}\" --load-cookie=\"#{@opt[:cookie]}\" "
-      `#{command} -c -O "#{dest}" --no-check-certificate`
+      `#{command} -c -O "#{dest}" --no-check-certificate -t 3`
     end
 
     def wget_download(url, user_agent, referer, dest)
       command = "wget '#{url}' --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='#{@opt[:cookie]}' "
-      `#{command} -c -O "#{dest}" --no-check-certificate`
+      `#{command} -c -O "#{dest}" --no-check-certificate -t 3`
     end
   end
 end
