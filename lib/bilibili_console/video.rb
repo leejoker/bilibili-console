@@ -47,6 +47,7 @@ module Bilibili
 
       video_qn = options[:qn]
       page_list = page_slice(page_list, options[:start], options[:end], options[:page])
+      log.info("wait download size: #{page_list.size}")
       video_qn = @opt[:video_qn].to_s if video_qn.nil?
       page_list.each do |page|
         get_video_url(bv_id, page.cid, video_qn).each do |down_url|
@@ -75,6 +76,13 @@ module Bilibili
     private
 
     def page_slice(page_list, start_page, end_page, page)
+      log_info = <<~LOG
+        page list size: #{page_list.size}
+        start page num: #{start_page}
+        end   page num: #{end_page}
+        order     page: #{page}
+      LOG
+      log.info(log_info)
       if page.nil?
         start_page = start_page.to_i - 1
         if end_page.nil?
