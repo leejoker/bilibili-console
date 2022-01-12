@@ -110,7 +110,7 @@ module Bilibili
       url[:file_path] = file_path
       @log.info "开始下载视频， 视频地址：#{url[:url]}"
       headers = generate_headers
-
+      download_and_check(url, headers, file_path)
       url
     end
 
