@@ -40,11 +40,13 @@ module Bilibili
       data[:durl]
     end
 
-    def video_url_list(bv_id, video_qn)
+    def video_url_list(bv_id, options)
       result = []
       page_list = video_page_list(bv_id)
       return nil if page_list.nil?
 
+      video_qn = options[:qn]
+      page_list = page_slice(page_list, options[:start], options[:end], options[:page])
       video_qn = @opt[:video_qn].to_s if video_qn.nil?
       page_list.each do |page|
         get_video_url(bv_id, page.cid, video_qn).each do |down_url|
@@ -52,15 +54,15 @@ module Bilibili
           result << { 'name': "#{page.part}_#{order}.flv", 'url': down_url[:url].to_s, 'prefix': page.part,
                       'order': "#{page.page}#{order}", 'bv': bv_id.to_s }
         end
+        sleep 1
       end
       result
     end
 
     def download_video_by_bv(bv_id, options)
-      urls = video_url_list(bv_id, options[:qn])
+      urls = video_url_list(bv_id, options)
       return nil if urls.empty?
 
-      urls = page_slice(urls, options[:start], options[:end], options[:page])
       download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{bv_id}/"
       url_array = []
       urls.map { |url| download_file(url, download_path) }.each_with_index do |u, i|
@@ -72,18 +74,18 @@ module Bilibili
 
     private
 
-    def page_slice(urls, start_page, end_page, page)
+    def page_slice(page_list, start_page, end_page, page)
       if page.nil?
         start_page = start_page.to_i - 1
         if end_page.nil?
-          urls.slice(start_page, urls.size - start_page)
+          page_list.slice(start_page, page_list.size - start_page)
         elsif start_page < end_page.to_i
-          urls.slice(start_page, end_page.to_i)
+          page_list.slice(start_page, end_page.to_i)
         else
           raise 'start should not less than or equals to end'
         end
       else
-        [] << urls[page.to_i - 1]
+        page_list.slice(page.to_i - 1, page.to_i)
       end
     end
 
