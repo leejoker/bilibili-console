@@ -110,9 +110,24 @@ module Bilibili
       url[:file_path] = file_path
       @log.info "开始下载视频， 视频地址：#{url[:url]}"
       headers = generate_headers
-      download(url[:url], headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
-      dest_file_exist?(file_path)
+
       url
+    end
+
+    def download_and_check(url, headers, file_path, retry_times = 0)
+      log.debug("retry times: #{retry_times}")
+      begin
+        download(url[:url], headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
+        dest_file_exist?(file_path)
+      rescue StandardError
+        log.error("error: #{$!} at:#{$@}")
+        sleep 3
+        if retry_times == 3
+          raise 'retry times is 3, you should try it later'
+        end
+        retry_times += 1
+        download_and_check(url, headers, file_path, retry_times)
+      end
     end
 
     def check_path(dir, filename)
