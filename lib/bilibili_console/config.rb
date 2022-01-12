@@ -24,6 +24,7 @@ module Bilibili
       video_qn: '720',
       save_video_pic: false,
       log_file: "#{Dir.home}/.bc/bilic.log",
+      log_level: "debug",
       download_dir: "#{Dir.home}/.bc/downloads",
       video_pic_dir: "#{Dir.home}/.bc/pic"
     }.freeze
@@ -41,6 +42,7 @@ module Bilibili
       check_paths
 
       logger = Logger.new(File.new(@options[:log_file], 'w+'))
+      logger.level(@options[:log_level])
       logger.debug("config info: #{@options}")
     end
 
