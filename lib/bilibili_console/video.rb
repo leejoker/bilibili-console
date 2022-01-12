@@ -54,7 +54,7 @@ module Bilibili
           result << { 'name': "#{page.part}_#{order}.flv", 'url': down_url[:url].to_s, 'prefix': page.part,
                       'order': "#{page.page}#{order}", 'bv': bv_id.to_s }
         end
-        sleep 1
+        sleep rand(3)
       end
       result
     end
@@ -104,6 +104,8 @@ module Bilibili
       headers = generate_headers
       download(url[:url], headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
       dest_file_exist?(file_path)
+      # sleep then start another download
+      sleep rand(5)
       url
     end
 
