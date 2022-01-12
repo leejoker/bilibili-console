@@ -42,7 +42,7 @@ module Bilibili
       check_paths
 
       logger = Logger.new(File.new(@options[:log_file], 'w+'))
-      logger.level(@options[:log_level])
+      logger.level = @options[:log_level]
       logger.debug("config info: #{@options}")
     end
 
