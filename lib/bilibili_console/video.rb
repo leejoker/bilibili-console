@@ -88,7 +88,7 @@ module Bilibili
         if end_page.nil?
           page_list.slice(start_page, page_list.size - start_page)
         elsif start_page < end_page.to_i
-          page_list.slice(start_page, end_page.to_i)
+          page_list.slice(start_page..(end_page.to_i - 1))
         else
           raise 'start should not less than or equals to end'
         end
