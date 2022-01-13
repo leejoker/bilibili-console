@@ -93,7 +93,7 @@ module Bilibili
           raise 'start should not less than or equals to end'
         end
       else
-        page_list.slice(page.to_i - 1, page.to_i)
+        [] << page_list[page.to_i - 1]
       end
     end
 
