@@ -18,10 +18,10 @@ GEM
     nice_http (1.8.9)
       nice_hash (~> 1.17, >= 1.17)
     parallel (1.21.0)
-    parser (3.0.3.2)
+    parser (3.1.0.0)
       ast (~> 2.4.1)
     progressbar (1.11.0)
-    rainbow (3.0.0)
+    rainbow (3.1.1)
     rake (13.0.6)
     regexp_parser (1.8.2)
     rexml (3.2.5)
@@ -71,4 +71,4 @@ DEPENDENCIES
   rubocop (~> 1.7)
 
 BUNDLED WITH
-   2.2.31
+   2.3.3
