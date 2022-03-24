@@ -23,6 +23,7 @@ class BilibiliConsole
 
   def login
     set_login_http
+    set_api_http
     @bilibili_login.login
   end
 
