@@ -40,7 +40,7 @@ module Bilibili
       data[:durl]
     end
 
-    def video_url_list(bv_id, options)
+    def download_video_by_bv(bv_id, options)
       result = []
       page_list = video_page_list(bv_id)
       return nil if page_list.nil?
@@ -52,21 +52,22 @@ module Bilibili
       page_list.each do |page|
         get_video_url(bv_id, page.cid, video_qn).each do |down_url|
           order = down_url[:order] < 10 ? "0#{down_url[:order]}" : down_url[:order]
-          result << { 'name': "#{page.part}_#{order}.flv", 'url': down_url[:url].to_s, 'prefix': page.part,
-                      'order': "#{page.page}#{order}", 'bv': bv_id.to_s }
+          url = { 'name': "#{page.part}_#{order}.flv", 'url': down_url[:url].to_s, 'prefix': page.part,
+                  'order': "#{page.page}#{order}", 'bv': bv_id.to_s }
+          download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{bv_id}/"
+          result << download_file(url, download_path)
         end
         sleep rand(3)
       end
       result
     end
 
-    def download_video_by_bv(bv_id, options)
-      urls = video_url_list(bv_id, options)
+    def combine_downloaded_videos(bv_id, urls)
       return nil if urls.empty?
 
       download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{bv_id}/"
       url_array = []
-      urls.map { |url| download_file(url, download_path) }.each_with_index do |u, i|
+      urls.each_with_index do |u, i|
         same_part = same_part?(u, i)
         url_array << u[:file_path]
         combine_media(url_array, "#{download_path}#{u[:prefix]}.flv") unless same_part
