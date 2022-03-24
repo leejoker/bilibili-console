@@ -212,14 +212,21 @@ module Bilibili
       end
     end
 
+    def wget_proxy
+      command = ""
+      command += " -e http_proxy=#{ENV['http_proxy']}" unless ENV['http_proxy'].nil?
+      command += " -e https_proxy=#{ENV['https_proxy']}" unless ENV['https_proxy'].nil?
+      command
+    end
+
     def win_wget_download(url, user_agent, referer, dest)
       wget_path = File.expand_path('../../bin/wget.exe', __dir__)
-      command = "#{wget_path} \"#{url}\" --referer \"#{referer}\" --user-agent \"#{user_agent}\" --load-cookie=\"#{@opt[:cookie]}\" "
+      command = "#{wget_path} \"#{url}\" #{wget_proxy} --referer \"#{referer}\" --user-agent \"#{user_agent}\" --load-cookie=\"#{@opt[:cookie]}\" "
       `#{command} -c -O "#{dest}" --no-check-certificate -t 3`
     end
 
     def wget_download(url, user_agent, referer, dest)
-      command = "wget '#{url}' --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='#{@opt[:cookie]}' "
+      command = "wget '#{url}' #{wget_proxy} --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='#{@opt[:cookie]}' "
       `#{command} -c -O "#{dest}" --no-check-certificate -t 3`
     end
   end
