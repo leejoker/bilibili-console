@@ -9,7 +9,6 @@ require_relative 'api'
 require_relative 'config'
 require_relative 'http/http'
 require 'fileutils'
-require 'progressbar'
 
 # video module
 module Bilibili
@@ -40,6 +39,7 @@ module Bilibili
       data[:durl]
     end
 
+    # TODO 通过创建下载任务来进行视频下载
     def download_video_by_bv(bv_id, options)
       result = []
       page_list = video_page_list(bv_id)

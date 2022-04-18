@@ -17,7 +17,6 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
   s.required_ruby_version = ['>= 2.5']
   s.add_dependency 'nice_http', '~> 1.8.9'
-  s.add_dependency 'progressbar', '~> 1.11.0'
   s.add_dependency 'rqrcode', '~> 2.0'
   s.add_dependency 'thor', '~> 1.1.0'
 end
