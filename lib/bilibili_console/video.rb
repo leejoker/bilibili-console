@@ -220,8 +220,7 @@ module Bilibili
     end
 
     def win_wget_download(url, user_agent, referer, dest)
-      wget_path = File.expand_path('../../bin/wget.exe', __dir__)
-      command = "#{wget_path} \"#{url}\" #{wget_proxy} --referer \"#{referer}\" --user-agent \"#{user_agent}\" --load-cookie=\"#{@opt[:cookie]}\" "
+      command = "wget.exe \"#{url}\" #{wget_proxy} --referer \"#{referer}\" --user-agent \"#{user_agent}\" --load-cookie=\"#{@opt[:cookie]}\" "
       @log.debug("#{command} -c -O \"#{dest}\" --no-check-certificate -t 3")
       `#{command} -c -O "#{dest}" --no-check-certificate -t 3`
     end

@@ -28,6 +28,12 @@ class BiliConsole < Thor
     HELP
   end
 
+  desc 'doctor', 'check environment and third-party dependencies'
+
+  def doctor
+    # TODO add doctor function
+  end
+
   desc 'login', 'login with qrcode'
 
   def login
