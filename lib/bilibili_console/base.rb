@@ -35,19 +35,26 @@ module Bilibili
 
   # base class
   class BilibiliBase
-    attr_accessor :log, :client, :opt
+    attr_accessor :log, :client, :opt, :cookies
 
     class << self
-      attr_accessor :options, :logger, :http_client
+      attr_accessor :options, :logger
     end
 
     def initialize
-      os
-      @client = BilibiliBase.http_client
+      @client = BiliHttp::HttpClient.new
       create_request_methods
       BilibiliBase.options = Config.new if BilibiliBase.options.nil?
       @opt = BilibiliBase.options.options
       @log = Logger.new(File.new(@opt[:log_file], 'w+'))
+
+      NiceHttp.log = :no unless @opt[:request_log]
+      NiceHttp.ssl = @opt[:ssl]
+      NiceHttp.port = @opt[:port]
+
+      @cookies = load_cookie
+      @client.api_http = NiceHttp.new(Bilibili::Api::API_HOST)
+      @client.api_http.cookies = @cookies
     end
 
     def save_cookie
@@ -112,23 +119,23 @@ module Bilibili
         @client.post_json(@client.instance_variable_get("@#{method_name}"), url, headers, req_body)
       end
     end
+  end
 
+  class << self
     def os
-      @os ||= (
-        host_os = RbConfig::CONFIG['host_os']
-        case host_os
-        when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-          :windows
-        when /darwin|mac os/
-          :macosx
-        when /linux/
-          :linux
-        when /solaris|bsd/
-          :unix
-        else
-          raise StandardError, "unknown os: #{host_os.inspect}"
-        end
-      )
+      host_os = RbConfig::CONFIG['host_os']
+      case host_os
+      when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+        :windows
+      when /darwin|mac os/
+        :macosx
+      when /linux/
+        :linux
+      when /solaris|bsd/
+        :unix
+      else
+        raise StandardError, "unknown os: #{host_os.inspect}"
+      end
     end
   end
 end

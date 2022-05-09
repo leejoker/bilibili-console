@@ -35,8 +35,10 @@ module Bilibili
   # bilibili search interfaces
   class Search < BilibiliBase
     def search(options)
+      sort_type = options[:sort]
       url = "#{Api::Search::TYPE}?search_type=video&keyword=#{CGI.escape(options[:keyword])}"
       url += "&page=#{options[:page]}" unless options[:page].nil?
+      url += "&order=#{sort_type}" unless sort_type.nil?
       data = Bilibili::SearchData.new(get_jsona(url))
       bv_filter(data, options)
       cover_save(data, options)

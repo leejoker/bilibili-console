@@ -7,28 +7,32 @@
 
 module Bilibili
   module Api
+    LOGIN_HOST = 'https://passport.bilibili.com'
+    API_HOST = 'https://api.bilibili.com'
+    MANGA_HOST = 'https://manga.bilibili.com'
+
     module Login
-      QRCODE = 'https://passport.bilibili.com/qrcode/getLoginUrl'
-      INFO = 'https://passport.bilibili.com/qrcode/getLoginInfo'
-      USERINFO = 'https://api.bilibili.com/nav'
+      QRCODE = "#{LOGIN_HOST}/qrcode/getLoginUrl"
+      INFO = "#{LOGIN_HOST}/qrcode/getLoginInfo"
+      USERINFO = "#{API_HOST}/nav"
     end
 
     module Fav
-      USER_FAV_LIST = 'https://api.bilibili.com/x/v3/fav/folder/created/list-all'
-      FAV_VIDEO_LIST = 'https://api.bilibili.com/x/v3/fav/resource/list'
+      USER_FAV_LIST = "#{API_HOST}/x/v3/fav/folder/created/list-all"
+      FAV_VIDEO_LIST = "#{API_HOST}/x/v3/fav/resource/list"
     end
 
     module Video
-      PAGE_LIST = 'https://api.bilibili.com/x/player/pagelist'
-      PLAY_URL = 'https://api.bilibili.com/x/player/playurl'
+      PAGE_LIST = "#{API_HOST}/x/player/pagelist"
+      PLAY_URL = "#{API_HOST}/x/player/playurl"
     end
 
     module Manga
-      CHECK_IN = 'https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn?platform=android'
+      CHECK_IN = "#{MANGA_HOST}/twirp/activity.v1.Activity/ClockIn?platform=android"
     end
 
     module Search
-      TYPE = 'https://api.bilibili.com/x/web-interface/search/type'
+      TYPE = "#{API_HOST}/x/web-interface/search/type"
     end
   end
 end

@@ -2,7 +2,7 @@
 
 require "bundler/gem_tasks"
 require "rspec/core/rake_task"
-require "bilibili_console"
+require_relative "lib/bilibili_console"
 
 RSpec::Core::RakeTask.new(:spec)
 

@@ -23,6 +23,12 @@ module Bilibili
   class Login < BilibiliBase
     attr_accessor :url, :oauth_key
 
+    def initialize
+      super
+      @client.login_http = NiceHttp.new(Bilibili::Api::LOGIN_HOST)
+      @client.login_http.cookies = @cookies
+    end
+
     def login_url
       data = get_jsonl(Api::Login::QRCODE)
       @url = data[:url]

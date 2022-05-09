@@ -203,7 +203,7 @@ module Bilibili
       DOWNLOAD
       )
       File.write((@opt[:cookie]).to_s, cookie) unless File.exist?((@opt[:cookie]).to_s)
-      if @os == :windows
+      if Bilibili.os == :windows
         @log.debug('OS: Windows, use wget.exe')
         win_wget_download(url, user_agent, referer, dest)
       else

@@ -21,6 +21,9 @@ module Bilibili
       config_file: "#{Dir.home}/.bc/bilic.conf",
       cookie_json: "#{Dir.home}/.bc/cookie.json",
       cookie: "#{Dir.home}/.bc/cookie.txt",
+      ssl: false,
+      port: 80,
+      request_log: false,
       video_qn: '720',
       save_video_pic: false,
       log_file: "#{Dir.home}/.bc/bilic.log",
@@ -38,7 +41,7 @@ module Bilibili
       @options = Config::DEFAULT_OPTIONS.dup
       conf = config_file.empty? ? @options[:config_file] : config_file[0]
       config_info = File.read(conf) if File.exist?(conf)
-      @options.merge!(JSON.parse(config_info)) unless config_info.nil?
+      @options.merge!(JSON.parse(config_info)) unless config_info.nil? || config_info.length.zero?
       check_paths
 
       logger = Logger.new(File.new(@options[:log_file], 'w+'))
