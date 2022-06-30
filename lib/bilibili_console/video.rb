@@ -220,7 +220,7 @@ module Bilibili
     end
 
     def win_wget_download(url, user_agent, referer, dest)
-      command = "powershell -c wget \"#{url}\" #{wget_proxy} --referer \"#{referer}\" --user-agent \"#{user_agent}\" --load-cookie=\"#{@opt[:cookie]}\" "
+      command = "wget \"#{url}\" #{wget_proxy} --referer \"#{referer}\" --user-agent \"#{user_agent}\" --load-cookie=\"#{@opt[:cookie]}\" "
       @log.debug("#{command} -c -O \"#{dest}\" --no-check-certificate -t 3")
       `#{command} -c -O "#{dest}" --no-check-certificate -t 3`
     end
