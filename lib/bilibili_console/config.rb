@@ -28,7 +28,7 @@ module Bilibili
       save_video_pic: false,
       enable_aria2: false,
       log_file: "#{Dir.home}/.bc/bilic.log",
-      log_level: "debug",
+      log_level: 'debug',
       download_dir: "#{Dir.home}/.bc/downloads",
       video_pic_dir: "#{Dir.home}/.bc/pic"
     }.freeze
@@ -42,7 +42,7 @@ module Bilibili
       @options = Config::DEFAULT_OPTIONS.dup
       conf = config_file.empty? ? @options[:config_file] : config_file[0]
       config_info = File.read(conf) if File.exist?(conf)
-      @options.merge!(JSON.parse(config_info)) unless config_info.nil? || config_info.length.zero?
+      @options.merge!(JSON.parse(config_info, symbolize_names: true)) unless config_info.nil? || config_info.length.zero?
       check_paths
 
       logger = Logger.new(File.new(@options[:log_file], 'w+'))

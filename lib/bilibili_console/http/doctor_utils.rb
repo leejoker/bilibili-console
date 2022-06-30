@@ -10,8 +10,10 @@ module Bilibili
   class Doctor
     class << self
       def check_wget
+        return unless Bilibili.os == :windows
+
+        puts 'Start check wget'
         result = `where wget.exe > nul 2> nul`
-        puts "result: #{result}"
         return unless result.nil? || result.to_s == ''
 
         puts 'Starting download wget.exe'
