@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
-require_relative 'bilibili_console/http/http'
-require_relative 'bilibili_console/login'
+require_relative 'bilibili_console/base'
 require_relative 'bilibili_console/fav'
-require_relative 'bilibili_console/video'
+require_relative 'bilibili_console/http/http'
+require_relative 'bilibili_console/http/doctor_utils'
+require_relative 'bilibili_console/login'
 require_relative 'bilibili_console/manga'
 require_relative 'bilibili_console/search'
+require_relative 'bilibili_console/video'
 
 module Bilibili
   # bilibili console main class
@@ -47,6 +49,11 @@ module Bilibili
     def search_keyword(options)
       search = Bilibili::Search.new
       search.search(options)
+    end
+
+    def doctor
+      base = BilibiliBase.new
+      Bilibili::Doctor.check_wget if base.opt[:enable_aria2] == false
     end
   end
 end

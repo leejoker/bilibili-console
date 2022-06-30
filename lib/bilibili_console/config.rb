@@ -26,6 +26,7 @@ module Bilibili
       request_log: false,
       video_qn: '720',
       save_video_pic: false,
+      enable_aria2: false,
       log_file: "#{Dir.home}/.bc/bilic.log",
       log_level: "debug",
       download_dir: "#{Dir.home}/.bc/downloads",
