@@ -43,6 +43,7 @@ module Bilibili
       data = Bilibili::SearchData.new(get_jsona(url))
       bv_filter(data, options)
       cover_save(data, options)
+      get_pages(data)
       data
     end
 
