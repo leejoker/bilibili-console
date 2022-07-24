@@ -8,6 +8,7 @@
 require_relative 'http/http'
 require_relative 'base'
 require_relative 'api'
+require_relative 'video'
 
 # search module
 module Bilibili
@@ -29,7 +30,7 @@ module Bilibili
   end
 
   class VideoResult < BiliBliliRecordBase
-    attr_accessor :author, :aid, :bvid, :title, :description, :pic
+    attr_accessor :author, :aid, :bvid, :title, :description, :pic, :page_size
   end
 
   # bilibili search interfaces
@@ -59,6 +60,14 @@ module Bilibili
       uri = URI("https:#{data.result[0].pic}")
       http = NiceHttp.new(host: "https://#{uri.host}", ssl: true)
       http.get(uri.request_uri, save_data: "#{@opt[:video_pic_dir]}/COVER_#{data.result[0].bvid}.jpg")
+    end
+
+    def get_pages(data)
+      data&.result&.collect! do |v|
+        video = Bilibili::Video.new
+        v.page_size = video.video_page_list(v.bvid)&.size
+        v
+      end
     end
   end
 end

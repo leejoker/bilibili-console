@@ -121,6 +121,7 @@ class BiliConsole < Thor
           author:        #{video.author}
           desc:          #{video.description}
           pic:           #{video.pic}
+          page_size:     #{video.page_size}
         -----------------------------------------------------------------------
       VIDEO
     end
