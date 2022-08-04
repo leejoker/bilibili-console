@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'bilibili_console/base'
+require_relative 'bilibili_console/base/base'
+require_relative 'bilibili_console/base/record'
 require_relative 'bilibili_console/fav'
 require_relative 'bilibili_console/http/http'
 require_relative 'bilibili_console/http/doctor_utils'

@@ -6,7 +6,6 @@
 # https://opensource.org/licenses/MIT
 
 require_relative 'http/http'
-require_relative 'base'
 require_relative 'api'
 require_relative 'video'
 
