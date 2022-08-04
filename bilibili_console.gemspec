@@ -19,4 +19,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'nice_http', '~> 1.8.9'
   s.add_dependency 'rqrcode', '~> 2.0'
   s.add_dependency 'thor', '~> 1.1.0'
+  s.add_dependency 'sqlite3', '~> 1.4.4'
 end
