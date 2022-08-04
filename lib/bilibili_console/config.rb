@@ -30,7 +30,10 @@ module Bilibili
       log_file: "#{Dir.home}/.bc/bilic.log",
       log_level: 'debug',
       download_dir: "#{Dir.home}/.bc/downloads",
-      video_pic_dir: "#{Dir.home}/.bc/pic"
+      video_pic_dir: "#{Dir.home}/.bc/pic",
+      db_file_path: "#{Dir.home}/.bc/bilic.db",
+      # ip:port
+      proxy: nil
     }.freeze
 
     VIDEO_QN = {

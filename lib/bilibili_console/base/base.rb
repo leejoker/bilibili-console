@@ -32,6 +32,12 @@ module Bilibili
       NiceHttp.ssl = @opt[:ssl]
       NiceHttp.port = @opt[:port]
 
+      unless @opt[:proxy].nil?
+        proxy = @opt[:proxy].split(':')
+        NiceHttp.proxy_host = proxy[0]
+        NiceHttp.proxy_port = proxy[1]
+      end
+
       @cookies = load_cookie
       @client.api_http = NiceHttp.new(Bilibili::Api::API_HOST)
       @client.api_http.cookies = @cookies
