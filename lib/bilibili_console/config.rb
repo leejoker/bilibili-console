@@ -32,6 +32,7 @@ module Bilibili
       download_dir: "#{Dir.home}/.bc/downloads",
       video_pic_dir: "#{Dir.home}/.bc/pic",
       db_file_path: "#{Dir.home}/.bc/bilic.db",
+      tmp_dir: "#{Dir.home}/.bc/tmp",
       # ip:port
       proxy: nil
     }.freeze
@@ -61,6 +62,7 @@ module Bilibili
       check_file(@options[:log_file])
       FileUtils.mkdir_p(@options[:download_dir]) unless Dir.exist?(@options[:download_dir])
       FileUtils.mkdir_p(@options[:video_pic_dir]) unless Dir.exist?(@options[:video_pic_dir])
+      FileUtils.mkdir_p(@options[:tmp_dir]) unless Dir.exist?(@options[:tmp_dir])
     end
 
     def check_file(path)

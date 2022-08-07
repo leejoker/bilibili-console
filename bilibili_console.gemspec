@@ -20,4 +20,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'rqrcode', '~> 2.0'
   s.add_dependency 'thor', '~> 1.1.0'
   s.add_dependency 'sqlite3', '~> 1.4.4'
+  s.add_dependency 'nokogiri', '~> 1.13.8'
 end

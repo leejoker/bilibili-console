@@ -129,5 +129,14 @@ module Bilibili
         raise StandardError, "unknown os: #{host_os.inspect}"
       end
     end
+
+    def os_bit
+      arch = RbConfig::CONFIG['arch']
+      return 64 unless arch.index('64').nil?
+
+      32
+    end
+
+    # TODO 获取linux系统发行版
   end
 end
