@@ -127,7 +127,8 @@ module Bilibili
           raise 'retry times is 3, you should try it later'
         end
         retry_times += 1
-        download_and_check(url.sub!('https', 'http'), headers, file_path, retry_times)
+        url[:url] = url[:url].sub!('https', 'http')
+        download_and_check(url, headers, file_path, retry_times)
       end
     end
 
