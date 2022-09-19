@@ -111,14 +111,14 @@ module Bilibili
       url[:file_path] = file_path
       @log.info "开始下载视频， 视频地址：#{url[:url]}"
       headers = generate_headers
-      download_and_check(url, headers, file_path)
+      download_and_check(url[:url], headers, file_path)
       url
     end
 
     def download_and_check(url, headers, file_path, retry_times = 0)
       log.debug("retry times: #{retry_times}")
       begin
-        download(url[:url], headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
+        download(url, headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
         dest_file_exist?(file_path)
       rescue StandardError
         log.error("error: #{$!} at:#{$@}")
@@ -127,7 +127,7 @@ module Bilibili
           raise 'retry times is 3, you should try it later'
         end
         retry_times += 1
-        url[:url] = url[:url].sub!('https', 'http')
+        url.gsub!('https', 'http')
         download_and_check(url, headers, file_path, retry_times)
       end
     end
