@@ -214,8 +214,8 @@ module Bilibili
 
     def wget_proxy
       command = ""
-      command += " -e http_proxy=#{ENV['http_proxy']}" unless ENV['http_proxy'].nil?
-      command += " -e https_proxy=#{ENV['https_proxy']}" unless ENV['https_proxy'].nil?
+      command += " -e http_proxy=\"http://#{@opt[:proxy]}\"" unless @opt[:proxy].nil?
+      command += " -e https_proxy=\"https://#{@opt[:proxy]}\"" unless @opt[:proxy].nil?
       command
     end
 
