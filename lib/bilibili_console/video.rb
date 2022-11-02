@@ -127,7 +127,6 @@ module Bilibili
           raise 'retry times is 3, you should try it later'
         end
         retry_times += 1
-        url.gsub!('https', 'http')
         download_and_check(url, headers, file_path, retry_times)
       end
     end
@@ -221,14 +220,14 @@ module Bilibili
     end
 
     def win_wget_download(url, user_agent, referer, dest)
-      command = "wget --no-check-certificate \"#{url}\" #{wget_proxy} --referer \"#{referer}\" --user-agent \"#{user_agent}\" --load-cookie=\"#{@opt[:cookie]}\" "
-      @log.debug("#{command} -c -O \"#{dest}\" --no-check-certificate -t 3")
+      command = "wget \"#{url}\" #{wget_proxy} --referer \"#{referer}\" --user-agent \"#{user_agent}\" --load-cookie=\"#{@opt[:cookie]}\" --no-check-certificate "
+      @log.debug("#{command} -c -O \"#{dest}\" -t 3")
       `#{command} -c -O "#{dest}" -t 3`
     end
 
     def wget_download(url, user_agent, referer, dest)
-      command = "wget --no-check-certificate '#{url}' #{wget_proxy} --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='#{@opt[:cookie]}' "
-      @log.debug("#{command} -c -O \"#{dest}\" --no-check-certificate -t 3")
+      command = "wget '#{url}' #{wget_proxy} --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='#{@opt[:cookie]}' --no-check-certificate "
+      @log.debug("#{command} -c -O \"#{dest}\" -t 3")
       `#{command} -c -O "#{dest}" -t 3`
     end
   end
