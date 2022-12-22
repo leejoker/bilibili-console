@@ -137,6 +137,19 @@ module Bilibili
       32
     end
 
-    # TODO 获取linux系统发行版
+    def linux_distribution
+      file = File.expand_path('/etc/os-release', __FILE__)
+      os_release = File.readlines(file, chomp: true)
+      id_like = "#{os_release[2].downcase} #{os_release[3].downcase}"
+      if id_like.include? 'debian'
+        :debian
+      elsif id_like.include? 'centos'
+        :centos
+      elsif id_like.include? 'arch'
+        :arch
+      else
+        :unknown
+      end
+    end
   end
 end

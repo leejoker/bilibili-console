@@ -6,12 +6,23 @@
 # https://opensource.org/licenses/MIT
 
 require 'nokogiri'
+require 'zip'
 
 module Bilibili
   # doctor util for bilibili_console
   # TODO 增加提示，暂时不提供非window或linux系统的aria2安装支持
   class Doctor
     class << self
+      def bilic_dir
+        result = `where bilic`
+        file_array = result.to_s.split("\n")
+        File.dirname(file_array[0])
+      end
+
+      def download_by_powershell(url, file_path)
+        `powershell.exe -c wget -Uri #{url} -OutFile #{file_path}`
+      end
+
       def check_wget
         return unless Bilibili.os == :windows
 
@@ -20,18 +31,17 @@ module Bilibili
         return unless result.nil? || result.to_s == ''
 
         puts 'Starting download wget.exe'
-        result = `where bilic`
-        file_array = result.to_s.split("\n")
-        dir = File.dirname(file_array[0])
-        `powershell.exe -c wget -Uri https://eternallybored.org/misc/wget/1.21.3/64/wget.exe -OutFile #{dir}/wget.exe`
+        download_by_powershell('https://eternallybored.org/misc/wget/1.21.3/64/wget.exe', " #{bilic_dir}/wget.exe")
         puts 'wget.exe installed'
       end
 
       def check_aria2
         if Bilibili.os == :windows
-
+          download_aria2_windows
+        elsif Bilibili.os == :linux
+          install_aria2_linux
         else
-
+          puts '暂不支持windows及linux意外的发行版'
         end
       end
 
@@ -45,12 +55,31 @@ module Bilibili
         href = node_set[0]&.attr('href')
         version = href[href.index('-') + 1..]
         os_bit = Bilibili.os_bit
-        download_url = "https://github.com/aria2/aria2/releases/download/release-#{version}/aria2-#{version}-win-#{os_bit}bit-build1.zip"
-        # TODO
+        dir = bilic_dir
+        filename = "aria2-#{version}-win-#{os_bit}bit-build1.zip"
+        download_by_powershell("https://github.com/aria2/aria2/releases/download/release-#{version}/#{filename}",
+                               "#{dir}/#{filename}")
+        content = Zip::File.open("#{dir}/#{filename}") do |zip_file|
+          entry = zip_file.glob('aria2c.exe').first
+          entry.get_input_stream.read
+        end
+        File.open("#{dir}/aria2c.exe", "wb+") do |file|
+          file.syswrite(content)
+        end
       end
 
       def install_aria2_linux
-        # TODO
+        linux_type = Bilibili.linux_distribution
+        case linux_type
+        when :debian
+          `sudo apt install aria2`
+        when :centos
+          `sudo yum install aria2`
+        when :arch
+          `sudo pacman -Sy aria2`
+        else
+          puts 'unknown linux distribution'
+        end
       end
     end
   end

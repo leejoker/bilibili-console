@@ -21,4 +21,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'thor', '~> 1.1.0'
   s.add_dependency 'sqlite3', '~> 1.4.4'
   s.add_dependency 'nokogiri', '~> 1.13.8'
+  s.add_dependency 'rubyzip', '~> 2.3.2'
 end
