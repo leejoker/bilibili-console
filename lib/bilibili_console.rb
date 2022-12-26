@@ -54,7 +54,8 @@ module Bilibili
 
     def doctor
       base = BilibiliBase.new
-      Bilibili::Doctor.check_wget if base.opt[:enable_aria2] == false
+      Bilibili::Doctor.check_wget unless base.opt[:enable_aria2]
+      Bilibili::Doctor.check_aria2 if base.opt[:enable_aria2]
     end
   end
 end

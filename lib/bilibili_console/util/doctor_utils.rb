@@ -20,6 +20,7 @@ module Bilibili
       end
 
       def download_by_powershell(url, file_path)
+        puts "Url: #{url}, filePath: #{file_path}"
         `powershell.exe -c wget -Uri #{url} -OutFile #{file_path}`
       end
 
@@ -48,7 +49,8 @@ module Bilibili
       private
 
       def download_aria2_windows
-        doc = Nokogiri::HTML(URI.open('https://github.com/aria2/aria2'))
+        http_client = NiceHttp.new('https://github.com')
+        doc = Nokogiri::HTML(http_client.get({ path: URI('https://github.com/aria2/aria2').request_uri }).data)
         node_set = doc.xpath('//*[@id="repo-content-pjax-container"]/div/div/div[3]/div[2]/div/div[2]/div/a')
         return if node_set.nil?
 
@@ -57,8 +59,10 @@ module Bilibili
         os_bit = Bilibili.os_bit
         dir = bilic_dir
         filename = "aria2-#{version}-win-#{os_bit}bit-build1.zip"
+        puts 'Starting download aria2'
         download_by_powershell("https://github.com/aria2/aria2/releases/download/release-#{version}/#{filename}",
                                "#{dir}/#{filename}")
+        puts 'aria2 downloaded'
         content = Zip::File.open("#{dir}/#{filename}") do |zip_file|
           entry = zip_file.glob('aria2c.exe').first
           entry.get_input_stream.read
@@ -66,6 +70,7 @@ module Bilibili
         File.open("#{dir}/aria2c.exe", "wb+") do |file|
           file.syswrite(content)
         end
+        puts 'aria2 installed'
       end
 
       def install_aria2_linux
