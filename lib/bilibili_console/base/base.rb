@@ -23,7 +23,7 @@ module Bilibili
     attr_accessor :log, :client, :opt, :cookies
 
     class << self
-      attr_accessor :options, :logger
+      attr_accessor :options, :logger, :proxy
     end
 
     def initialize
@@ -34,18 +34,16 @@ module Bilibili
       @opt = BilibiliBase.options.options
       @log = Logger.new(File.new(@opt[:log_file], 'w+'))
 
-      NiceHttp.log = :no unless @opt[:request_log]
-      NiceHttp.ssl = @opt[:ssl]
-      NiceHttp.port = @opt[:port]
-
+      BilibiliBase.proxy = {}
       unless @opt[:proxy].nil?
-        proxy = @opt[:proxy].split(':')
-        NiceHttp.proxy_host = proxy[0]
-        NiceHttp.proxy_port = proxy[1]
+        proxy_array = @opt[:proxy].split(':')
+        BilibiliBase.proxy[:type] = @opt[:proxy_type]
+        BilibiliBase.proxy[:url] = proxy_array[0]
+        BilibiliBase.proxy[:port] = proxy_array[1]
       end
 
+      @client.api_http = BiliHttp::BiliHttpClient.new(Bilibili::Api::API_HOST, @opt[:port], @opt[:ssl], BilibiliBase.proxy)
       @cookies = load_cookie
-      @client.api_http = NiceHttp.new(Bilibili::Api::API_HOST)
       @client.api_http.cookies = @cookies
     end
 

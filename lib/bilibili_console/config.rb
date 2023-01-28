@@ -34,6 +34,7 @@ module Bilibili
       db_file_path: "#{Dir.home}/.bc/bilic.db",
       tmp_dir: "#{Dir.home}/.bc/tmp",
       # ip:port
+      proxy_type: 'http',
       proxy: nil
     }.freeze
 

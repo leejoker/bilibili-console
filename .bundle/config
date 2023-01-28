@@ -1,2 +1,4 @@
 ---
 BUNDLE_WITHOUT: "production"
+BUNDLE_MIRROR__HTTPS://RUBYGEMS__ORG/: "https://gems.ruby-china.org"
+BUNDLE_SSL_VERIFY_MODE: NONE

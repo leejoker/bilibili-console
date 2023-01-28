@@ -24,7 +24,7 @@ module Bilibili
 
     def initialize
       super
-      @client.login_http = NiceHttp.new(Bilibili::Api::LOGIN_HOST)
+      @client.login_http = BiliHttp::BiliHttpClient.new(Bilibili::Api::LOGIN_HOST, @opt[:port], @opt[:ssl], BilibiliBase.proxy)
       @client.login_http.cookies = @cookies
     end
 
