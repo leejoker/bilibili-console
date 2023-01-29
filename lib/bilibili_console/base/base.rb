@@ -95,9 +95,9 @@ module Bilibili
 
     def define_post_form_json_method(method_name)
       new_method_name = "post_form_json#{method_name[0]}"
-      BilibiliBase.define_method(new_method_name) do |url, params|
-        $log.debug("#{new_method_name}: [url]= #{url}, params= #{params}")
-        @client.post_form_json(@client.instance_variable_get("@#{method_name}"), url, params)
+      BilibiliBase.define_method(new_method_name) do |url, headers, params|
+        $log.debug("#{new_method_name}: [url]= #{url}, headers= #{headers}, params= #{params}")
+        @client.post_form_json(@client.instance_variable_get("@#{method_name}"), url, headers, params)
       end
     end
 

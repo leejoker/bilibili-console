@@ -7,9 +7,9 @@
 
 module Bilibili
   module Api
-    LOGIN_HOST = 'http://passport.bilibili.com'
-    API_HOST = 'http://api.bilibili.com'
-    MANGA_HOST = 'http://manga.bilibili.com'
+    LOGIN_HOST = 'https://passport.bilibili.com'
+    API_HOST = 'https://api.bilibili.com'
+    MANGA_HOST = 'https://manga.bilibili.com'
 
     module Login
       QRCODE = "#{LOGIN_HOST}/qrcode/getLoginUrl"
@@ -28,7 +28,7 @@ module Bilibili
     end
 
     module Manga
-      CHECK_IN = "#{MANGA_HOST}/twirp/activity.v1.Activity/ClockIn?platform=android"
+      CHECK_IN = "#{MANGA_HOST}/twirp/activity.v1.Activity/ClockIn"
     end
 
     module Search

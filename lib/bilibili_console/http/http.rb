@@ -151,11 +151,11 @@ module BiliHttp
     end
 
     # post method with form data
-    def post_form_json(http, url, params)
-      custom_headers = BiliHttp.headers.clone
-      custom_headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    def post_form_json(http, url, headers, params)
+      headers = BiliHttp.headers.clone if headers.nil? || headers.empty?
+      headers['Content-Type'] = 'application/x-www-form-urlencoded'
       request = {
-        headers: custom_headers,
+        headers: headers,
         path: URI(url),
         data: params
       }
@@ -170,7 +170,7 @@ module BiliHttp
         headers: headers,
         path: URI(url)
       }
-      request.merge!({ data: req_body }) unless req_body.nil? || req_body.empty?
+      request.merge!({ data: req_body.to_json }) unless req_body.nil? || req_body.empty?
       json_data(http.post_json(request))
     end
 
