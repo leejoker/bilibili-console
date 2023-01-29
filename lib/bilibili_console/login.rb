@@ -56,6 +56,7 @@ module Bilibili
       else
         puts 'Cookie已失效'
         clean_cookie
+        login
         login_user_info
       end
     end
