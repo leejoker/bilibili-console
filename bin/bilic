@@ -22,7 +22,7 @@ class BiliConsole < Thor
         help    [command]          help messages
         login                      qrcode login
         user                       user info
-        manga                      bilibili manga checkin
+        manga   [-i]               bilibili manga checkin
         down    [-s e p q]         download video
         fav     [-s m a s n]       show user video collections
     HELP
@@ -52,13 +52,26 @@ class BiliConsole < Thor
   end
 
   desc 'manga', 'checkin bilibili manga'
+  option :info, aliases: :i, desc: 'checkin info'
 
   def manga_checkin
-    body = BILI_CONSOLE.manga_checkin
-    if body.code == 'invalid_argument'
-      puts '您已经签到了'
+    if options[:info].nil?
+      body = BILI_CONSOLE.manga_checkin
+      if body.code == 'invalid_argument'
+        puts '您已经签到了'
+      else
+        body = BILI_CONSOLE.manga_checkin_info
+        puts <<~CHECKINFO
+          签到成功!
+          连续签到天数: #{body[:day_count]}
+        CHECKINFO
+      end
     else
-      puts '签到成功'
+      body = BILI_CONSOLE.manga_checkin_info
+      puts <<~CHECKINFO
+        签到状态: #{body[:status] == 1 ? '已签到' : '未签到'}
+        连续签到天数: #{body[:day_count]}
+      CHECKINFO
     end
   end
 

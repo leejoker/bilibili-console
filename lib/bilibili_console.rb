@@ -47,6 +47,11 @@ module Bilibili
       manga.check_in
     end
 
+    def manga_checkin_info
+      manga = Bilibili::Manga.new
+      manga.check_in_info
+    end
+
     def search_keyword(options)
       search = Bilibili::Search.new
       search.search(options)

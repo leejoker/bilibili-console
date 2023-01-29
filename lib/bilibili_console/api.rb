@@ -29,6 +29,7 @@ module Bilibili
 
     module Manga
       CHECK_IN = "#{MANGA_HOST}/twirp/activity.v1.Activity/ClockIn"
+      CHECK_IN_INFO = "#{MANGA_HOST}/twirp/activity.v1.Activity/GetClockInInfo"
     end
 
     module Search
