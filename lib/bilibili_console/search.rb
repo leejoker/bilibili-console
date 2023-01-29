@@ -58,8 +58,13 @@ module Bilibili
       return unless options[:pic] && options[:bv]
 
       uri = URI("https:#{data.result[0].pic}")
-      http = NiceHttp.new(host: "https://#{uri.host}", ssl: true)
-      http.get(uri.request_uri, save_data: "#{@opt[:video_pic_dir]}/COVER_#{data.result[0].bvid}.jpg")
+      http = BiliHttp::BiliHttpClient.new("https://#{uri.host}", 443, true, BilibiliBase.proxy)
+      request = {
+        path: uri,
+        save_data: "#{@opt[:video_pic_dir]}/COVER_#{data.result[0].bvid}.jpg",
+        headers: BiliHttp.headers
+      }
+      http.get_stream(request)
     end
 
     def get_pages(data)

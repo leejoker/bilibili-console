@@ -59,12 +59,3 @@ module Bilibili
     end
   end
 end
-
-
-BILI_CONSOLE = Bilibili::BilibiliConsole.new
-user = BILI_CONSOLE.login_user_info
-puts <<~USER
-      uid: #{user.mid}
-      uname: #{user.uname}
-      level: #{user.level_info[:current_level]}
-USER

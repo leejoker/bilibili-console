@@ -109,7 +109,7 @@ module Bilibili
     def download_file(url, dir)
       file_path = check_path(dir, url[:name])
       url[:file_path] = file_path
-      @log.info "开始下载视频， 视频地址：#{url[:url]}"
+      $log.info "开始下载视频， 视频地址：#{url[:url]}"
       headers = generate_headers
       download_and_check(url[:url], headers, file_path)
       url
@@ -159,7 +159,7 @@ module Bilibili
         begin
           FileUtils.mv(files[0], dest)
         rescue StandardError
-          @log.error("error: #{$!} at:#{$@}")
+          $log.error("error: #{$!} at:#{$@}")
         end
         files.clear
         return
@@ -194,7 +194,7 @@ module Bilibili
 
     def download(url, user_agent, referer, cookie, dest)
       puts "开始下载文件到： #{dest}"
-      @log.debug(<<~DOWNLOAD
+      $log.debug(<<~DOWNLOAD
         url:        #{url}
         user_agent: #{user_agent}
         referer:    #{referer}
@@ -204,10 +204,10 @@ module Bilibili
       )
       File.write((@opt[:cookie]).to_s, cookie) unless File.exist?((@opt[:cookie]).to_s)
       if Bilibili.os == :windows
-        @log.debug('OS: Windows, use wget.exe')
+        $log.debug('OS: Windows, use wget.exe')
         win_wget_download(url, user_agent, referer, dest)
       else
-        @log.debug('OS: unix like, use wget')
+        $log.debug('OS: unix like, use wget')
         wget_download(url, user_agent, referer, dest)
       end
     end
@@ -221,13 +221,13 @@ module Bilibili
 
     def win_wget_download(url, user_agent, referer, dest)
       command = "wget \"#{url}\" #{wget_proxy} --referer \"#{referer}\" --user-agent \"#{user_agent}\" --load-cookie=\"#{@opt[:cookie]}\" --no-check-certificate "
-      @log.debug("#{command} -c -O \"#{dest}\" -t 3")
+      $log.debug("#{command} -c -O \"#{dest}\" -t 3")
       `#{command} -c -O "#{dest}" -t 3`
     end
 
     def wget_download(url, user_agent, referer, dest)
       command = "wget '#{url}' #{wget_proxy} --referer '#{referer}' --user-agent '#{user_agent}' --load-cookie='#{@opt[:cookie]}' --no-check-certificate "
-      @log.debug("#{command} -c -O \"#{dest}\" -t 3")
+      $log.debug("#{command} -c -O \"#{dest}\" -t 3")
       `#{command} -c -O "#{dest}" -t 3`
     end
   end

@@ -50,9 +50,9 @@ module Bilibili
       @options.merge!(JSON.parse(config_info, symbolize_names: true)) unless config_info.nil? || config_info.length.zero?
       check_paths
 
-      logger = Logger.new(File.new(@options[:log_file], 'w+'))
-      logger.level = @options[:log_level]
-      logger.debug("config info: #{@options}")
+      $log = Logger.new(File.new(@options[:log_file], 'w+'))
+      $log.level = @options[:log_level]
+      $log.debug("config info: #{@options}")
     end
 
     private

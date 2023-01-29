@@ -30,11 +30,15 @@ module Bilibili
 
     def login_url
       data = get_jsonl(Api::Login::QRCODE)
+      return if data.nil? || data[:url].nil?
+
       @url = data[:url]
       @oauth_key = data[:oauthKey]
     end
 
     def show_qrcode
+      return if @url.nil?
+
       qr = RQRCode::QRCode.new(@url)
       pic = qr.as_ansi(
         light: "\033[47m", dark: "\033[40m",
@@ -47,7 +51,7 @@ module Bilibili
     def login_user_info
       set_http_cookie
       data = get_jsona(Api::Login::USERINFO)
-      if data.code != '-101'
+      if data[:isLogin]
         Bilibili::UserInfo.new(data)
       else
         puts 'Cookie已失效'
@@ -69,7 +73,7 @@ module Bilibili
 
     def login_check
       data = post_form_jsonl(Api::Login::INFO, { oauthKey: @oauth_key })
-      @log.debug("login response data: #{data}")
+      $log.debug("login response data: #{data}")
       if [-4, -5].include?(data)
         sleep 2
         login_check

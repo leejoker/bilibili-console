@@ -7,7 +7,7 @@
 
 require 'net/http'
 require 'json'
-require 'socksify'
+require 'socksify/http'
 require_relative 'response_body'
 
 # bilibili client http module
@@ -17,12 +17,13 @@ module BiliHttp
   end
 
   class BiliHttpClient
-    attr_accessor :http, :cookies, :ssl
+    attr_accessor :http, :cookies, :ssl, :port
 
-    def initialize(address, port = nil, ssl = true, proxy = {})
+    def initialize(address, port = nil, ssl = false, proxy = {})
       @http = Net::HTTP.new(address, port)
       @cookies = {}
       @ssl = ssl
+      @port = port unless port.nil?
       return if proxy.empty?
 
       case proxy[:type]
@@ -39,45 +40,61 @@ module BiliHttp
     def get(request)
       uri = request[:path]
       path = uri.path + (uri.query ? ('?' + uri.query) : '')
-      @http.start(uri.host, uri.port) do |http|
-        req = Net::HTTP::Get.new(path, request_headers(request))
+      req = Net::HTTP::Get.new(path, request_headers(request))
+      do_request(uri.host, @port, ssl, req)
+    end
+
+    def get_stream(request)
+      uri = request[:path]
+      path = uri.path + (uri.query ? ('?' + uri.query) : '')
+      req = Net::HTTP::Get.new(path, request_headers(request))
+      save_path = request[:save_data]
+      @http.start(host, port, use_ssl: ssl, verify_mode: OpenSSL::SSL::VERIFY_NONE) do |http|
         response = http.request(req)
         response_headers(response)
-        response.body.to_s
+        open(save_path, "wb") { |file|
+          file.write(response.body)
+        }
       end
     end
 
     def post_json(request)
       uri = request[:path]
       data = request[:data]
-      @http.start(uri.host, uri.port) do |http|
-        req = Net::HTTP::Post.new(uri.path, request_headers(request))
-        req.body = data unless data.nil?
-        response = http.request(req)
-        response_headers(response)
-        response.body.to_s
-      end
+      req = Net::HTTP::Post.new(uri.path, request_headers(request))
+      req.body = data unless data.nil?
+      do_request(uri.host, @port, ssl, req)
     end
 
     def post_form(request)
       uri = request[:path]
       form_data = request[:data]
-      @http.start(uri.host, uri.port) do |http|
-        req = Net::HTTP::Post.new(uri.path, request_headers(request))
-        req.set_form_data(form_data)
-        response = http.request(req)
-        response_headers(response)
-        response.body.to_s
-      end
+      req = Net::HTTP::Post.new(uri.path, request_headers(request))
+      req.set_form_data(form_data)
+      do_request(uri.host, @port, ssl, req)
     end
 
     private
 
-    def handle_http(http)
-      return unless @ssl
-
-      http.use_ssl = ssl
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    def do_request(host, port, ssl, request)
+      begin
+        @http.start(host, port, use_ssl: ssl, verify_mode: OpenSSL::SSL::VERIFY_NONE) do |http|
+          response = http.request(request)
+          $log.debug(<<~REQUEST
+            host:       #{host}
+            port:       #{port}
+            ssl:        #{ssl}
+            cookie:     #{request['Cookie']}
+            path:       #{request.path}
+          REQUEST
+          )
+          response_headers(response)
+          $log.debug("response body: #{response.body.to_s}")
+          response.body.to_s
+        end
+      rescue
+        puts "error: #{$!}"
+      end
     end
 
     def makeup_cookie(cookies)
@@ -130,7 +147,7 @@ module BiliHttp
         headers: BiliHttp.headers,
         path: URI(url)
       }
-      http.get(request).data
+      http.get(request)
     end
 
     # post method with form data
@@ -142,7 +159,7 @@ module BiliHttp
         path: URI(url),
         data: params
       }
-      json_data(http.post_form(request).data)
+      json_data(http.post_form(request))
     end
 
     # post method with json body
@@ -154,11 +171,13 @@ module BiliHttp
         path: URI(url)
       }
       request.merge!({ data: req_body }) unless req_body.nil? || req_body.empty?
-      json_data(http.post_json(request).data)
+      json_data(http.post_json(request))
     end
 
     def json_data(data)
-      body = BiliHttp::ResponseBody.new(JSON.parse(data))
+      return if data.nil? || data.empty?
+
+      body = BiliHttp::ResponseBody.new(JSON.parse(data, symbolize_names: true))
       if body.data.nil?
         body
       else
