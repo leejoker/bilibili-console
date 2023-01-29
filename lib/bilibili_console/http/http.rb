@@ -49,12 +49,16 @@ module BiliHttp
       path = uri.path + (uri.query ? ('?' + uri.query) : '')
       req = Net::HTTP::Get.new(path, request_headers(request))
       save_path = request[:save_data]
-      @http.start(host, port, use_ssl: ssl, verify_mode: OpenSSL::SSL::VERIFY_NONE) do |http|
+      @http.start(uri.host, @port, use_ssl: ssl, verify_mode: OpenSSL::SSL::VERIFY_NONE) do |http|
         response = http.request(req)
-        response_headers(response)
-        open(save_path, "wb") { |file|
-          file.write(response.body)
-        }
+        if response.code.to_i == 302
+          request[:path] = URI(response['location'])
+          get_stream(request)
+        else
+          open(save_path, 'wb') { |file|
+            file.write(response.body)
+          }
+        end
       end
     end
 
