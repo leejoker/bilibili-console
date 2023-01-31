@@ -57,14 +57,14 @@ class BiliConsole < Thor
   def manga_checkin
     if options[:info].nil?
       body = BILI_CONSOLE.manga_checkin
-      if body.code == 'invalid_argument'
-        puts '您已经签到了'
-      else
+      if body.code.nil?
         body = BILI_CONSOLE.manga_checkin_info
         puts <<~CHECKINFO
           签到成功!
           连续签到天数: #{body[:day_count]}
         CHECKINFO
+      else
+        puts '您已经签到了'
       end
     else
       body = BILI_CONSOLE.manga_checkin_info
