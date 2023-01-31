@@ -31,7 +31,7 @@ module Bilibili
         return unless Bilibili.os == :windows
 
         puts 'Start check wget'
-        result = `where wget.exe > nul 2> nul`
+        result = `where wget.exe`
         return unless result.nil? || result.to_s == ''
 
         puts 'Starting download wget.exe'
