@@ -41,6 +41,7 @@ module Bilibili
           return unless windows_command_check('aria2c')
           download_aria2_windows
         elsif Bilibili.os == :linux
+          return unless linux_command_check('aria2c')
           install_aria2_linux
         else
           puts '暂不支持windows及linux意外的发行版'
