@@ -19,12 +19,12 @@ module BiliHttp
   class BiliHttpClient
     attr_accessor :http, :cookies, :ssl, :port
 
-    def initialize(address, port = nil, ssl = false, proxy = {})
-      @http = Net::HTTP.new(address, port)
+    def initialize(port = nil, ssl = false, proxy = {})
+      @http = Net::HTTP
       @cookies = {}
       @ssl = ssl
       @port = port unless port.nil?
-      return if proxy.empty?
+      return if proxy.nil? || proxy.empty?
 
       case proxy[:type]
       when 'http'
@@ -51,13 +51,14 @@ module BiliHttp
       save_path = request[:save_data]
       @http.start(uri.host, @port, use_ssl: ssl, verify_mode: OpenSSL::SSL::VERIFY_NONE) do |http|
         response = http.request(req)
-        if response.code.to_i == 302
+        code = response.code.to_i
+        if code == 301 || code == 302
           request[:path] = URI(response['location'])
           get_stream(request)
         else
-          open(save_path, 'wb') { |file|
+          File.open(save_path, 'wb+') do |file|
             file.write(response.body)
-          }
+          end
         end
       end
     end
@@ -85,6 +86,7 @@ module BiliHttp
         @http.start(host, port, use_ssl: ssl, verify_mode: OpenSSL::SSL::VERIFY_NONE) do |http|
           response = http.request(request)
           $log.debug(<<~REQUEST
+
             host:       #{host}
             port:       #{port}
             ssl:        #{ssl}

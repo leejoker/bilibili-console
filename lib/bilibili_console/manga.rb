@@ -20,7 +20,7 @@ module Bilibili
 
     def initialize
       super
-      @client.manga_http = BiliHttp::BiliHttpClient.new(Bilibili::Api::MANGA_HOST, 443, true, BilibiliBase.proxy)
+      @client.manga_http = BiliHttp::BiliHttpClient.new(443, true, BilibiliBase.proxy)
       @client.manga_http.cookies = @cookies
     end
 

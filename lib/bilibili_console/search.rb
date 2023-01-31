@@ -58,7 +58,7 @@ module Bilibili
       return unless options[:pic] && options[:bv]
 
       uri = URI("https:#{data.result[0].pic}")
-      http = BiliHttp::BiliHttpClient.new("https://#{uri.host}", 443, true, BilibiliBase.proxy)
+      http = BiliHttp::BiliHttpClient.new(443, true, BilibiliBase.proxy)
       request = {
         path: uri,
         save_data: "#{@opt[:video_pic_dir]}/COVER_#{data.result[0].bvid}.jpg",

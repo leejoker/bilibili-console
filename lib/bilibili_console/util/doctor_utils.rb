@@ -21,8 +21,9 @@ module Bilibili
 
       def download_file(url, file_path)
         puts "Url: #{url}, filePath: #{file_path}"
-        http_client = BiliHttp::BiliHttpClient.new('https://github.com', 443, true, BilibiliBase.proxy)
-        http_client.get_stream({ path: URI(url), save_data: file_path })
+        uri = URI(url)
+        http_client = BiliHttp::BiliHttpClient.new(443, true, BilibiliBase.proxy)
+        http_client.get_stream({ path: uri, save_data: file_path })
         yield file_path
       end
 
@@ -34,8 +35,9 @@ module Bilibili
         return unless result.nil? || result.to_s == ''
 
         puts 'Starting download wget.exe'
-        download_file('https://eternallybored.org/misc/wget/1.21.3/64/wget.exe', " #{bilic_dir}/wget.exe")
-        puts 'wget.exe installed'
+        download_file('https://eternallybored.org/misc/wget/1.21.3/64/wget.exe', "#{bilic_dir}#{File::ALT_SEPARATOR}wget.exe") do |path|
+          puts 'wget.exe installed'
+        end
       end
 
       def check_aria2
@@ -49,7 +51,7 @@ module Bilibili
       end
 
       def download_aria2_windows
-        http_client = BiliHttp::BiliHttpClient.new('https://github.com', 443, true, BilibiliBase.proxy)
+        http_client = BiliHttp::BiliHttpClient.new(443, true, BilibiliBase.proxy)
         doc = Nokogiri::HTML(http_client.get({ path: URI('https://github.com/aria2/aria2') }))
         node_set = doc.xpath('//*[@id="repo-content-pjax-container"]/div/div/div[3]/div[2]/div/div[2]/div/a')
         return if node_set.nil?

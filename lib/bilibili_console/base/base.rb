@@ -41,7 +41,7 @@ module Bilibili
         BilibiliBase.proxy[:port] = proxy_array[1]
       end
 
-      @client.api_http = BiliHttp::BiliHttpClient.new(Bilibili::Api::API_HOST, @opt[:port], @opt[:ssl], BilibiliBase.proxy)
+      @client.api_http = BiliHttp::BiliHttpClient.new(@opt[:port], @opt[:ssl], BilibiliBase.proxy)
       @cookies = load_cookie
       @client.api_http.cookies = @cookies
     end
