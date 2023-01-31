@@ -123,8 +123,11 @@ $ bilic search BV1zL411L75A --bv --pic
 
 ##### Gem依赖
 
-* [nice_http](https://github.com/MarioRuiz/nice_http)
+* [nokogiri](https://github.com/sparklemotion/nokogiri)
 * [rqrcode](https://github.com/whomwah/rqrcode/)
+* [rubyzip](https://github.com/rubyzip/rubyzip)
+* [socksify](https://github.com/astro/socksify-ruby)
+* [sqlite3](https://github.com/sparklemotion/sqlite3-ruby)
 * [thor](https://github.com/rails/thor)
 
 ##### 接口文档
