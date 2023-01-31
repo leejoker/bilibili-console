@@ -28,11 +28,7 @@ module Bilibili
       end
 
       def check_wget
-        return unless Bilibili.os == :windows
-
-        puts 'Start check wget'
-        result = `where wget.exe`
-        return unless result.nil? || result.to_s == ''
+        return unless windows_command_check('wget')
 
         puts 'Starting download wget.exe'
         download_file('https://eternallybored.org/misc/wget/1.21.3/64/wget.exe', "#{bilic_dir}#{File::ALT_SEPARATOR}wget.exe") do |path|
@@ -42,6 +38,7 @@ module Bilibili
 
       def check_aria2
         if Bilibili.os == :windows
+          return unless windows_command_check('aria2c')
           download_aria2_windows
         elsif Bilibili.os == :linux
           install_aria2_linux
@@ -91,6 +88,32 @@ module Bilibili
           `sudo pacman -Sy aria2`
         else
           puts 'unknown linux distribution'
+        end
+      end
+
+      def windows_command_check(command)
+        return false unless Bilibili.os == :windows
+
+        puts "Start check #{command}"
+        result = `where #{command}`
+        if result.nil? || result.to_s == ''
+          true
+        else
+          puts "#{command} installed"
+          false
+        end
+      end
+
+      def linux_command_check(command)
+        return false unless Bilibili.os == :linux
+
+        puts "Start check #{command}"
+        result = `command -v #{command}`
+        if result.nil? || result.to_s == ''
+          true
+        else
+          puts "#{command} installed"
+          false
         end
       end
     end
