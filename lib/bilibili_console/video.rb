@@ -47,7 +47,7 @@ module Bilibili
 
       video_qn = options[:qn]
       page_list = page_slice(page_list, options[:start], options[:end], options[:page])
-      log.info("wait download size: #{page_list.size}")
+      $log.info("wait download size: #{page_list.size}")
       video_qn = @opt[:video_qn].to_s if video_qn.nil?
       page_list.each do |page|
         get_video_url(bv_id, page.cid, video_qn).each do |down_url|
@@ -83,7 +83,7 @@ module Bilibili
         end   page num: #{end_page}
         order     page: #{page}
       LOG
-      log.info(log_info)
+      $log.info(log_info)
       if page.nil?
         start_page = start_page.to_i - 1
         if end_page.nil?
@@ -116,12 +116,12 @@ module Bilibili
     end
 
     def download_and_check(url, headers, file_path, retry_times = 0)
-      log.debug("retry times: #{retry_times}")
+      $log.debug("retry times: #{retry_times}")
       begin
         download(url, headers['User-Agent'], headers['Referer'], headers['Cookie'], file_path)
         dest_file_exist?(file_path)
       rescue StandardError
-        log.error("error: #{$!} at:#{$@}")
+        $log.error("error: #{$!} at:#{$@}")
         sleep 3
         if retry_times == 3
           raise 'retry times is 3, you should try it later'
@@ -136,19 +136,11 @@ module Bilibili
       "#{dir}#{filename}"
     end
 
-    def create_cookie_str(cookies)
-      cookie_array = cookies['/'].map do |key, value|
-        "#{key}=#{value}; "
-      end
-      cookie_array.join
-    end
-
     def generate_headers
       headers = BiliHttp.headers
       {
         'User-Agent' => headers[:"User-Agent"],
-        'Referer' => headers[:Referer],
-        'Cookie' => create_cookie_str(load_cookie)
+        'Referer' => headers[:Referer]
       }
     end
 
