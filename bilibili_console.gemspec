@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ['>= 2.5']
   s.add_dependency 'socksify', '~> 1.7.1'
   s.add_dependency 'rqrcode', '~> 2.0'
-  s.add_dependency 'thor', '~> 1.1.0'
+  s.add_dependency 'thor', '~> 1.2.1'
   s.add_dependency 'sqlite3', '~> 1.6.0'
   s.add_dependency 'nokogiri', '~> 1.14.0'
   s.add_dependency 'rubyzip', '~> 2.3.2'

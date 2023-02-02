@@ -7,7 +7,7 @@ PATH
       rubyzip (~> 2.3.2)
       socksify (~> 1.7.1)
       sqlite3 (~> 1.6.0)
-      thor (~> 1.1.0)
+      thor (~> 1.2.1)
 
 GEM
   remote: https://gems.ruby-china.com/
@@ -75,7 +75,7 @@ GEM
     sqlite3 (1.6.0-x64-mingw-ucrt)
     sqlite3 (1.6.0-x64-mingw32)
     sqlite3 (1.6.0-x86_64-linux)
-    thor (1.1.0)
+    thor (1.2.1)
     unicode-display_width (2.4.2)
 
 PLATFORMS
