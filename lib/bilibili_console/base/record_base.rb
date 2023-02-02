@@ -10,7 +10,7 @@ module Bilibili
     def initialize(json)
       hash = {}
       public_methods(false).filter { |m| m.to_s.index('=').nil? }.each do |method|
-        next if json[method.to_s.to_sym].nil?
+        next if json.nil? || json[method.to_s.to_sym].nil?
 
         value = method("#{method.to_s}=".to_sym).call(json[method.to_s.to_sym])
         hash.merge!({ method.to_s => value })
