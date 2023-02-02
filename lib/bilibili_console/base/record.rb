@@ -9,7 +9,7 @@ module Bilibili
   class BiliBliliRecord < BiliBliliRecordBase
     def initialize(json)
       if !json.nil?
-        super.initialize(json)
+        super json
       else
         # TODO 校验表是否存在，否则创建表， 表结构根据COLUMNS字段读取
         # TODO 增加表的增删改方法和通过id查询的方法
