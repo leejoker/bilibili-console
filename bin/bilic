@@ -80,6 +80,7 @@ class BiliConsole < Thor
   option :end, aliases: :e, desc: 'end page'
   option :page, aliases: :p, desc: 'order one page'
   option :qn, aliases: :q, desc: 'video resolution ratio'
+  option :rename, aliases: :r, desc: 'rename the video file name'
 
   def download_video(bv_id)
     options_dup = options.dup

@@ -95,7 +95,9 @@ $ bilic search BV1zL411L75A --bv --pic
 
 #### 5 功能清单
 
-##### DONE
+##### RELEASE NOTES
+
+###### 0.0.3
 
 - bilibili漫画签到
 - B站二维码登录
@@ -104,7 +106,12 @@ $ bilic search BV1zL411L75A --bv --pic
 - 个人收藏夹（查看、搜索）
 - 全局视频检索(目前只支持搜索视频)
 - 视频封面提取
+
+###### 0.0.4
+
 - 增加doctor诊断
+- 支持aria2c下载
+- 支持下载视频重命名
 
 ##### TODO
 
@@ -113,7 +120,6 @@ $ bilic search BV1zL411L75A --bv --pic
 - 增加saucenao图片检索
 - 查看观看历史
 - 尝试调用本地播放器进行播放
-- 支持aria2c下载
 - 多账号管理
 - 定时签到
 
@@ -129,7 +135,7 @@ $ bilic search BV1zL411L75A --bv --pic
 * [rqrcode](https://github.com/whomwah/rqrcode/)
 * [rubyzip](https://github.com/rubyzip/rubyzip)
 * [socksify](https://github.com/astro/socksify-ruby)
-* [sqlite3](https://github.com/sparklemotion/sqlite3-ruby)
+* [activerecord-jdbcsqlite3-adapter](https://github.com/jruby/activerecord-jdbc-adapter)
 * [thor](https://github.com/rails/thor)
 
 ##### 接口文档

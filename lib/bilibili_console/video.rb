@@ -52,7 +52,9 @@ module Bilibili
       page_list.each do |page|
         get_video_url(bv_id, page.cid, video_qn).each do |down_url|
           order = down_url[:order] < 10 ? "0#{down_url[:order]}" : down_url[:order]
-          url = { 'name': "#{page.part}_#{order}.flv", 'url': down_url[:url].to_s, 'prefix': page.part,
+          file_name = "#{page.part}_#{order}.flv"
+          file_name = "#{options[:rename]}.flv" unless options[:rename].nil?
+          url = { 'name': file_name, 'url': down_url[:url].to_s, 'prefix': page.part,
                   'order': "#{page.page}#{order}", 'bv': bv_id.to_s }
           download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{bv_id}/"
           result << download_file(url, download_path)
