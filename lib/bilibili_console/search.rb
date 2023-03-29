@@ -8,6 +8,7 @@
 require_relative 'http/http'
 require_relative 'api'
 require_relative 'video'
+require_relative 'util/bilibili_utils'
 
 # search module
 module Bilibili
@@ -41,6 +42,7 @@ module Bilibili
       url += "&order=#{sort_type}" unless sort_type.nil?
       data = Bilibili::SearchData.new(get_jsona(url))
       bv_filter(data, options)
+      av_filter(data, options)
       cover_save(data, options)
       get_pages(data)
       data
@@ -51,6 +53,12 @@ module Bilibili
     def bv_filter(data, options)
       data&.result&.select! do |v|
         options[:bv] ? v.bvid.to_s == options[:keyword].to_s : true
+      end
+    end
+
+    def av_filter(data, options)
+      data&.result&.select! do |v|
+        options[:av] ? v.aid.to_s == BilibiliUtils.get_av_code(options[:keyword]) : true
       end
     end
 

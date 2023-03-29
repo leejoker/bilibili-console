@@ -36,10 +36,10 @@ module Bilibili
       @fav.list_fav_video(options)
     end
 
-    def download_video(bv_id, options)
+    def download_video(id, options)
       @video = Bilibili::Video.new if @video.nil?
-      urls = @video.download_video_by_bv(bv_id, options)
-      @video.combine_downloaded_videos(bv_id, urls)
+      urls = @video.download_video_by_id(id, options)
+      @video.combine_downloaded_videos(id, urls)
     end
 
     def manga_checkin

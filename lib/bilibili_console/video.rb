@@ -8,6 +8,7 @@
 require_relative 'api'
 require_relative 'config'
 require_relative 'http/http'
+require_relative 'util/bilibili_utils'
 require 'fileutils'
 
 # video module
@@ -20,10 +21,10 @@ module Bilibili
 
   # bilibili video interfaces
   class Video < BilibiliBase
-    def video_page_list(bv_id)
-      return nil if bv_id.nil?
+    def video_page_list(id)
+      return nil if id.nil?
 
-      url = "#{Api::Video::PAGE_LIST}?bvid=#{bv_id}"
+      url = "#{Api::Video::PAGE_LIST}?#{BilibiliUtils.get_id_search_param(id)}"
       datas = get_jsona(url)
       return nil if datas.nil?
 
@@ -32,17 +33,17 @@ module Bilibili
       end
     end
 
-    def get_video_url(bv_id, cid, video_qn)
+    def get_video_url(id, cid, video_qn)
       qn = Config::VIDEO_QN[video_qn]
-      url = "#{Api::Video::PLAY_URL}?bvid=#{bv_id}&cid=#{cid}&qn=#{qn}&fnval=0&fnver=0&fourk=1"
+      url = "#{Api::Video::PLAY_URL}?#{BilibiliUtils.get_id_download_param(id)}&cid=#{cid}&qn=#{qn}&fnval=0&fnver=0&fourk=1"
       data = get_jsona(url)
       data[:durl]
     end
 
     # TODO 通过创建下载任务来进行视频下载
-    def download_video_by_bv(bv_id, options)
+    def download_video_by_id(id, options)
       result = []
-      page_list = video_page_list(bv_id)
+      page_list = video_page_list(id)
       return nil if page_list.nil?
 
       video_qn = options[:qn]
@@ -50,13 +51,13 @@ module Bilibili
       $log.info("wait download size: #{page_list.size}")
       video_qn = @opt[:video_qn].to_s if video_qn.nil?
       page_list.each do |page|
-        get_video_url(bv_id, page.cid, video_qn).each do |down_url|
+        get_video_url(id, page.cid, video_qn).each do |down_url|
           order = down_url[:order] < 10 ? "0#{down_url[:order]}" : down_url[:order]
           file_name = "#{page.part}_#{order}.flv"
           file_name = "#{options[:rename]}.flv" unless options[:rename].nil?
           url = { 'name': file_name, 'url': down_url[:url].to_s, 'prefix': page.part,
-                  'order': "#{page.page}#{order}", 'bv': bv_id.to_s }
-          download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{bv_id}/"
+                  'order': "#{page.page}#{order}", 'id': id.to_s }
+          download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{id}/"
           result << download_file(url, download_path)
         end
         sleep rand(3)
@@ -64,10 +65,10 @@ module Bilibili
       result
     end
 
-    def combine_downloaded_videos(bv_id, urls)
+    def combine_downloaded_videos(id, urls)
       return nil if urls.empty?
 
-      download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{bv_id}/"
+      download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{id}/"
       url_array = []
       urls.each_with_index do |u, i|
         same_part = same_part?(u, i)
