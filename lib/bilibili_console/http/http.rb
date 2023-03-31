@@ -82,24 +82,19 @@ module BiliHttp
     private
 
     def do_request(host, port, ssl, request)
-      begin
-        @http.start(host, port, use_ssl: ssl, verify_mode: OpenSSL::SSL::VERIFY_NONE) do |http|
-          response = http.request(request)
-          $log.debug(<<~REQUEST
-
-            host:       #{host}
-            port:       #{port}
-            ssl:        #{ssl}
-            cookie:     #{request['Cookie']}
-            path:       #{request.path}
-          REQUEST
-          )
-          response_headers(response)
-          $log.debug("response body: #{response.body.to_s}")
-          response.body.to_s
-        end
-      rescue
-        puts "error: #{$!}"
+      @http.start(host, port, use_ssl: ssl, verify_mode: OpenSSL::SSL::VERIFY_NONE) do |http|
+        response = http.request(request)
+        $log.debug(<<~REQUEST
+          host:       #{host}
+          port:       #{port}
+          ssl:        #{ssl}
+          cookie:     #{request['Cookie']}
+          path:       #{request.path}
+        REQUEST
+        )
+        response_headers(response)
+        $log.debug("response body: #{response.body.to_s}")
+        response.body.to_s
       end
     end
 

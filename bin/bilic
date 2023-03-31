@@ -3,6 +3,22 @@
 require 'thor'
 require_relative '../lib/bilibili_console'
 
+at_exit do
+  if $!
+    $log.error("error: #{$!} at:#{$@}")
+    puts 'Error! Please check the error log.'
+  end
+end
+
+def raise(err, *args)
+  $log.error("error: #{err} at:#{args}")
+  puts 'Error! Please check the error log.'
+end
+
+def fail(*args)
+  raise(*args)
+end
+
 # bilibili-console command line
 class BiliConsole < Thor
   BILI_CONSOLE = Bilibili::BilibiliConsole.new
