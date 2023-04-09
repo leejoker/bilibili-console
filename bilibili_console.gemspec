@@ -16,10 +16,9 @@ Gem::Specification.new do |s|
   s.homepage = 'https://github.com/leejoker/bilibili-console'
   s.license = 'MIT'
   s.required_ruby_version = ['>= 2.5']
-  s.add_dependency 'socksify', '~> 1.7.1'
-  s.add_dependency 'rqrcode', '~> 2.0'
-  s.add_dependency 'thor', '~> 1.2.1'
-  s.add_dependency 'activerecord-jdbcsqlite3-adapter', '~> 51.0'
   s.add_dependency 'nokogiri', '~> 1.14.0'
+  s.add_dependency 'rqrcode', '~> 2.0'
   s.add_dependency 'rubyzip', '~> 2.3.2'
+  s.add_dependency 'socksify', '~> 1.7.1'
+  s.add_dependency 'thor', '~> 1.2.1'
 end
