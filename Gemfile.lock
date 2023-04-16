@@ -16,6 +16,8 @@ GEM
     diff-lcs (1.5.0)
     json (2.6.3)
     json (2.6.3-java)
+    nokogiri (1.14.0-arm64-darwin)
+      racc (~> 1.4)
     nokogiri (1.14.0-java)
       racc (~> 1.4)
     nokogiri (1.14.0-x64-mingw-ucrt)
@@ -69,6 +71,7 @@ GEM
     unicode-display_width (2.4.2)
 
 PLATFORMS
+  arm64-darwin-22
   universal-java-11
   universal-java-17
   x64-mingw-ucrt
@@ -82,4 +85,4 @@ DEPENDENCIES
   rubocop (~> 1.7)
 
 BUNDLED WITH
-   2.3.26
+   2.4.10
