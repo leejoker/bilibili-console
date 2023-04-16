@@ -73,7 +73,7 @@ class BiliConsole < Thor
   def manga_checkin
     if options[:info].nil?
       body = BILI_CONSOLE.manga_checkin
-      if body.code.to_i == 0
+      if body.code.to_i.zero?
         body = BILI_CONSOLE.manga_checkin_info
         puts <<~CHECKINFO
           签到成功!
