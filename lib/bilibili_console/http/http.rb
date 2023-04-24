@@ -40,7 +40,13 @@ module BiliHttp
     def get(request)
       uri = request[:path]
       path = uri.path + (uri.query ? ('?' + uri.query) : '')
-      req = Net::HTTP::Get.new(path, request_headers(request))
+      headers = request_headers(request)
+      req = Net::HTTP::Get.new(path, headers)
+      $log.debug(<<~GET
+        url:      #{path}
+        headers:  #{headers.to_json}
+      GET
+      )
       do_request(uri.host, @port, ssl, req)
     end
 

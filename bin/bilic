@@ -2,18 +2,19 @@
 
 require 'thor'
 require_relative '../lib/bilibili_console'
+require_relative '../lib/bilibili_console/constants/comment_type'
 
-at_exit do
-  if $!
-    $log.error("error: #{$!} at:#{$@}")
-    puts 'Error! Please check the error log.'
-  end
-end
-
-def raise(err, *args)
-  $log.error("error: #{err} at:#{args}")
-  puts 'Error! Please check the error log.'
-end
+# at_exit do
+#   if $!
+#     $log.error("error: #{$!} at:#{$@}")
+#     puts 'Error! Please check the error log.'
+#   end
+# end
+#
+# def raise(err, *args)
+#   $log.error("error: #{err} at:#{args}")
+#   puts 'Error! Please check the error log.'
+# end
 
 def fail(*args)
   raise(*args)
@@ -25,23 +26,6 @@ class BiliConsole < Thor
 
   def self.exit_on_failure?
     true
-  end
-
-  desc 'info', 'help content'
-
-  def info
-    banner = File.read(File.expand_path('banner.txt', __dir__))
-    puts <<~HELP
-      #{banner}
-
-      Usage: bilic [arguments]
-        help    [command]          help messages
-        login                      qrcode login
-        user                       user info
-        manga   [-i]               bilibili manga checkin
-        down    [-s e p q]         download video
-        fav     [-s m a s n]       show user video collections
-    HELP
   end
 
   desc 'doctor', 'check environment and third-party dependencies'
@@ -156,6 +140,22 @@ class BiliConsole < Thor
         -----------------------------------------------------------------------
       VIDEO
     end
+  end
+
+  desc 'vc', 'Get video comment'
+  option :page, desc: 'page number'
+
+  def vc(keyword)
+    return if keyword.nil?
+
+    options_dup = options.dup
+    options_dup[:oid] = keyword
+    options_dup[:type] = Bilibili::Constants::COMMENT_TYPE[:video]
+    data = BILI_CONSOLE.video_comments(options_dup)
+    puts <<~COMMENT
+      hots:          #{data&.hots&.to_json}
+      replies:       #{data&.replies&.to_json}
+    COMMENT
   end
 
   private

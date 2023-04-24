@@ -9,6 +9,7 @@ require_relative 'bilibili_console/login'
 require_relative 'bilibili_console/manga'
 require_relative 'bilibili_console/search'
 require_relative 'bilibili_console/video'
+require_relative 'bilibili_console/video_comment'
 
 module Bilibili
   # bilibili console main class
@@ -55,6 +56,11 @@ module Bilibili
     def search_keyword(options)
       search = Bilibili::Search.new
       search.search(options)
+    end
+
+    def video_comments(options)
+      comment = Bilibili::Comment.new
+      comment.comment_list(options)
     end
 
     def doctor
