@@ -54,6 +54,7 @@ module Bilibili
     end
 
     def load_cookie
+      return ENV['COOKIE_STR'] unless ENV['COOKIE_STR'].nil?
       return {} unless File.exist?(@opt[:cookie_json])
 
       json_str = File.read(@opt[:cookie_json])
