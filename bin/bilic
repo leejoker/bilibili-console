@@ -4,17 +4,17 @@ require 'thor'
 require_relative '../lib/bilibili_console'
 require_relative '../lib/bilibili_console/constants/comment_type'
 
-# at_exit do
-#   if $!
-#     $log.error("error: #{$!} at:#{$@}")
-#     puts 'Error! Please check the error log.'
-#   end
-# end
-#
-# def raise(err, *args)
-#   $log.error("error: #{err} at:#{args}")
-#   puts 'Error! Please check the error log.'
-# end
+at_exit do
+  if $!
+    $log.error("error: #{$!} at:#{$@}")
+    puts 'Error! Please check the error log.'
+  end
+end
+
+def raise(err, *args)
+  $log.error("error: #{err} at:#{args}")
+  puts 'Error! Please check the error log.'
+end
 
 def fail(*args)
   raise(*args)
@@ -152,10 +152,21 @@ class BiliConsole < Thor
     options_dup[:oid] = keyword
     options_dup[:type] = Bilibili::Constants::COMMENT_TYPE[:video]
     data = BILI_CONSOLE.video_comments(options_dup)
-    puts <<~COMMENT
-      hots:          #{data&.hots&.to_json}
-      replies:       #{data&.replies&.to_json}
-    COMMENT
+    list = data.hots.nil? ? data.replies : data.hots
+    list.each do |comment|
+      puts <<~COMMENT
+        sender id:        #{comment.mid}
+        sender name:      #{comment.member[:uname]}
+        sender avatar:    #{comment.member[:avatar]}
+        sender level:     #{comment.member[:level_info]}
+        send time:        #{comment.ctime}
+
+        content:          #{comment.content[:message]}
+        content_pic:      #{comment.content[:pictures]}
+
+        ------------------------------------------------------
+      COMMENT
+    end
   end
 
   private

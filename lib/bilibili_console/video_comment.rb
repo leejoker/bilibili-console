@@ -11,34 +11,46 @@ require_relative 'api'
 module Bilibili
   include BiliHttp
 
+  # cursor data
   class Cursor < BiliBliliRecordBase
     attr_accessor :all_count, :is_begin, :prev, :next, :is_end, :mode, :show_type, :support_mode, :name
   end
 
+  # comment reply
   class CommentReply < BiliBliliRecordBase
     attr_accessor :rpid, :oid, :type, :mid, :root, :ctime, :member, :content
 
     def member=(json)
-      @member = json[:member]
+      return if json.nil?
+
+      @member = {
+        mid: json[:mid],
+        uname: json[:uname],
+        avatar: json[:avatar],
+        level_info: json[:level_info][:current_level]
+      }
     end
 
     def content=(json)
-      @content = json[:content]
+      return if json.nil?
+
+      @content = {
+        message: json[:message],
+        pictures: json[:pictures]
+      }
     end
   end
 
+  # comment response data
   class CommentPage < BiliBliliRecordBase
     attr_accessor :cursor, :hots, :notice, :replies, :top, :top_replies, :lottery_card, :folder, :upper, :show_bvid
-
-    def cursor=(json)
-      @cursor = Cursor.new(json[:cursor])
-    end
 
     def hots=(json)
       data = []
       if !json.nil? && !json.empty?
         json.each do |hot|
-          data << CommentReply.new(hot)
+          comment = CommentReply.new(hot)
+          data << comment if comment.root.zero?
         end
       end
       @hots = data
@@ -48,14 +60,18 @@ module Bilibili
       data = []
       if !json.nil? && !json.empty?
         json.each do |reply|
-          data << CommentReply.new(reply)
+          comment = CommentReply.new(reply)
+          data << comment if comment.root.zero?
         end
       end
       @replies = data
     end
   end
 
+  # comment class
   class Comment < BilibiliBase
+
+    # get comment list
     def comment_list(options)
       nil if options.nil?
 
