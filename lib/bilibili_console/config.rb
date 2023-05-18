@@ -27,13 +27,13 @@ module Bilibili
       video_qn: '720',
       save_video_pic: false,
       enable_aria2: false,
+      aria_thread_num: 3,
       log_file: "#{Dir.home}/.bc/bilic.log",
       log_level: 'debug',
       download_dir: "#{Dir.home}/.bc/downloads",
       video_pic_dir: "#{Dir.home}/.bc/pic",
       db_file_path: "#{Dir.home}/.bc/bilic.db",
       tmp_dir: "#{Dir.home}/.bc/tmp",
-      # ip:port
       proxy_type: 'http',
       proxy: nil
     }.freeze
