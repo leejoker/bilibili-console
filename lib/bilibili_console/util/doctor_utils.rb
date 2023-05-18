@@ -51,7 +51,7 @@ module Bilibili
       def download_aria2_windows
         http_client = BiliHttp::BiliHttpClient.new(443, true, BilibiliBase.proxy)
         doc = Nokogiri::HTML(http_client.get({ path: URI('https://github.com/aria2/aria2') }))
-        node_set = doc.xpath('//*[@id="repo-content-pjax-container"]/div/div/div[3]/div[2]/div/div[2]/div/a')
+        node_set = doc.xpath('//*[@id="repo-content-pjax-container"]/div/div/div[2]/div[2]/div/div[2]/div/a')
         return if node_set.nil?
 
         href = node_set[0]&.attr('href')

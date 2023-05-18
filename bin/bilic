@@ -2,6 +2,7 @@
 
 require 'thor'
 require_relative '../lib/bilibili_console'
+require_relative '../lib/bilibili_console/constants/comment_type'
 
 at_exit do
   if $!
@@ -25,23 +26,6 @@ class BiliConsole < Thor
 
   def self.exit_on_failure?
     true
-  end
-
-  desc 'info', 'help content'
-
-  def info
-    banner = File.read(File.expand_path('banner.txt', __dir__))
-    puts <<~HELP
-      #{banner}
-
-      Usage: bilic [arguments]
-        help    [command]          help messages
-        login                      qrcode login
-        user                       user info
-        manga   [-i]               bilibili manga checkin
-        down    [-s e p q]         download video
-        fav     [-s m a s n]       show user video collections
-    HELP
   end
 
   desc 'doctor', 'check environment and third-party dependencies'
@@ -155,6 +139,33 @@ class BiliConsole < Thor
           page_size:     #{video.page_size}
         -----------------------------------------------------------------------
       VIDEO
+    end
+  end
+
+  desc 'vc', 'Get video comment'
+  option :page, desc: 'page number'
+
+  def vc(keyword)
+    return if keyword.nil?
+
+    options_dup = options.dup
+    options_dup[:oid] = keyword
+    options_dup[:type] = Bilibili::Constants::COMMENT_TYPE[:video]
+    data = BILI_CONSOLE.video_comments(options_dup)
+    list = data.hots.nil? ? data.replies : data.hots
+    list.each do |comment|
+      puts <<~COMMENT
+        sender id:        #{comment.mid}
+        sender name:      #{comment.member[:uname]}
+        sender avatar:    #{comment.member[:avatar]}
+        sender level:     #{comment.member[:level_info]}
+        send time:        #{comment.ctime}
+
+        content:          #{comment.content[:message]}
+        content_pic:      #{comment.content[:pictures]}
+
+        ------------------------------------------------------
+      COMMENT
     end
   end
 

@@ -35,5 +35,9 @@ module Bilibili
     module Search
       TYPE = "#{API_HOST}/x/web-interface/search/type"
     end
+
+    module Comment
+      COMMENT_LAZY = "#{API_HOST}/x/v2/reply/main"
+    end
   end
 end
