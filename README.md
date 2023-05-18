@@ -60,6 +60,9 @@ $ bilic down -e 10 bv_id
 
 # 下载指定分P
 $ bilic down -p 2 bv_id
+
+# 重命名下载文件
+$ bilic down bv_id --rename "demo"
 ```
 
 #### 4.5 查询收藏
