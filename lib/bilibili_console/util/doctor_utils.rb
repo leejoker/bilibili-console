@@ -81,8 +81,8 @@ module Bilibili
       def install_aria2_linux
         linux_type = Bilibili.linux_distribution
         case linux_type
-        when :debian
-          `sudo apt install aria2`
+        when :debian, :deepin
+          `sudo apt-get install aria2`
         when :centos
           `sudo yum install aria2`
         when :arch
@@ -109,7 +109,7 @@ module Bilibili
         return false unless Bilibili.os == :linux
 
         puts "Start check #{command}"
-        result = `command -v #{command}`
+        result = `sh -c \"command -v #{command}\"`
         if result.nil? || result.to_s == ''
           true
         else

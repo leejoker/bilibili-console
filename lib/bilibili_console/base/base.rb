@@ -146,6 +146,8 @@ module Bilibili
       elsif id_like.include? 'arch'
         :arch
       else
+        return :deepin if os_release[4].downcase.include? 'deepin'
+
         :unknown
       end
     end

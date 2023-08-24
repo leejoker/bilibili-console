@@ -5,6 +5,7 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
+require 'fileutils'
 require_relative 'api'
 
 # bilibili video comments
@@ -86,7 +87,26 @@ module Bilibili
       data = get_jsona(url)
       return nil if data.nil?
 
-      CommentPage.new(data)
+      comment_page = CommentPage.new(data)
+
+      if options[:pic]
+        comment_data = []
+        comment_data = comment_data + comment_page.hots unless comment_page.hots.nil? || comment_page.hots.empty?
+        comment_data = comment_data + comment_page.replies unless comment_page.replies.nil? || comment_page.replies.empty?
+
+        unless comment_data.empty?
+          comment_data.each do |c|
+            next if c.content[:pictures].nil?
+            c.content[:pictures].each do |pic|
+              url = pic[:img_src]
+              $log.debug("oid: #{oid}, url: #{url}")
+              comment_pic_save(oid, url)
+            end
+          end
+        end
+      else
+        comment_page
+      end
     end
 
     private
@@ -98,6 +118,24 @@ module Bilibili
       url.concat("&ps=#{size}") unless size.nil?
 
       url
+    end
+
+    def comment_pic_save(bv, url)
+      return if bv.nil? || url.nil?
+
+      array = url.split("/")
+      uri = URI(url)
+      dir = "#{@opt[:video_pic_dir]}/comment_picture/#{bv}"
+      FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
+
+      puts "Download #{array.last} to #{dir}/#{array.last}"
+      http = BiliHttp::BiliHttpClient.new(443, true, BilibiliBase.proxy)
+      request = {
+        path: uri,
+        save_data: "#{dir}/#{array.last}",
+        headers: BiliHttp.headers
+      }
+      http.get_stream(request)
     end
   end
 end

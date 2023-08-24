@@ -144,28 +144,33 @@ class BiliConsole < Thor
 
   desc 'vc', 'Get video comment'
   option :page, desc: 'page number'
+  option :pic, desc: 'download pics in comment', type: :boolean
 
-  def vc(keyword)
+  def vc(keyword = nil)
     return if keyword.nil?
 
     options_dup = options.dup
     options_dup[:oid] = keyword
     options_dup[:type] = Bilibili::Constants::COMMENT_TYPE[:video]
     data = BILI_CONSOLE.video_comments(options_dup)
-    list = data.hots.nil? ? data.replies : data.hots
-    list.each do |comment|
-      puts <<~COMMENT
-        sender id:        #{comment.mid}
-        sender name:      #{comment.member[:uname]}
-        sender avatar:    #{comment.member[:avatar]}
-        sender level:     #{comment.member[:level_info]}
-        send time:        #{comment.ctime}
+    if options[:pic]
+      puts "Pictures Downloaded"
+    else
+      list = data.hots.nil? ? data.replies : data.hots
+      list.each do |comment|
+        puts <<~COMMENT
+          sender id:        #{comment.mid}
+          sender name:      #{comment.member[:uname]}
+          sender avatar:    #{comment.member[:avatar]}
+          sender level:     #{comment.member[:level_info]}
+          send time:        #{comment.ctime}
 
-        content:          #{comment.content[:message]}
-        content_pic:      #{comment.content[:pictures]}
+          content:          #{comment.content[:message]}
+          content_pic:      #{comment.content[:pictures]}
 
-        ------------------------------------------------------
-      COMMENT
+          ------------------------------------------------------
+        COMMENT
+      end
     end
   end
 
