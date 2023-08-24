@@ -116,6 +116,7 @@ $ bilic search BV1zL411L75A --bv --pic
 - 支持aria2c下载
 - 支持下载视频重命名
 - 获取视频评论区内容
+- 支持下载评论区图片
 
 ##### TODO
 
