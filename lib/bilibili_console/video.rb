@@ -59,7 +59,7 @@ module Bilibili
           file_name = "#{options[:rename]}_#{order}.flv" unless options[:rename].nil?
           url = { 'name': file_name, 'url': down_url[:url].to_s, 'prefix': page.part,
                   'order': "#{page.page}#{order}", 'id': id.to_s }
-          download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{id}/"
+          download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{id}###{}/"
           result << download_file(url, download_path)
         end
         sleep rand(3)

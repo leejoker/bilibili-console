@@ -120,13 +120,10 @@ $ bilic search BV1zL411L75A --bv --pic
 
 ##### TODO
 
-- 多类型全局检索
-- 下载管理(待下载，已下载，对应BV下载进度)
+- 管理已下载项
 - 增加saucenao图片检索
 - 查看观看历史
 - 尝试调用本地播放器进行播放
-- 多账号管理
-- 定时签到
 
 #### 6 相关项目
 
@@ -136,7 +133,6 @@ $ bilic search BV1zL411L75A --bv --pic
 * [rqrcode](https://github.com/whomwah/rqrcode/)
 * [rubyzip](https://github.com/rubyzip/rubyzip)
 * [socksify](https://github.com/astro/socksify-ruby)
-* [activerecord-jdbcsqlite3-adapter](https://github.com/jruby/activerecord-jdbc-adapter)
 * [thor](https://github.com/rails/thor)
 
 ##### 接口文档
