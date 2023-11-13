@@ -12,9 +12,9 @@ module Bilibili
     MANGA_HOST = 'https://manga.bilibili.com'
 
     module Login
-      QRCODE = "#{LOGIN_HOST}/qrcode/getLoginUrl"
-      INFO = "#{LOGIN_HOST}/qrcode/getLoginInfo"
-      USERINFO = "#{API_HOST}/nav"
+      QRCODE = "#{LOGIN_HOST}/x/passport-login/web/qrcode/generate"
+      INFO = "#{LOGIN_HOST}/x/passport-login/web/qrcode/poll"
+      USERINFO = "#{API_HOST}/x/web-interface/nav"
     end
 
     module Fav

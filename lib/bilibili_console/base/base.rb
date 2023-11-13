@@ -27,7 +27,6 @@ module Bilibili
     end
 
     def initialize
-      # TODO 增加数据库文件是否存在的校验，并设置全局变量db
       @client = BiliHttp::HttpClient.new
       create_request_methods
       BilibiliBase.options = Config.new if BilibiliBase.options.nil?

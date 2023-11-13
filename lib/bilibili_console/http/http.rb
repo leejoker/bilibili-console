@@ -185,7 +185,7 @@ module BiliHttp
       return if data.nil? || data.empty?
 
       body = BiliHttp::ResponseBody.new(JSON.parse(data, symbolize_names: true))
-      if body.data.nil? || (body.status && body.data.empty?)
+      if body.data.nil? || body.data.empty?
         body
       else
         body.data
