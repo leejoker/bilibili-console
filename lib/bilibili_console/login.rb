@@ -20,7 +20,7 @@ module Bilibili
 
   # login class
   class Login < BilibiliBase
-    attr_accessor :url, :oauth_key
+    attr_accessor :url, :qrcode_key
 
     def initialize
       super
@@ -33,7 +33,7 @@ module Bilibili
       return if data.nil? || data[:url].nil?
 
       @url = data[:url]
-      @oauth_key = data[:oauthKey]
+      @qrcode_key = data[:qrcode_key]
     end
 
     def show_qrcode
@@ -73,11 +73,14 @@ module Bilibili
     private
 
     def login_check
-      data = post_form_jsonl(Api::Login::INFO, nil, { oauthKey: @oauth_key })
+      data = get_jsonl("#{Api::Login::INFO}?qrcode_key=#{@qrcode_key}")
       $log.debug("login response data: #{data}")
-      if [-4, -5].include?(data)
+      if data[:code] == 86_101 || data[:code] == 86_090
         sleep 2
         login_check
+      elsif data[:code] == 86_038
+        sleep 10
+        login
       else
         true
       end
