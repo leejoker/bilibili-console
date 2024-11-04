@@ -1,4 +1,3 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 # Copyright (c) 2021 leejoker
@@ -19,6 +18,10 @@ module Bilibili
   # video page list
   class PageInfo < BiliBliliRecordBase
     attr_accessor :cid, :page, :from, :part, :duration, :vid, :weblink
+  end
+
+  class VideoInfo < BiliBliliRecordBase
+    attr_accessor :title, :pic, :owner, :videos
   end
 
   # bilibili video interfaces
@@ -42,11 +45,22 @@ module Bilibili
       data[:durl]
     end
 
-    # TODO 通过创建下载任务来进行视频下载
+    def get_video_info(id)
+      url = "#{Api::Video::VIDEO_INFO}?bvid=#{id}"
+      data = get_jsona(url)
+      return nil if data.nil?
+
+      Bilibili::VideoInfo.new(data)
+    end
+
+    # TODO: 通过创建下载任务来进行视频下载
     def download_video_by_id(id, options)
       result = []
       page_list = video_page_list(id)
       return nil if page_list.nil?
+
+      video_info = get_video_info(id)
+      return nil if video_info.nil?
 
       video_qn = options[:qn]
       page_list = page_slice(page_list, options[:start], options[:end], options[:page])
@@ -59,7 +73,7 @@ module Bilibili
           file_name = "#{options[:rename]}_#{order}.flv" unless options[:rename].nil?
           url = { 'name': file_name, 'url': down_url[:url].to_s, 'prefix': page.part,
                   'order': "#{page.page}#{order}", 'id': id.to_s }
-          download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{id}###{}/"
+          download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{id}-#{video_info.title}/"
           result << download_file(url, download_path)
         end
         sleep rand(3)
@@ -129,9 +143,8 @@ module Bilibili
       rescue StandardError
         $log.error("error: #{$!} at:#{$@}")
         sleep 3
-        if retry_times == 3
-          raise 'retry times is 3, you should try it later'
-        end
+        raise 'retry times is 3, you should try it later' if retry_times == 3
+
         retry_times += 1
         download_and_check(url, headers, file_path, retry_times)
       end
@@ -200,7 +213,7 @@ module Bilibili
         cookie:     #{cookie}
         dest:       #{file_path}
       DOWNLOAD
-      )
+                )
       File.write((@opt[:cookie]).to_s, cookie) unless File.exist?((@opt[:cookie]).to_s)
       if @opt[:enable_aria2]
         aria2_download(url, user_agent, referer, dir, filename)
@@ -210,14 +223,14 @@ module Bilibili
     end
 
     def wget_proxy
-      command = ""
+      command = ''
       command += " -e http_proxy=\"http://#{@opt[:proxy]}\"" unless @opt[:proxy].nil?
       command += " -e https_proxy=\"https://#{@opt[:proxy]}\"" unless @opt[:proxy].nil?
       command
     end
 
     def aria2_proxy
-      command = ""
+      command = ''
       command += "--all-proxy=\"#{@opt[:proxy_type]}://#{@opt[:proxy]}\"" unless @opt[:proxy].nil?
       command
     end

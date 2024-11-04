@@ -25,6 +25,7 @@ module Bilibili
     module Video
       PAGE_LIST = "#{API_HOST}/x/player/pagelist"
       PLAY_URL = "#{API_HOST}/x/player/playurl"
+      VIDEO_INFO = "#{API_HOST}/x/web-interface/view"
     end
 
     module Manga
