@@ -20,7 +20,7 @@ module Bilibili
 
   # login class
   class Login < BilibiliBase
-    attr_accessor :url, :oauth_key
+    attr_accessor :url, :qrcode_key
 
     def initialize
       super
@@ -33,24 +33,32 @@ module Bilibili
       return if data.nil? || data[:url].nil?
 
       @url = data[:url]
-      @oauth_key = data[:oauthKey]
+      @qrcode_key = data[:qrcode_key]
     end
 
     def show_qrcode
       return if @url.nil?
 
       qr = RQRCode::QRCode.new(@url)
-      pic = qr.as_ansi(
-        light: "\033[47m", dark: "\033[40m",
-        fill_character: '  ',
-        quiet_zone_size: 1
+      png = qr.as_png(
+        bit_depth: 1,
+        border_modules: 4,
+        color_mode: ChunkyPNG::COLOR_GRAYSCALE,
+        color: 'black',
+        file: nil,
+        fill: 'white',
+        module_px_size: 6,
+        resize_exactly_to: false,
+        resize_gte_to: false,
+        size: 240
       )
-      puts pic
+      IO.binwrite('/tmp/bilibili-qrcode.png', png.to_s)
+      `fim -a /tmp/bilibili-qrcode.png`
     end
 
     def login_user_info
       set_http_cookie
-      data = get_jsona(Api::Login::USERINFO)
+      data = get_jsona(Api::Login::NAV)
       if data[:isLogin]
         Bilibili::UserInfo.new(data)
       else
@@ -73,7 +81,8 @@ module Bilibili
     private
 
     def login_check
-      data = post_form_jsonl(Api::Login::INFO, nil, { oauthKey: @oauth_key })
+      url = Api::Login::INFO + "?qrcode_key=#{@qrcode_key}"
+      data = get_jsonl(url)
       $log.debug("login response data: #{data}")
       if [-4, -5].include?(data)
         sleep 2

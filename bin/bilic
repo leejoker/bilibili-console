@@ -48,6 +48,8 @@ class BiliConsole < Thor
       uid: #{user.mid}
       uname: #{user.uname}
       level: #{user.level_info[:current_level]}
+      coins: #{user.money}
+      moral: #{user.moral}
     USER
   end
 
@@ -155,7 +157,7 @@ class BiliConsole < Thor
     options_dup[:type] = Bilibili::Constants::COMMENT_TYPE[:video]
     data = BILI_CONSOLE.video_comments(options_dup)
     if options[:pic]
-      puts "Pictures Downloaded"
+      puts 'Pictures Downloaded'
     else
       list = data.hots.nil? ? data.replies : data.hots
       list.each do |comment|
