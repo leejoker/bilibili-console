@@ -64,11 +64,9 @@ module Bilibili
                       "#{dir}#{File::ALT_SEPARATOR}#{filename}.zip") do |path|
           puts 'aria2 downloaded'
           File.open("#{dir}/aria2c.exe", 'wb') do |file|
-            Zip::File.open(path) do |zip_file|
-              entry = zip_file.glob("#{filename}/aria2c.exe").first
-              entry.get_input_stream do |f|
-                file.write(f.read)
-              end
+            Zip::InputStream.open(path) do |zip_input|
+              entry = zip_input.glob("#{filename}/aria2c.exe").first
+              file.write(zip_input.read)
             end
           end
           File.delete(path)

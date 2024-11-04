@@ -231,7 +231,7 @@ module Bilibili
     def aria2_download(url, user_agent, referer, dir, filename)
       command = "aria2c #{aria2_proxy} --referer=\"#{referer}\" --user-agent \"#{user_agent}\" --load-cookies=\"#{@opt[:cookie]}\" -s #{@opt[:aria_thread_num]} --check-certificate=false \"#{url}\""
       $log.debug("#{command} -c -d \"#{dir}\" -o \"#{filename}\" --max-tries=3")
-      command = "#{command} -c -d \"#{dir}\" -o \"#{filename}\" --max-tries=3"
+      command = "#{command} -c -d \"#{dir}\" -o \"#{filename}\" --max-tries=3 --file-allocation=none"
 
       Open3.popen3(command) do |_stdin, stdout, _stderr, _status|
         stdout.each_line do |line|
