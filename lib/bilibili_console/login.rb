@@ -52,8 +52,14 @@ module Bilibili
         resize_gte_to: false,
         size: 240
       )
-      IO.binwrite('/tmp/bilibili-qrcode.png', png.to_s)
-      `fim -a /tmp/bilibili-qrcode.png`
+      qr_path = '/tmp/bilibili-qrcode.png'
+      IO.binwrite(qr_path, png.to_s)
+      puts "二维码已保存到 #{qr_path}，请使用哔哩哔哩 App 扫描"
+      begin
+        spawn('fim', '-a', qr_path, out: File::NULL, err: File::NULL)
+      rescue SystemCallError, NotImplementedError
+        nil
+      end
     end
 
     def login_user_info
@@ -71,8 +77,11 @@ module Bilibili
 
     def login
       login_url
+      return nil if @url.nil?
+
       show_qrcode
-      login_check
+      return nil unless login_check
+
       puts 'Login Success !!!'
       save_cookie
       'success'
@@ -80,16 +89,34 @@ module Bilibili
 
     private
 
+    QR_STATUS = {
+      86101 => :waiting,
+      86090 => :scanned,
+      86038 => :expired
+    }.freeze
+
     def login_check
-      url = Api::Login::INFO + "?qrcode_key=#{@qrcode_key}"
-      data = get_jsonl(url)
-      $log.debug("login response data: #{data}")
-      if [-4, -5].include?(data)
-        sleep 2
-        login_check
-      else
-        true
+      deadline = Time.now + 180
+      while Time.now < deadline
+        data = get_jsonl(Api::Login::INFO + "?qrcode_key=#{@qrcode_key}")
+        $log.debug("login response data: #{data}")
+        code = data.is_a?(Hash) ? data[:code] : data
+        return false if code.nil?
+
+        case QR_STATUS[code]
+        when :waiting, :scanned
+          sleep 2
+        when :expired
+          break
+        else
+          return true if code.to_i.zero?
+
+          $log.warn("login poll unexpected: #{data}")
+          return false
+        end
       end
+      puts '二维码已过期，请重新执行 bilic login'
+      false
     end
 
     def set_http_cookie

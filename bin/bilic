@@ -5,19 +5,12 @@ require_relative '../lib/bilibili_console'
 require_relative '../lib/bilibili_console/constants/comment_type'
 
 at_exit do
-  if $!
-    $log.error("error: #{$!} at:#{$@}")
-    puts 'Error! Please check the error log.'
-  end
-end
+  next if $!.nil? || $!.is_a?(SignalException)
 
-def raise(err, *args)
-  $log.error("error: #{err} at:#{args}")
-  puts 'Error! Please check the error log.'
-end
-
-def fail(*args)
-  raise(*args)
+  error = $!
+  $log&.error("error: #{error.class}: #{error.message}\n#{Array(error.backtrace).join("\n")}")
+  puts "Error! #{error.class}: #{error.message}"
+  puts 'Please check the error log.'
 end
 
 # bilibili-console command line
