@@ -65,8 +65,12 @@ module Bilibili
           puts 'aria2 downloaded'
           File.open("#{dir}/aria2c.exe", 'wb') do |file|
             Zip::InputStream.open(path) do |zip_input|
-              entry = zip_input.glob("#{filename}/aria2c.exe").first
-              file.write(zip_input.read)
+              while (entry = zip_input.get_next_entry)
+                next unless entry.name == "#{filename}/aria2c.exe"
+
+                file.write(zip_input.read)
+                break
+              end
             end
           end
           File.delete(path)
