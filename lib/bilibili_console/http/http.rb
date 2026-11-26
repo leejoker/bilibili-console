@@ -12,6 +12,18 @@ require_relative 'response_body'
 
 # bilibili client http module
 module BiliHttp
+  # bilibili 风控拦截时返回 HTTP 200 + HTML 页面，或 JSON code=-412/-352
+  BLOCK_PAGE_PREFIXES = ['<!doctype', '<html'].freeze
+  BLOCK_CODES = [-412, -352].freeze
+  BLOCK_RETRY_LIMIT = 2
+  BLOCK_RETRY_INTERVAL = 3
+
+  # raised when bilibili keeps answering with its risk-control page
+  class RequestBlockedError < StandardError; end
+
+  # raised when an API payload carries a non-zero business code
+  class ApiError < StandardError; end
+
   class << self
     attr_accessor :headers, :proxy
   end
@@ -88,6 +100,42 @@ module BiliHttp
     private
 
     def do_request(host, port, ssl, request)
+      attempt = 0
+      loop do
+        attempt += 1
+        body = perform_request(host, port, ssl, request)
+        blocked = blocked_body?(body)
+        return body unless blocked
+        raise BiliHttp::RequestBlockedError, blocked_message(attempt, blocked) if attempt > BiliHttp::BLOCK_RETRY_LIMIT
+
+        $log&.warn("bilibili 风控拦截（#{blocked}），第 #{attempt} 次重试：#{request.path}")
+        sleep BiliHttp::BLOCK_RETRY_INTERVAL
+      end
+    end
+
+    # returns a human-readable marker when the response is a risk-control
+    # answer (HTML challenge page or JSON with code -412/-352), else nil
+    def blocked_body?(body)
+      text = body.to_s
+      head = text.lstrip[0, 16].to_s.downcase
+      return 'HTML 风控页' if BiliHttp::BLOCK_PAGE_PREFIXES.any? { |prefix| head.start_with?(prefix) }
+
+      parsed = begin
+        JSON.parse(text, symbolize_names: true)
+      rescue JSON::ParserError
+        return nil
+      end
+      return nil unless parsed.is_a?(Hash)
+
+      code = parsed[:code]
+      BiliHttp::BLOCK_CODES.include?(code) ? "code=#{code} #{parsed[:message]}" : nil
+    end
+
+    def blocked_message(attempt, blocked)
+      "bilibili 风控拦截（#{blocked}，已尝试 #{attempt} 次），请检查代理配置或稍后重试"
+    end
+
+    def perform_request(host, port, ssl, request)
       @http.start(host, port, use_ssl: ssl, verify_mode: OpenSSL::SSL::VERIFY_NONE) do |http|
         response = http.request(request)
         $log.debug(<<~REQUEST
@@ -139,8 +187,17 @@ module BiliHttp
 
     def initialize
       BiliHttp.headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.64',
-        'Referer': 'https://www.bilibili.com'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Referer': 'https://www.bilibili.com/',
+        'Origin': 'https://www.bilibili.com',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+        'sec-ch-ua': '"Chromium";v="131", "Google Chrome";v="131", "Not_A Brand";v="24"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-site'
       }
     end
 
@@ -185,11 +242,13 @@ module BiliHttp
       return if data.nil? || data.empty?
 
       body = BiliHttp::ResponseBody.new(JSON.parse(data, symbolize_names: true))
-      if body.data.nil? || (body.status && body.data.empty?)
-        body
-      else
-        body.data
+      if body.data.nil?
+        raise BiliHttp::ApiError, "bilibili 接口错误：code=#{body.code} message=#{body.message}" unless body.code.to_i.zero?
+
+        return body
       end
+
+      body.status && body.data.empty? ? body : body.data
     end
   end
 end
