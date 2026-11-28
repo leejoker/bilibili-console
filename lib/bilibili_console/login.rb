@@ -9,6 +9,8 @@ require_relative 'http/http'
 require_relative 'api'
 require 'rqrcode'
 require 'json'
+require 'fileutils'
+require 'tmpdir'
 
 # login module
 module Bilibili
@@ -52,14 +54,10 @@ module Bilibili
         resize_gte_to: false,
         size: 240
       )
-      qr_path = '/tmp/bilibili-qrcode.png'
+      qr_path = qrcode_path
       IO.binwrite(qr_path, png.to_s)
       puts "二维码已保存到 #{qr_path}，请使用哔哩哔哩 App 扫描"
-      begin
-        spawn('fim', '-a', qr_path, out: File::NULL, err: File::NULL)
-      rescue SystemCallError, NotImplementedError
-        nil
-      end
+      open_qrcode(qr_path)
     end
 
     def login_user_info
@@ -88,6 +86,30 @@ module Bilibili
     end
 
     private
+
+    # 二维码固定写到配置的 tmp_dir，Windows 上不存在 /tmp，且该目录在 check_paths 里已确保存在
+    def qrcode_path
+      dir = @opt[:tmp_dir].to_s
+      dir = Dir.tmpdir if dir.empty?
+      FileUtils.mkdir_p(dir)
+      File.join(dir, 'bilibili-qrcode.png')
+    end
+
+    # 尽力唤起图片查看器，打不开也不影响扫码登录（路径已经打印出来了）
+    def open_qrcode(path)
+      if Gem.win_platform?
+        spawn('cmd', '/c', 'start', '', path, out: File::NULL, err: File::NULL)
+      else
+        %w[fim xdg-open open].each do |viewer|
+          spawn(viewer, path, out: File::NULL, err: File::NULL)
+          break
+        rescue SystemCallError
+          next
+        end
+      end
+    rescue SystemCallError, NotImplementedError
+      nil
+    end
 
     QR_STATUS = {
       86101 => :waiting,

@@ -75,12 +75,15 @@ module Bilibili
       http.get_stream(request)
     end
 
+    # 复用同一个 Video 实例：每个结果 new 一次等于每条都重新做一次 TLS 握手
     def get_pages(data)
-      data&.result&.collect! do |v|
-        video = Bilibili::Video.new
+      return data if data&.result.nil?
+
+      video = Bilibili::Video.new
+      data.result.each do |v|
         v.page_size = video.video_page_list(v.bvid)&.size
-        v
       end
+      data
     end
   end
 end
