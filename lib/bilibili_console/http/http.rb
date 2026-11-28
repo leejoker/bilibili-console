@@ -31,20 +31,27 @@ module BiliHttp
   class BiliHttpClient
     attr_accessor :http, :cookies, :ssl, :port
 
+    # 支持的 proxy_type：https 与 http 等价（Net::HTTP 只有明文 CONNECT 隧道，没有 TLS 到代理的通道）
+    PROXY_TYPES_HTTP = %w[http https].freeze
+    PROXY_TYPES_SOCKS = %w[socks socks5 socks5h].freeze
+
     def initialize(port = nil, ssl = false, proxy = {})
       @http = Net::HTTP
+      @connections = {}
       @cookies = {}
       @ssl = ssl
       @port = port unless port.nil?
       return if proxy.nil? || proxy.empty?
 
-      case proxy[:type]
-      when 'http'
+      proxy_type = proxy[:type].to_s.downcase
+      proxy_type = 'http' if proxy_type.empty?
+      if PROXY_TYPES_HTTP.include?(proxy_type)
+        $log&.warn("proxy_type=#{proxy_type} 按普通 HTTP 代理（CONNECT 隧道）处理") if proxy_type == 'https'
         BiliHttp.proxy = Net::HTTP::Proxy(proxy[:url], proxy[:port])
-      when 'socks'
+      elsif PROXY_TYPES_SOCKS.include?(proxy_type)
         BiliHttp.proxy = Net::HTTP.SOCKSProxy(proxy[:url], proxy[:port])
       else
-        raise 'unknown proxy type'
+        raise "unknown proxy type: #{proxy[:type]}（支持 #{(PROXY_TYPES_HTTP + PROXY_TYPES_SOCKS).join('/')}）"
       end
       @http = BiliHttp.proxy
     end
@@ -99,17 +106,44 @@ module BiliHttp
 
     private
 
+    # 走代理时连接被重置/握手失败是常态，重试几次再放弃
+    NETWORK_ERRORS = [
+      OpenSSL::SSL::SSLError, EOFError, Errno::ECONNRESET, Errno::ECONNREFUSED,
+      Errno::EPIPE, Errno::EHOSTUNREACH, Errno::ETIMEDOUT, Net::OpenTimeout, Net::ReadTimeout
+    ].freeze
+    # 代理隧道做 TLS 握手失败一次就要 5s，次数给足，间隔线性拉长
+    NETWORK_RETRY_LIMIT = 4
+    NETWORK_RETRY_INTERVAL = 1
+
     def do_request(host, port, ssl, request)
-      attempt = 0
+      blocked_attempt = 0
       loop do
-        attempt += 1
-        body = perform_request(host, port, ssl, request)
+        body = perform_with_network_retry(host, port, ssl, request)
         blocked = blocked_body?(body)
         return body unless blocked
-        raise BiliHttp::RequestBlockedError, blocked_message(attempt, blocked) if attempt > BiliHttp::BLOCK_RETRY_LIMIT
 
-        $log&.warn("bilibili 风控拦截（#{blocked}），第 #{attempt} 次重试：#{request.path}")
+        blocked_attempt += 1
+        if blocked_attempt > BiliHttp::BLOCK_RETRY_LIMIT
+          raise BiliHttp::RequestBlockedError, blocked_message(blocked_attempt, blocked)
+        end
+
+        $log&.warn("bilibili 风控拦截（#{blocked}），第 #{blocked_attempt} 次重试：#{request.path}")
         sleep BiliHttp::BLOCK_RETRY_INTERVAL
+      end
+    end
+
+    def perform_with_network_retry(host, port, ssl, request)
+      attempt = 0
+      begin
+        attempt += 1
+        perform_request(host, port, ssl, request)
+      rescue *NETWORK_ERRORS => e
+        close_connections
+        raise if attempt > NETWORK_RETRY_LIMIT
+
+        $log&.warn("网络异常（#{e.class}: #{e.message}），第 #{attempt} 次重试：#{request.path}")
+        sleep(NETWORK_RETRY_INTERVAL * attempt)
+        retry
       end
     end
 
@@ -136,20 +170,44 @@ module BiliHttp
     end
 
     def perform_request(host, port, ssl, request)
-      @http.start(host, port, use_ssl: ssl, verify_mode: OpenSSL::SSL::VERIFY_NONE) do |http|
-        response = http.request(request)
-        $log.debug(<<~REQUEST
-          host:       #{host}
-          port:       #{port}
-          ssl:        #{ssl}
-          cookie:     #{request['Cookie']}
-          path:       #{request.path}
-        REQUEST
-        )
-        response_headers(response)
-        $log.debug("response body: #{response.body.to_s}")
-        response.body.to_s
+      http = connection(host, port, ssl)
+      response = http.request(request)
+      $log.debug(<<~REQUEST
+        host:       #{host}
+        port:       #{port}
+        ssl:        #{ssl}
+        cookie:     #{request['Cookie']}
+        path:       #{request.path}
+      REQUEST
+      )
+      response_headers(response)
+      $log.debug("response body: #{response.body.to_s}")
+      response.body.to_s
+    end
+
+    # 同一 host 复用一条连接：每条请求都重新做 TLS 握手的话，代理抖动时几乎必然失败
+    def connection(host, port, ssl)
+      key = [host, port, ssl]
+      cached = @connections[key]
+      return cached if cached&.started?
+
+      http = @http.new(host, port)
+      http.use_ssl = ssl
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE if ssl
+      http.open_timeout = 10
+      http.read_timeout = 30
+      http.keep_alive_timeout = 30
+      http.start
+      @connections[key] = http
+    end
+
+    def close_connections
+      @connections.each_value do |conn|
+        conn.finish if conn.started?
+      rescue IOError, SystemCallError
+        nil
       end
+      @connections = {}
     end
 
     def makeup_cookie(cookies)
