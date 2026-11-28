@@ -37,6 +37,10 @@ module Bilibili
       TYPE = "#{API_HOST}/x/web-interface/search/type"
     end
 
+    module History
+      CURSOR = "#{API_HOST}/x/web-interface/history/cursor"
+    end
+
     module Comment
       COMMENT_LAZY = "#{API_HOST}/x/v2/reply/main"
     end

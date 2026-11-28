@@ -39,6 +39,7 @@ Ruby gem + Thor CLI (`bilic`) for bilibili, plus an agent harness under `agent-h
 - rubyzip 3.x removed `Zip::InputStream#glob`; iterate `get_next_entry` and match `entry.name`.
 - Ruby 4.0 no longer ships `logger` as a default gem — it is an explicit gemspec dependency.
 - `https_proxy`/`HTTPS_PROXY` env vars are ignored by the current `Net::HTTP.start` call path; only the `proxy` key in `~/.bc/bilic.conf` is honoured.
+- Downloads are task-based: state lives in `~/.bc/tasks.json` (locked writes, see `download_task.rb`), segments resume with `wget -c`, and multi-segment pages merge with `ffmpeg` — missing ffmpeg raises a clear error instead of silently producing nothing. Task management: `bilic tasks [<id>] [--retry|--cancel|--remove]`.
 
 ## Verify before claiming done
 1. `ruby -c` on every changed Ruby file.

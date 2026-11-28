@@ -35,7 +35,10 @@ module Bilibili
       db_file_path: "#{Dir.home}/.bc/bilic.db",
       tmp_dir: "#{Dir.home}/.bc/tmp",
       proxy_type: 'http',
-      proxy: nil
+      proxy: nil,
+      task_file: "#{Dir.home}/.bc/tasks.json",
+      player: nil,
+      saucenao_api_key: nil
     }.freeze
 
     VIDEO_QN = {

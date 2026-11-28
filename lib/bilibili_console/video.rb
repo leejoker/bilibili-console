@@ -53,44 +53,91 @@ module Bilibili
       Bilibili::VideoInfo.new(data)
     end
 
-    # TODO: 通过创建下载任务来进行视频下载
-    def download_video_by_id(id, options)
-      result = []
-      page_list = video_page_list(id)
-      return nil if page_list.nil?
+    # download (or resume) the video as a persisted task
+    def download_video_by_id(id, options = {})
+      task = store.find_open_by_bvid(id) || build_task(id, options)
+      return nil if task.nil?
 
-      video_info = get_video_info(id)
-      return nil if video_info.nil?
-
-      video_qn = options[:qn]
-      page_list = page_slice(page_list, options[:start], options[:end], options[:page])
-      $log.info("wait download size: #{page_list.size}")
-      video_qn = @opt[:video_qn].to_s if video_qn.nil?
-      page_list.each do |page|
-        get_video_url(id, page.cid, video_qn).each do |down_url|
-          order = down_url[:order] < 10 ? "0#{down_url[:order]}" : down_url[:order]
-          file_name = "#{page.part}_#{order}.flv"
-          file_name = "#{options[:rename]}_#{order}.flv" unless options[:rename].nil?
-          url = { 'name': file_name, 'url': down_url[:url].to_s, 'prefix': page.part,
-                  'order': "#{page.page}#{order}", 'id': id.to_s }
-          download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{id}-#{video_info.title}/"
-          result << download_file(url, download_path)
-        end
-        sleep rand(3)
-      end
-      result
+      DownloadTaskRunner.new(task, store, self, workers: options[:workers]).run
     end
 
-    def combine_downloaded_videos(id, urls)
-      return nil if urls.empty?
+    def tasks
+      store.all.sort_by { |task| -task.updated_at }
+    end
 
-      download_path = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{id}/"
-      url_array = []
-      urls.each_with_index do |u, i|
-        same_part = same_part?(u, i)
-        url_array << u[:file_path]
-        combine_media(url_array, "#{download_path}#{u[:prefix]}.flv") unless same_part
+    def find_task(id)
+      store.find(id)
+    end
+
+    def retry_task(id, options = {})
+      task = store.find(id)
+      return nil if task.nil?
+
+      task.segments.each { |segment| segment[:status] = 'pending' if segment[:status] == 'failed' }
+      task.status = 'pending'
+      task.error = ''
+      store.save(task)
+      DownloadTaskRunner.new(task, store, self, workers: options[:workers]).run
+    end
+
+    def cancel_task(id)
+      task = store.find(id)
+      return nil if task.nil?
+      return task if task.done?
+
+      task.status = 'canceling'
+      store.save(task)
+      task
+    end
+
+    def remove_task(id)
+      store.delete(id)
+    end
+
+    # resolve a playable url for one page of the video
+    def play_url(id, options = {})
+      page_list = video_page_list(id)
+      return nil if page_list.nil? || page_list.empty?
+
+      page = (options[:page] || 1).to_i
+      info = page_list[page - 1]
+      return nil if info.nil?
+
+      qn = options[:qn] || @opt[:video_qn].to_s
+      urls = get_video_url(id, info.cid, qn)
+      return nil if urls.nil? || urls.empty?
+
+      { url: urls.first[:url].to_s, title: get_video_info(id)&.title.to_s, part: info.part.to_s, cid: info.cid }
+    end
+
+    # directories under download_dir, biggest first
+    def downloaded_items
+      root = File.expand_path(@opt[:download_dir].to_s, __dir__)
+      return [] unless Dir.exist?(root)
+
+      Dir.children(root).filter_map do |entry|
+        path = File.join(root, entry)
+        next unless File.directory?(path)
+
+        files = Dir.glob(File.join(path, '**', '*')).select { |file| File.file?(file) }
+        id, title = entry.split('-', 2)
+        { id: id.to_s, title: title.to_s, path: path, files: files.size,
+          size: files.sum { |file| File.size(file) } }
+      end.sort_by { |item| -item[:size] }
+    end
+
+    # remove downloaded directories matching id; returns the matched names.
+    # without force nothing is deleted, so callers can show a preview.
+    def remove_downloaded(id, force: false)
+      root = File.expand_path(@opt[:download_dir].to_s, __dir__)
+      return [] unless Dir.exist?(root) && !id.to_s.empty?
+
+      matches = Dir.children(root).select do |entry|
+        File.directory?(File.join(root, entry)) &&
+          (entry == id.to_s || entry.start_with?("#{id}-"))
       end
+      matches.each { |entry| FileUtils.rm_rf(File.join(root, entry)) } if force
+      matches
     end
 
     private
@@ -117,90 +164,37 @@ module Bilibili
       end
     end
 
-    def next?(array, index)
-      !array[index + 1].nil?
-    end
+    def build_task(id, options = {})
+      page_list = video_page_list(id)
+      return nil if page_list.nil? || page_list.empty?
 
-    def same_part?(array, idx)
-      next?(array, idx) && array[idx][:prefix] == array[idx + 1][:prefix]
-    end
+      info = get_video_info(id)
+      return nil if info.nil?
 
-    def download_file(url, dir)
-      file_path = check_path(dir, url[:name])
-      url[:file_path] = file_path
-      $log.info "开始下载视频， 视频地址：#{url[:url]}"
-      headers = generate_headers
-      download_and_check(url[:url], headers, dir, url[:name])
-      url
-    end
-
-    def download_and_check(url, headers, dir, filename, retry_times = 0)
-      $log.debug("retry times: #{retry_times}")
-      file_path = "#{dir}#{filename}"
-      begin
-        download(url, headers['User-Agent'], headers['Referer'], headers['Cookie'], dir, filename)
-        dest_file_exist?(file_path)
-      rescue StandardError
-        $log.error("error: #{$!} at:#{$@}")
-        sleep 3
-        raise 'retry times is 3, you should try it later' if retry_times == 3
-
-        retry_times += 1
-        download_and_check(url, headers, file_path, retry_times)
-      end
-    end
-
-    def check_path(dir, filename)
-      FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
-      "#{dir}#{filename}"
-    end
-
-    def generate_headers
-      headers = BiliHttp.headers
-      {
-        'User-Agent' => headers[:"User-Agent"],
-        'Referer' => headers[:Referer]
-      }
-    end
-
-    def combine_media(files, dest)
-      return if files.size.zero?
-
-      if files.size == 1
-        begin
-          FileUtils.mv(files[0], dest)
-        rescue StandardError
-          $log.error("error: #{$!} at:#{$@}")
+      pages = page_slice(page_list, options[:start], options[:end], options[:page])
+      qn = options[:qn] || @opt[:video_qn].to_s
+      dir = "#{File.expand_path(@opt[:download_dir].to_s, __dir__)}/#{id}-#{safe_name(info.title)}/"
+      segments = pages.flat_map do |page|
+        get_video_url(id, page.cid, qn).to_a.map do |down_url|
+          order = down_url[:order] < 10 ? "0#{down_url[:order]}" : down_url[:order]
+          name = options[:rename].nil? ? "#{page.part}_#{order}.flv" : "#{options[:rename]}_#{order}.flv"
+          { name: name, url: down_url[:url].to_s, prefix: page.part.to_s,
+            order: "#{page.page}#{order}", status: 'pending', attempts: 0,
+            total_size: down_url[:size].to_i }
         end
-        files.clear
-        return
       end
-
-      return if files.select! { |file| File.exist?(file) }.size.zero?
-
-      `ffmpeg -i concat:"#{files.join('|')}" -c copy #{dest}`
-      files.clear
+      task = DownloadTask.new(id: "#{id}-#{Time.now.strftime('%Y%m%d%H%M%S')}", bvid: id,
+                              title: info.title.to_s, qn: qn, dir: dir, segments: segments)
+      store.save(task)
+      task
     end
 
-    def dest_file_exist?(dest)
-      if File.exist?(dest)
-        local = File.new(dest).size
-        raise 'file size is zero' if local.zero?
-
-        true
-      else
-        false
-      end
+    def safe_name(name)
+      name.to_s.gsub(%r{[/\\]}, '_').strip
     end
 
-    def wget_file_size(command)
-      result = `#{command} -o -`
-      hash = {}
-      result.split("\n").filter { |n| n.include?(':') }.each do |line|
-        a = line.split(':')
-        hash[a[0].strip] = a[1].strip
-      end
-      hash['Content-Length'].to_i
+    def store
+      @store ||= TaskStore.new(File.expand_path(@opt[:task_file].to_s, __dir__))
     end
 
     def download(url, user_agent, referer, cookie, dir, filename)
@@ -214,7 +208,7 @@ module Bilibili
         dest:       #{file_path}
       DOWNLOAD
                 )
-      File.write((@opt[:cookie]).to_s, cookie) unless File.exist?((@opt[:cookie]).to_s)
+      File.write(@opt[:cookie].to_s, cookie.to_s) unless File.exist?(@opt[:cookie].to_s)
       if @opt[:enable_aria2]
         aria2_download(url, user_agent, referer, dir, filename)
       else

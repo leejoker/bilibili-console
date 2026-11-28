@@ -76,13 +76,97 @@ class BiliConsole < Thor
   option :page, aliases: :p, desc: 'order one page'
   option :qn, aliases: :q, desc: 'video resolution ratio'
   option :rename, aliases: :r, desc: 'rename the video file name'
-  option :list, aliases: :l, desc: 'list downloaded videos'
+  option :list, aliases: :l, desc: 'list downloaded videos', type: :boolean
+  option :remove, aliases: :R, desc: 'remove downloaded video by bv id', type: :boolean
+  option :yes, aliases: :y, desc: 'confirm removal without asking', type: :boolean
+  option :workers, aliases: :w, desc: 'parallel download workers (default 1)', default: '1'
 
-  def download_video(id)
+  def download_video(id = nil)
+    return list_downloaded if options[:list]
+    return remove_downloaded(id) if options[:remove]
+    raise '缺少 bv 号：bilic down <bvid>，或使用 --list / --remove' if id.nil?
+
     options_dup = options.dup
     options_dup[:start] = 1 if options[:start].nil?
     options_dup[:qn] = '720' if options[:qn].nil?
-    BILI_CONSOLE.download_video(id, options_dup)
+    print_task_summary(BILI_CONSOLE.download_video(id, options_dup))
+  end
+
+  desc 'history', 'show watch history'
+  option :page, aliases: :p, desc: 'page number', default: '1'
+  option :count, aliases: :c, desc: 'items per page', default: '20'
+
+  def history
+    items = BILI_CONSOLE.history(options)
+    if items.empty?
+      puts '没有观看记录，或登录状态已失效（bilic login）'
+      return
+    end
+
+    items.each do |item|
+      puts <<~HISTORY
+        bv:        #{item.bvid}
+        title:     #{item.title}
+        author:    #{item.author_name}
+        progress:  #{item.progress}/#{item.duration} (#{item.progress_percent}%)
+        watched:   #{item.viewed_at}
+        -----------------------------------------------------------------------
+      HISTORY
+    end
+  end
+
+  desc 'play', 'play a video with the local player'
+  option :page, aliases: :p, desc: 'page number', default: '1'
+  option :qn, aliases: :q, desc: 'video resolution ratio'
+  option :player, desc: 'player command (default: mpv -> vlc -> xdg-open)'
+  option :no_launch, desc: 'print the play url without launching', type: :boolean
+
+  def play(id)
+    return puts('usage: bilic play <bvid> [--page N] [--qn 720]') if id.nil?
+
+    info = BILI_CONSOLE.play(id, options)
+    return puts('未找到可播放的分P，请检查 bv 号') if info.nil?
+
+    puts "url:   #{info[:url]}"
+    puts "title: #{info[:title]}"
+    puts "part:  #{info[:part]}"
+    puts '仅输出地址，未启动播放器' if options[:no_launch]
+  end
+
+  desc 'saucenao', 'reverse image search with saucenao'
+  option :db, desc: 'saucenao db index', default: '999'
+
+  def saucenao(target)
+    return puts('usage: bilic saucenao <image-url|image-file>') if target.nil?
+
+    results = BILI_CONSOLE.saucenao(target, options)
+    return puts('没有匹配结果') if results.empty?
+
+    results.first(5).each do |result|
+      puts <<~RESULT
+        similarity: #{result.similarity}
+        index:      #{result.index_name}
+        title:      #{result.title}
+        urls:       #{result.urls.join(' ')}
+        -----------------------------------------------------------------------
+      RESULT
+    end
+  end
+
+  desc 'tasks', 'list, inspect, retry, cancel or remove download tasks'
+  option :retry, desc: 'retry failed segments of the task', type: :boolean
+  option :cancel, desc: 'request cancellation of a running task', type: :boolean
+  option :remove, desc: 'delete the task record (downloaded files stay)', type: :boolean
+  option :yes, desc: 'confirm removal without asking', type: :boolean
+  option :workers, aliases: :w, desc: 'parallel download workers (default 1)', default: '1'
+
+  def tasks(id = nil)
+    return list_tasks if id.nil?
+    return retry_task(id) if options[:retry]
+    return cancel_task(id) if options[:cancel]
+    return remove_task(id) if options[:remove]
+
+    show_task(id)
   end
 
   desc 'fav', 'show user fav info'
@@ -167,6 +251,137 @@ class BiliConsole < Thor
           ------------------------------------------------------
         COMMENT
       end
+    end
+  end
+
+  no_commands do
+    def list_downloaded
+      items = BILI_CONSOLE.downloaded_items
+      if items.empty?
+        puts '下载目录为空'
+        return
+      end
+
+      items.each do |item|
+        puts <<~DOWNLOADED
+          bv:    #{item[:id]}
+          title: #{item[:title]}
+          files: #{item[:files]}
+          size:  #{human_size(item[:size])}
+          path:  #{item[:path]}
+          -----------------------------------------------------------------------
+        DOWNLOADED
+      end
+    end
+
+    def remove_downloaded(id)
+      return puts('usage: bilic down <bvid> --remove [--yes]') if id.nil?
+
+      matched = BILI_CONSOLE.remove_downloaded(id, force: options[:yes])
+      if matched.empty?
+        puts "未找到 #{id} 的下载记录"
+      elsif options[:yes]
+        matched.each { |entry| puts "已删除 #{entry}" }
+      else
+        matched.each { |entry| puts "将删除 #{entry}（加 --yes 确认）" }
+      end
+    end
+
+    def list_tasks
+      tasks = BILI_CONSOLE.download_tasks
+      return puts('没有下载任务') if tasks.empty?
+
+      tasks.each { |task| print_task(task) }
+    end
+
+    def show_task(id)
+      task = BILI_CONSOLE.find_download_task(id)
+      return puts("未找到任务 #{id}") if task.nil?
+
+      print_task(task, detail: true)
+    end
+
+    def retry_task(id)
+      task = BILI_CONSOLE.retry_download_task(id, options)
+      return puts("未找到任务 #{id}") if task.nil?
+
+      print_task_summary(task)
+    end
+
+    def cancel_task(id)
+      task = BILI_CONSOLE.cancel_download_task(id)
+      return puts("未找到任务 #{id}") if task.nil?
+      return puts("任务 #{task.id} 已完成，无需取消") if task.done?
+
+      puts "已请求取消 #{task.id}（当前状态 #{task.status}）"
+    end
+
+    def remove_task(id)
+      task = BILI_CONSOLE.remove_download_task(id)
+      return puts("未找到任务 #{id}") if task.nil?
+
+      puts "已删除任务记录 #{task.id}（下载文件保留在 #{task.dir}）"
+    end
+
+    def print_task(task, detail: false)
+      puts <<~TASK
+        id:       #{task.id}
+        bv:       #{task.bvid}
+        title:    #{task.title}
+        status:   #{task.status}
+        progress: #{task.done_count}/#{task.total} (失败 #{task.failed_count}) #{byte_progress(task)}
+        updated:  #{Time.at(task.updated_at).localtime.strftime('%Y-%m-%d %H:%M:%S')}
+        dir:      #{task.dir}
+      TASK
+      return unless detail
+
+      task.segments.each do |segment|
+        state = segment[:status]
+        error = segment[:error].to_s.empty? ? '' : " (#{segment[:error]})"
+        puts "  - #{segment[:name]} [#{state}] #{segment_bytes(task, segment)}#{error}"
+      end
+    end
+
+    def segment_bytes(task, segment)
+      path = File.join(task.dir, segment[:name])
+      current = segment[:status] == 'done' ? segment[:size].to_i : (File.file?(path) ? File.size(path) : 0)
+      total = segment[:total_size].to_i
+      percent = total.positive? ? ((current.to_f / total) * 100).round(1) : nil
+      return "#{human_size(current)}" if total.zero?
+
+      "#{human_size(current)} / #{human_size(total)} (#{percent}%)"
+    end
+
+    def byte_progress(task)
+      return '' if task.total.zero?
+
+      current = task.segments.sum do |segment|
+        path = File.join(task.dir, segment[:name])
+        segment[:status] == 'done' ? segment[:size].to_i : (File.file?(path) ? File.size(path) : 0)
+      end
+      total = task.segments.sum { |segment| segment[:total_size].to_i }
+      return "(#{human_size(current)})" if total.zero?
+
+      "(#{human_size(current)}/#{human_size(total)} #{(current.to_f / total * 100).round(1)}%)"
+    end
+
+    def print_task_summary(task)
+      return if task.nil?
+
+      puts "任务：#{task.id} 状态=#{task.status} 分片=#{task.done_count}/#{task.total} 失败=#{task.failed_count}"
+      puts "下载目录：#{task.dir}"
+      puts '查看任务：bilic tasks；重试失败分片：bilic tasks <id> --retry' if task.failed_count.positive?
+    end
+
+    def human_size(bytes)
+      units = %w[B KB MB GB TB]
+      size = bytes.to_f
+      index = 0
+      while size >= 1024 && index < units.size - 1
+        size /= 1024
+        index += 1
+      end
+      format('%.1f %s', size, units[index])
     end
   end
 

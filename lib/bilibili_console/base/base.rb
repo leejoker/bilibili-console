@@ -46,6 +46,10 @@ module Bilibili
       @client.api_http.cookies = @cookies
     end
 
+    def cookie_string
+      @cookies.map { |key, value| "#{key}=#{value}" }.join('; ')
+    end
+
     def save_cookie
       @client.api_http.cookies = @client.login_http.cookies
       json_str = @client.login_http.cookies.to_json

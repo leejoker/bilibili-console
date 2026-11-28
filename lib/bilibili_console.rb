@@ -2,11 +2,15 @@
 
 require_relative 'bilibili_console/base/base'
 require_relative 'bilibili_console/base/record_base'
+require_relative 'bilibili_console/download_task'
 require_relative 'bilibili_console/fav'
+require_relative 'bilibili_console/history'
 require_relative 'bilibili_console/http/http'
 require_relative 'bilibili_console/util/doctor_utils'
+require_relative 'bilibili_console/local_player'
 require_relative 'bilibili_console/login'
 require_relative 'bilibili_console/manga'
+require_relative 'bilibili_console/saucenao'
 require_relative 'bilibili_console/search'
 require_relative 'bilibili_console/video'
 require_relative 'bilibili_console/video_comment'
@@ -39,8 +43,27 @@ module Bilibili
 
     def download_video(id, options)
       @video = Bilibili::Video.new if @video.nil?
-      urls = @video.download_video_by_id(id, options)
-      @video.combine_downloaded_videos(id, urls)
+      @video.download_video_by_id(id, options)
+    end
+
+    def download_tasks
+      Bilibili::Video.new.tasks
+    end
+
+    def find_download_task(id)
+      Bilibili::Video.new.find_task(id)
+    end
+
+    def retry_download_task(id, options)
+      Bilibili::Video.new.retry_task(id, options)
+    end
+
+    def cancel_download_task(id)
+      Bilibili::Video.new.cancel_task(id)
+    end
+
+    def remove_download_task(id)
+      Bilibili::Video.new.remove_task(id)
     end
 
     def manga_checkin
@@ -67,6 +90,45 @@ module Bilibili
       base = BilibiliBase.new
       Bilibili::Doctor.check_wget unless base.opt[:enable_aria2]
       Bilibili::Doctor.check_aria2 if base.opt[:enable_aria2]
+    end
+
+    def history(options)
+      Bilibili::History.new.list(options)
+    end
+
+    def play(id, options)
+      info = Bilibili::Video.new.play_url(id, options)
+      return nil if info.nil?
+      return info if options[:no_launch]
+
+      Bilibili::LocalPlayer.new(options[:player]).play(info[:url])
+      info
+    end
+
+    def saucenao(target, options)
+      Bilibili::Saucenao.new(config.options[:saucenao_api_key], proxy).search(target, db: options[:db])
+    end
+
+    def downloaded_items
+      Bilibili::Video.new.downloaded_items
+    end
+
+    def remove_downloaded(id, force: false)
+      Bilibili::Video.new.remove_downloaded(id, force: force)
+    end
+
+    private
+
+    def config
+      @config ||= Bilibili::Config.new
+    end
+
+    def proxy
+      opt = config.options
+      return {} if opt[:proxy].nil?
+
+      url, port = opt[:proxy].to_s.split(':', 2)
+      { type: opt[:proxy_type], url: url, port: port }
     end
   end
 end
