@@ -42,7 +42,7 @@ calls.
 | `login` | QR-code login; **blocks** until scanned (`--timeout`, default 180s) | yes |
 | `user` | Account profile (uid/uname/level/coins/moral) | no |
 | `search <keyword>` | Video search; `--page`, `--sort`, `--bv`, `--av`, `--pic` | `--pic` only |
-| `down <id>` | Download by BV/av id; `--start`, `--end`, `--page`, `--qn`, `--rename`, `--list` | yes (except `--list`) |
+| `down <id>` | Download by BV/av id; `--start`, `--end`, `--page`, `--qn`, `--rename`, `--list`, `--remove`, `--workers` | yes (`--list` is read-only) |
 | `fav` | Favourite folders or their media; `--search`, `--fav`, `--page-size`, `--page-num`, `--all` | no |
 | `vc <oid>` | Video comments; `--page`, `--pic` | `--pic` only |
 | `manga` | Manga check-in; `--info` for status only | yes (except `--info`) |

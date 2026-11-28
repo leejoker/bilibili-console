@@ -26,22 +26,29 @@ and what state does it own".
 
 ### 1.3 Command surface (verified with `bilic --help` / `bilic tree`)
 
-`bilic tree` prints the **Ruby method names**, not the CLI names given to
-`desc` — `desc 'down' … def download_video` therefore shows up as
-`download_video`. The harness keeps that mapping explicit
-(`core/parsers.py:CLI_NAME_ALIASES`).
+`bilic tree` prints the CLI names taken from each `desc` (`down`, `play`,
+`fav` …) and `bilic help` prints the same names with their arguments
+(`down BVID`). The harness still keeps the method-name mapping explicit
+(`core/parsers.py:CLI_NAME_ALIASES`) because releases before this one printed
+`download_video`/`fav_info`/`manga_checkin` instead.
 
 | Thor method | CLI name | Options | Mutating | Output |
 |-------------|----------|---------|----------|--------|
+| `config` | `config` | `--json` | no | effective config as `key: value` or JSON |
 | `doctor` | `doctor` | – | no | nothing on Linux (see 1.5) |
-| `download_video` | `down <id>` | `--start`,`--end`,`--page`,`--qn`,`--rename`,`--list` | yes | progress lines |
+| `download_video` | `down <bvid>` | `--start`,`--end`,`--page`,`--qn`,`--rename`,`--list`,`--remove`,`--yes`,`--workers` | yes (`--list` read-only) | task summary or downloaded list |
 | `fav_info` | `fav` | `--search`,`--fav`,`--page-size`,`--page-num`,`--all` | no | `fav_id/fav_name/media count` or `title/intro/bv` blocks |
+| `history` | `history` | `--page`,`--count` | no | `bv/title/author/progress/watched` blocks |
 | `login` | `login` | – | yes (writes cookie, blocks on QR scan) | QR code + URL |
 | `manga_checkin` | `manga` | `--info` | yes unless `--info` | `签到成功!/连续签到天数` |
+| `play` | `play <bvid>` | `--page`,`--qn`,`--player`,`--no-launch` | no (starts a player) | `url/title/part` |
+| `saucenao` | `saucenao <target>` | `--db` | no (needs `saucenao_api_key`) | `similarity/index/title/urls` blocks |
 | `search` | `search <keyword>` | `--page`,`--bv`,`--av`,`--pic`,`--sort` | `--pic` only | `av/bv/title/author/desc/pic/page_size` blocks |
+| `tasks` | `tasks [id]` | `--retry`,`--cancel`,`--remove`,`--yes`,`--workers` | yes | task blocks with segment state |
+| `tree` | `tree` | – | no | ASCII command tree (CLI names) |
 | `user` | `user` | – | no | `uid/uname/level/coins/moral` |
-| `vc` | `vc <oid>` | `--page`,`--pic` | `--pic` only | `sender id/sender name/…/content` blocks |
-| `tree` | `tree` | – | no | ASCII command tree |
+| `vc` | `vc <bvid>` | `--page`,`--pic` | `--pic` only | `sender id/sender name/…/content` blocks |
+| `version` | `version` (`-v`, `--version`) | – | no | `bilic <version>` |
 
 ### 1.4 State owned by the target
 
@@ -60,10 +67,14 @@ The harness treats all of them as **read-only**: it only ever reads
 1. **No `--json`.** Every command prints formatted text, so the harness parses
    it (`core/parsers.py`). Fields that are absent in the text stay absent in the
    JSON — the parser never invents values.
-2. **The exit status is unreliable.** `bin/bilic:7-14` wraps everything in an
-   `at_exit` hook that prints `Error! <Class>: <message>` and then lets the
-   process exit with status 0. The backend therefore classifies the `Error!`
-   line, not just `returncode` (`utils/bilic_backend.py:classify_failure`).
+2. **Two failure shapes, both exit 1.** Argument errors are printed by Thor
+   (`ERROR: "bilic play" was called with no arguments` / the Chinese hint the
+   command raises itself). Runtime exceptions go through the `at_exit` hook in
+   `bin/bilic`, which prints `Error! <Class>: <message>` + `Please check the error
+   log.` Both exit non-zero (`exit_on_failure?` is true) — verified with a dead
+   proxy: `rc=1`, `Error! Errno::ECONNREFUSED: …`. The backend still classifies the
+   `Error!` line rather than trusting `returncode` alone
+   (`utils/bilic_backend.py:classify_failure`).
 3. **bilibili's WAF answers with HTML.** The Ruby client parses responses with
    `JSON.parse` (`http/http.rb:187`), so an HTTP 412 risk-control page becomes
    `JSON::ParserError: unexpected character: '<!DOCTYPE'`. Observed on this
@@ -76,16 +87,22 @@ The harness treats all of them as **read-only**: it only ever reads
    `enable_aria2` is set. So `bilic doctor` prints nothing and exits 0 on Linux.
    The harness reports an empty result as the truth and attaches the real config
    snapshot so the command is still useful.
-5. **`down --list` is declared but unused.** `bin/bilic:79` declares the option;
-   no `options[:list]` read exists anywhere in `lib/`. The harness still passes
-   `--list` through (faithful wrapper), and documents the observed behaviour
-   rather than inventing a listing feature.
+5. **`down --list` reads the download dir, nothing more.** It prints one block per
+   subdirectory of `download_dir` (bv/title/files/size/path) and never touches the
+   network, so the harness treats it as read-only.
 6. **`login` blocks** on a QR scan and writes `~/.bc/cookie.json`. The harness
    never runs it in tests, exposes `--timeout`, and `--dry-run` short-circuits it.
 7. **`search` fans out.** `Search#get_pages` calls `video_page_list` once per
    result (`search.rb:79`), so one harness `search` is ~20 upstream requests.
    That is why the harness keeps a 300 s timeout and why the E2E suite treats a
    single search as the whole network budget.
+8. **`play` needs a Referer.** The CDN URL from `playurl` answers `403` to a plain
+   GET (measured: 471-byte edge error), and `200` once `Referer:
+   https://www.bilibili.com/` is sent. `Bilibili::LocalPlayer` injects that header
+   for mpv (`--http-header-fields=Referer: …`) and vlc (`--http-referrer=…`);
+   anything else (`xdg-open`, a bare player path) only receives the URL and will
+   fail. `--no-launch` exists precisely so a caller can fetch with its own
+   headers.
 
 ### 1.6 Environment facts (verified, this machine)
 
@@ -189,4 +206,3 @@ mutating commands) and every write.
   `session.FALLBACK_QN` (currently `"720"`, matching `bin/bilic:84`) must follow.
 - If a `--json` flag is ever added upstream, replace `core/parsers.py` with the
   native payload and keep the same envelope.
-- If `down --list` is implemented upstream, remove the note in README/§1.5.5.

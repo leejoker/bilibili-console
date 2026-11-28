@@ -121,9 +121,10 @@ from this machine, so a successful `search` proves the proxy path works.
 
 ### Introspection + REPL (`TestTreeAndReplE2E`, 4 tests)
 
-- `tree --json` returns the parsed tree: root `bili_console`, all 8 Thor
-  commands, `download_video`/`fav_info`/`manga_checkin` aliased to
-  `down`/`fav`/`manga`
+- `tree --json` returns the parsed tree: root `bili_console`, the 14 commands
+  `tree` itself prints (`help` and `tree` are excluded; `bilic help` lists 16),
+  now including `config`, `version`, `play`, `history`, `tasks`, `saucenao`;
+  `download_video`/`fav_info`/`manga_checkin` aliased to `down`/`fav`/`manga`
 - `tree` (human) exits 0 and mentions the root
 - no arguments enters the REPL and exits cleanly on EOF (exit code 0, banner and
   goodbye present)
@@ -225,8 +226,8 @@ result, or an invocation that did not happen.
 - **Parsers are text-scraping by necessity** - bilic has no `--json`. If the
   target's `puts` blocks change, `core/parsers.py` must change with them; the
   unit tests pin the current format.
-- **`down --list` is a declared-but-unused option upstream** (BILIC.md
-  section 1.5.5); the harness passes it through and invents no behaviour for it.
+- **`down --list`** only lists `download_dir` subdirectories (BILIC.md section
+  1.5.5); it is read-only and safe to run.
 - **`doctor` prints nothing on Linux** and is verified as an empty-but-ok
   payload (BILIC.md section 1.5.4).
 

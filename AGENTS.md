@@ -39,6 +39,8 @@ Ruby gem + Thor CLI (`bilic`) for bilibili, plus an agent harness under `agent-h
 - rubyzip 3.x removed `Zip::InputStream#glob`; iterate `get_next_entry` and match `entry.name`.
 - Ruby 4.0 no longer ships `logger` as a default gem — it is an explicit gemspec dependency.
 - `https_proxy`/`HTTPS_PROXY` env vars are ignored by the current `Net::HTTP.start` call path; only the `proxy` key in `~/.bc/bilic.conf` is honoured.
+- B站 CDN 播放直链必须带 `Referer: https://www.bilibili.com/`，裸 GET 一律 403（实测 471 字节 edge 错误页）。`bilibili_console/local_player.rb` 给 mpv/vlc 注入该头，其它播放器只拿到裸地址。
+- `bilic play` 默认依次找 `mpv` / `vlc` / `xdg-open`，Windows 上没有 `xdg-open`，所以要么装 mpv/vlc，要么在 `~/.bc/bilic.conf` 里配 `"player"`。
 - Downloads are task-based: state lives in `~/.bc/tasks.json` (locked writes, see `download_task.rb`), segments resume with `wget -c`, and multi-segment pages merge with `ffmpeg` — missing ffmpeg raises a clear error instead of silently producing nothing. Task management: `bilic tasks [<id>] [--retry|--cancel|--remove]`.
 
 ## Verify before claiming done

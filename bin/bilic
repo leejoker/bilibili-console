@@ -1,11 +1,14 @@
 #!/usr/bin/env ruby
 
 require 'thor'
+require 'json'
 require_relative '../lib/bilibili_console'
+require_relative '../lib/bilibili_console/version'
 require_relative '../lib/bilibili_console/constants/comment_type'
 
 at_exit do
-  next if $!.nil? || $!.is_a?(SignalException)
+  # Thor 的参数错误已经打印过消息并以 SystemExit 退出，这里不要再叠一层 "Error! SystemExit"
+  next if $!.nil? || $!.is_a?(SignalException) || $!.is_a?(SystemExit)
 
   error = $!
   $log&.error("error: #{error.class}: #{error.message}\n#{Array(error.backtrace).join("\n")}")
@@ -21,19 +24,54 @@ class BiliConsole < Thor
     true
   end
 
-  desc 'doctor', 'check environment and third-party dependencies'
+  map %w[-v --version] => :version
+
+  desc 'version', '查看 bilic 版本'
+
+  def version
+    puts "bilic #{Bilibili::VERSION}"
+  end
+
+  desc 'config', '查看生效配置（默认值叠加 ~/.bc/bilic.conf）'
+  option :json, desc: '以 JSON 输出', type: :boolean
+
+  def config
+    opt = Bilibili::Config.new.options
+    if options[:json]
+      puts JSON.pretty_generate(opt)
+    else
+      opt.each { |key, value| puts "#{key}: #{value}" }
+    end
+  end
+
+  desc 'tree', '以树形打印所有命令'
+
+  def tree
+    puts 'bili_console'
+    # Thor 的 commands 以方法名为键，这里统一取 usage 里的命令名（down/play/tasks…）
+    entries = self.class.commands.values.reject(&:hidden?).filter_map do |cmd|
+      name = cmd.usage.to_s.split(' ').first
+      { name: name, desc: cmd.description.to_s.split("\n").first } unless %w[help tree].include?(name)
+    end
+    entries.sort_by { |entry| entry[:name] }.each_with_index do |entry, index|
+      icon = index == entries.size - 1 ? '└─' : '├─'
+      puts "  #{icon} #{entry[:name]} (#{entry[:desc]})"
+    end
+  end
+
+  desc 'doctor', '检查环境与第三方依赖（aria2c / wget）'
 
   def doctor
     BILI_CONSOLE.doctor
   end
 
-  desc 'login', 'login with qrcode'
+  desc 'login', '扫码登录并保存 cookie'
 
   def login
     puts BILI_CONSOLE.do_login
   end
 
-  desc 'user', 'get user info'
+  desc 'user', '查看当前登录用户信息'
 
   def user
     user = BILI_CONSOLE.login_user_info
@@ -46,11 +84,17 @@ class BiliConsole < Thor
     USER
   end
 
-  desc 'manga', 'checkin bilibili manga'
-  option :info, aliases: :i, desc: 'checkin info'
+  desc 'manga', '哔哩哔哩漫画每日签到'
+  option :info, aliases: :i, desc: '只查看签到状态，不执行签到', type: :boolean
 
   def manga_checkin
-    if options[:info].nil?
+    if options[:info]
+      body = BILI_CONSOLE.manga_checkin_info
+      puts <<~CHECKINFO
+        签到状态: #{body[:status] == 1 ? '已签到' : '未签到'}
+        连续签到天数: #{body[:day_count]}
+      CHECKINFO
+    else
       body = BILI_CONSOLE.manga_checkin
       if body.code.to_i == 0
         body = BILI_CONSOLE.manga_checkin_info
@@ -61,30 +105,24 @@ class BiliConsole < Thor
       else
         puts '您已经签到了'
       end
-    else
-      body = BILI_CONSOLE.manga_checkin_info
-      puts <<~CHECKINFO
-        签到状态: #{body[:status] == 1 ? '已签到' : '未签到'}
-        连续签到天数: #{body[:day_count]}
-      CHECKINFO
     end
   end
 
-  desc 'down', 'download video by bv code'
-  option :start, aliases: :s, desc: 'start page'
-  option :end, aliases: :e, desc: 'end page'
-  option :page, aliases: :p, desc: 'order one page'
-  option :qn, aliases: :q, desc: 'video resolution ratio'
-  option :rename, aliases: :r, desc: 'rename the video file name'
-  option :list, aliases: :l, desc: 'list downloaded videos', type: :boolean
-  option :remove, aliases: :R, desc: 'remove downloaded video by bv id', type: :boolean
-  option :yes, aliases: :y, desc: 'confirm removal without asking', type: :boolean
-  option :workers, aliases: :w, desc: 'parallel download workers (default 1)', default: '1'
+  desc 'down BVID', '按 BV 号下载视频（任务化，支持断点续传）'
+  option :start, aliases: :s, desc: '起始分P（默认 1）'
+  option :end, aliases: :e, desc: '结束分P'
+  option :page, aliases: :p, desc: '只下载指定分P'
+  option :qn, aliases: :q, desc: '清晰度 240/360/480/720/1080（默认 720）'
+  option :rename, aliases: :r, desc: '重命名下载文件前缀'
+  option :list, aliases: :l, desc: '列出已下载的视频', type: :boolean
+  option :remove, aliases: :R, desc: '按 BV 号删除已下载的视频', type: :boolean
+  option :yes, aliases: :y, desc: '删除时不再询问', type: :boolean
+  option :workers, aliases: :w, desc: '并发下载数（默认 1）', default: '1'
 
   def download_video(id = nil)
     return list_downloaded if options[:list]
     return remove_downloaded(id) if options[:remove]
-    raise '缺少 bv 号：bilic down <bvid>，或使用 --list / --remove' if id.nil?
+    raise Thor::RequiredArgumentMissingError, '缺少 BV 号，例如 bilic down BV1xx411c7mD（列已下载用 -l，删除用 -R）' if id.nil?
 
     options_dup = options.dup
     options_dup[:start] = 1 if options[:start].nil?
@@ -92,9 +130,9 @@ class BiliConsole < Thor
     print_task_summary(BILI_CONSOLE.download_video(id, options_dup))
   end
 
-  desc 'history', 'show watch history'
-  option :page, aliases: :p, desc: 'page number', default: '1'
-  option :count, aliases: :c, desc: 'items per page', default: '20'
+  desc 'history', '查看观看历史'
+  option :page, aliases: :p, desc: '页码（默认 1）', default: '1'
+  option :count, aliases: :c, desc: '每页条数（默认 20）', default: '20'
 
   def history
     items = BILI_CONSOLE.history(options)
@@ -115,14 +153,14 @@ class BiliConsole < Thor
     end
   end
 
-  desc 'play', 'play a video with the local player'
-  option :page, aliases: :p, desc: 'page number', default: '1'
-  option :qn, aliases: :q, desc: 'video resolution ratio'
-  option :player, desc: 'player command (default: mpv -> vlc -> xdg-open)'
-  option :no_launch, desc: 'print the play url without launching', type: :boolean
+  desc 'play BVID', '用本地播放器播放在线视频'
+  option :page, aliases: :p, desc: '分P（默认 1）', default: '1'
+  option :qn, aliases: :q, desc: '清晰度 240/360/480/720/1080（默认取配置 video_qn）'
+  option :player, desc: '播放器命令，留空依次尝试 mpv / vlc / xdg-open'
+  option :no_launch, desc: '只打印播放地址，不启动播放器', type: :boolean
 
-  def play(id)
-    return puts('usage: bilic play <bvid> [--page N] [--qn 720]') if id.nil?
+  def play(id = nil)
+    raise Thor::RequiredArgumentMissingError, '缺少 BV 号，例如 bilic play BV1xx411c7mD' if id.nil?
 
     info = BILI_CONSOLE.play(id, options)
     return puts('未找到可播放的分P，请检查 bv 号') if info.nil?
@@ -133,11 +171,11 @@ class BiliConsole < Thor
     puts '仅输出地址，未启动播放器' if options[:no_launch]
   end
 
-  desc 'saucenao', 'reverse image search with saucenao'
-  option :db, desc: 'saucenao db index', default: '999'
+  desc 'saucenao TARGET', '以图搜图（saucenao，需在配置里填 saucenao_api_key）'
+  option :db, desc: 'saucenao 库编号（默认 999）', default: '999'
 
-  def saucenao(target)
-    return puts('usage: bilic saucenao <image-url|image-file>') if target.nil?
+  def saucenao(target = nil)
+    raise Thor::RequiredArgumentMissingError, '缺少图片参数，例如 bilic saucenao https://i0.hdslb.com/xxx.jpg' if target.nil?
 
     results = BILI_CONSOLE.saucenao(target, options)
     return puts('没有匹配结果') if results.empty?
@@ -153,12 +191,12 @@ class BiliConsole < Thor
     end
   end
 
-  desc 'tasks', 'list, inspect, retry, cancel or remove download tasks'
-  option :retry, desc: 'retry failed segments of the task', type: :boolean
-  option :cancel, desc: 'request cancellation of a running task', type: :boolean
-  option :remove, desc: 'delete the task record (downloaded files stay)', type: :boolean
-  option :yes, desc: 'confirm removal without asking', type: :boolean
-  option :workers, aliases: :w, desc: 'parallel download workers (default 1)', default: '1'
+  desc 'tasks [ID]', '查看 / 重试 / 取消 / 删除下载任务'
+  option :retry, desc: '重试任务中失败的分片', type: :boolean
+  option :cancel, desc: '请求取消正在运行的任务', type: :boolean
+  option :remove, desc: '删除任务记录（已下载的文件保留）', type: :boolean
+  option :yes, desc: '删除时不再询问', type: :boolean
+  option :workers, aliases: :w, desc: '并发下载数（默认 1）', default: '1'
 
   def tasks(id = nil)
     return list_tasks if id.nil?
@@ -169,12 +207,12 @@ class BiliConsole < Thor
     show_task(id)
   end
 
-  desc 'fav', 'show user fav info'
-  option :search, aliases: :s, desc: 'search in fav'
-  option :fav, aliases: :m, desc: 'ordered a fav to do some operations'
-  option :page_size, aliases: :p, desc: 'page size'
-  option :page_num, aliases: :n, desc: 'page number'
-  option :all, aliases: :a, desc: 'searching in all fav', type: :boolean
+  desc 'fav', '查看收藏夹列表，或在收藏夹内搜索'
+  option :search, aliases: :s, desc: '在收藏夹内搜索的关键词'
+  option :fav, aliases: :m, desc: '目标收藏夹 id（默认第一个收藏夹）'
+  option :page_size, aliases: :p, desc: '每页条数（默认 10）'
+  option :page_num, aliases: :n, desc: '页码（默认 1）'
+  option :all, aliases: :a, desc: '搜索时包含全部收藏夹', type: :boolean
 
   def fav_info
     if options[:search].nil? && options[:fav].nil?
@@ -185,21 +223,12 @@ class BiliConsole < Thor
     end
   end
 
-  desc 'search', 'Searching by type'
-  option :page, aliases: :p, desc: 'page number'
-  option :bv, desc: 'search by bv id', type: :boolean
-  option :av, desc: 'search by av id', type: :boolean
-  option :pic, desc: 'save video cover with ordered bv', type: :boolean
-  option :sort, desc: <<~SORT
-    默认为totalrank
-    综合排序：totalrank
-    最多点击：click
-    最新发布：pubdate
-    最多弹幕：dm
-    最多收藏：stow
-    最多评论：scores
-    最多喜欢：attention（仅用于专栏）
-  SORT
+  desc 'search KEYWORD', '按关键词搜索视频'
+  option :page, aliases: :p, desc: '页码（默认 1）'
+  option :bv, desc: '按 BV 号精确过滤', type: :boolean
+  option :av, desc: '按 AV 号精确过滤', type: :boolean
+  option :pic, desc: '保存所选 BV 的封面', type: :boolean
+  option :sort, desc: '排序：totalrank(默认) / click / pubdate / dm / stow / scores / attention'
 
   def search(keyword)
     return if keyword.nil?
@@ -222,12 +251,12 @@ class BiliConsole < Thor
     end
   end
 
-  desc 'vc', 'Get video comment'
-  option :page, desc: 'page number'
-  option :pic, desc: 'download pics in comment', type: :boolean
+  desc 'vc BVID', '获取视频评论'
+  option :page, aliases: :p, desc: '页码（默认 1）'
+  option :pic, desc: '下载评论中的图片', type: :boolean
 
   def vc(keyword = nil)
-    return if keyword.nil?
+    raise Thor::RequiredArgumentMissingError, '缺少 BV 号，例如 bilic vc BV1xx411c7mD' if keyword.nil?
 
     options_dup = options.dup
     options_dup[:oid] = keyword
